@@ -27,10 +27,14 @@ if [ ! -f "$HOME/.dotfiles/lib/toolbox/utilities.sh" ]; then
 fi
 # shellcheck source=/dev/null
 . "$DOTFILES/lib/toolbox/utilities.sh"
+CHECK_COLOR_SUPPORT
+: "${green:=}"
+: "${red:=}"
+: "${reset:=}"
 # ============================================================================= #
 #  ➜ ➜ ➜ FUNCTIONS
 # ============================================================================= #
-__procceed() {
+EXECUTE() {
     echo "Proceed? [y/N]"
     read -r response
     case $response in
@@ -59,14 +63,13 @@ IS_GIT() {
     fi
 }
 USAGE() {
-    tput sgr0
     tput bold
     cat <<EOF
     -===============================================================================-
     Usage: ./install [option] or dosync [option] (If installed option: --dosync)
     -===============================================================================-
     Options:
-    -U | --pull       - Update dotfiles repository and submodules 
+    -U | --pull       - Update dotfiles repository and submodules
     -D | --add        - Add all changes
     -C | --commit     - Commit changes
     -P | --push       - Push to repository
@@ -75,27 +78,25 @@ USAGE() {
     --notebook        - Install notebook (nb.sh)
     --fonts           - Install extra fonts
     -===============================================================================-
-    --dosync          - Install dotfiles base and add command 'dosync' 
+    --dosync          - Install dotfiles base and add command 'dosync'
     -===============================================================================-
     -H | --help       - Show this help message
 EOF
+    stput sgr0
 }
 RM_BROKEN_LINKS() {
-    tput setaf 3
     #    if [[ "$VERBOSE" == True ]]; then
-    echo "Removing broken symlinks from $HOME"
+    MSG_INFO "Removing broken symlinks from $HOME"
     #    fi
     find "$HOME" -maxdepth 1 -name ".*" -type l | while read -r f; do if [ ! -e "$f" ]; then rm -f "$f"; fi; done
     #    if [[ "$VERBOSE" == True ]]; then
-    echo "Removing broken symlinks from $HOME/.config"
+    MSG_INFO "Removing broken symlinks from $HOME/.config"
     #    fi
     find "$HOME/.config" -maxdepth 1 -name "*" -type l | while read -r f; do if [ ! -e "$f" ]; then rm -f "$f"; fi; done
-    tput sgr0
 }
 INIT_LOCAL() {
     cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
     IS_GIT
-    # init the main repo
     git submodule $GITSUB update --init --recursive
     cd || return 0
 }
@@ -250,7 +251,7 @@ DO_OPTIONS() {
             USAGE
             exit 0
             ;;
-        *) echo "Unknown action, run: './install -H' for help." ;;
+        *) ERROR "Unknown action, run: './install -H' for help." ;;
         esac
         shift
     done
@@ -261,25 +262,23 @@ DO_SYNC() {
     RM_BROKEN_LINKS
     GET_SYNCFILE
     GET_FILES_LIST
-    tput bold
-    tput setaf 6
     for config_file in $CONFIG_FILES; do
         GET_FILE "$config_file"
         if [[ -e "$CONFIG_DOTFILE" ]] && [[ ! -L "$CONFIG_DOTFILE" ]]; then
             [[ ! -d "$BACKUP_DIR/config" ]] && mkdir -p "$BACKUP_DIR/config"
             CONFIG_BACKUP="$BACKUP_DIR/config/$(basename "$config_file")"
-            echo "$CONFIG_DOTFILE already exists, backing up -> $CONFIG_BACKUP"
+            MSG_INFO "$CONFIG_DOTFILE already exists, backing up -> $CONFIG_BACKUP"
             cp -r "$CONFIG_DOTFILE" "$CONFIG_BACKUP"
             rm -rf "$CONFIG_DOTFILE"
             ln -s "$CONFIG_DOTSRC" "$CONFIG_DOTFILE"
-            echo "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
+            MSG_OK "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
         elif [[ -e "$CONFIG_DOTFILE" ]]; then
             rm -f "$CONFIG_DOTFILE"
             ln -s "$CONFIG_DOTSRC" "$CONFIG_DOTFILE"
-            echo "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
+            MSG_OK "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
         else
             ln -s "$CONFIG_DOTSRC" "$CONFIG_DOTFILE"
-            echo "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
+            MSG_OK "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
         fi
     done
     for file in $SRCFILES; do
@@ -287,30 +286,28 @@ DO_SYNC() {
         if [[ -e "$DOTFILE" ]] && [[ ! -L "$DOTFILE" ]]; then
             [[ ! -d "$BACKUP_DIR" ]] && mkdir -p "$BACKUP_DIR"
             BACKUP="$BACKUP_DIR/$(basename "$file")"
-            echo "$DOTFILE already exists, backing up -> $BACKUP"
+            MSG_INFO "$DOTFILE already exists, backing up -> $BACKUP"
             cp -r "$DOTFILE" "$BACKUP"
             rm -rf "$DOTFILE"
             ln -s "$DOTSRC" "$DOTFILE"
-            echo "Symlinked: $DOTSRC -> $DOTFILE"
+            MSG_OK "Symlinked: $DOTSRC -> $DOTFILE"
         elif [[ -e "$DOTFILE" ]]; then
             rm -f "$DOTFILE"
             ln -s "$DOTSRC" "$DOTFILE"
-            echo "Symlinked: $DOTSRC -> $DOTFILE"
+            MSG_OK "Symlinked: $DOTSRC -> $DOTFILE"
         else
             ln -s "$DOTSRC" "$DOTFILE"
-            echo "Symlinked: $DOTSRC -> $DOTFILE"
+            MSG_OK "Symlinked: $DOTSRC -> $DOTFILE"
         fi
+        $reset
     done
-    tput sgr0
 }
 DO_ACTION() {
-    tput bold
-    tput setaf 2
     case $ACTION in
     sync)
         if DO_SYNC; then
-            SUCCESS
-            FINISHED "Sync completed"
+            SUCCESS "Success"
+            FINISHED "Symlinks completed"
         else
             ERROR "Sync failed"
         fi
@@ -318,24 +315,19 @@ DO_ACTION() {
     install)
         export PATH="$PATH:$DOTFILES_BIN"
         if DO_SYNC; then
-            SUCCESS
-            exec '/bin/zsh'
+            SUCCESS "Success"
         else
             ERROR "Install failed"
         fi
         ;;
     esac
-    tput sgr0
 }
 MAIN() {
+    CHECK_COLOR_SUPPORT
     NO_ROOT
-    tput setaf 5
-    echo "DoSync Version: $DOSYNC_VERSION"
-    tput bold
-    tput setaf 4
+    TITLE "DoSync Version: $DOSYNC_VERSION"
     DO_OPTIONS "${@}"
     exit 0
-    tput sgr0
 }
 while true; do
     MAIN "${@}"

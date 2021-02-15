@@ -26,9 +26,11 @@ for i in "$DOTFILES/bin" \
     "$HOME/.yarn/bin" \
     "$HOME/.cabal/bin" \
     "$HOME/.config/composer/vendor/bin" \
+    "/home/linuxbrew/.linuxbrew/bin/" \
     "$HOME/.composer/vendor/bin" \
     "$HOME/.luarocks/bin" \
     "$HOME/.ruby/gems/bin" \
+    "/usr/sbin/" \
     "$HOME/.bin"; do
     if [ -d "$i" ]; then
         case :$PATH: in

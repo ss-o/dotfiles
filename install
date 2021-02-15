@@ -10,10 +10,8 @@ if [ -z "$TERM" ]; then
     TERM='xterm-256color'
 fi
 INSTALL() {
-    tput setaf 4
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
     exit 0
-    tput sgr0
 }
 while true; do
     INSTALL "${@}"

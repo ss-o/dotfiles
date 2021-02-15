@@ -1,8 +1,0 @@
-sso-load() {
-    for sso_load in "$HOME/.dotfiles/**/.load/*"; do
-        if [ -r "$sso_load" ]; then
-            source "$sso_load" || return 0
-        fi
-    done
-    unset sso_load
-}

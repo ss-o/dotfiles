@@ -1,0 +1,1 @@
+it gc --aggressive --prune=now

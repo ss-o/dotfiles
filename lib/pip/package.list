@@ -1,1 +1,4 @@
 pip install beets
+pip install -U tqdm
+
+sudo pip3 install asciinema

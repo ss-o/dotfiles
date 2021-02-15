@@ -1,0 +1,7 @@
+sso-load() {
+    for sso_load in "$HOME/.dotfiles/zsh/**/*.load.zsh"; do
+        if [ -r "$sso_load" ]; then
+            source "$sso_load" || echo "load error"
+        fi
+    done
+}
