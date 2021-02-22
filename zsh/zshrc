@@ -4,8 +4,8 @@
 # ============================================================================= #
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-emulate -LR zsh
-setopt extendedglob warncreateglobal typesetsilent noshortloops rcquotes
+#emulate -LR zsh
+#setopt extendedglob warncreateglobal typesetsilent noshortloops rcquotes
 fi; MYPROMPT='1'
 export DOTFILES="$HOME/.dotfiles"
 export ZSH_HOME="$HOME/.zsh"
