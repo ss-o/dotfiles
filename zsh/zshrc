@@ -1,6 +1,11 @@
-#!/usr/bin/env zsh
+# -*- mode: sh; sh-indentation: 4; indent-tabs-mode: nil; sh-basic-offset: 4; -*-
+#============================================================================== #
+# *** ➜ ➜ ➜ # Copyright (c) 2021 Salvydas Lukosius
+# ============================================================================= #
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+emulate -LR zsh
+setopt extendedglob warncreateglobal typesetsilent noshortloops rcquotes
 fi; MYPROMPT='1'
 export DOTFILES="$HOME/.dotfiles"
 export ZSH_HOME="$HOME/.zsh"
@@ -15,7 +20,7 @@ if [[ -f $DIRSTACKFILE ]] && [[ $#dirstack -eq 0 ]]; then
     dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
 fi
 DIRSTACKSIZE=20
-#========================================================================== #
+#============================================================================== #
 # *** ➜ ➜ ➜ ZINIT
 # ============================================================================= #
 if [[ ! -f "$ZINIT_HOME/bin/zinit.zsh" ]]; then
@@ -27,6 +32,7 @@ if [[ ! -f "$ZINIT_HOME/bin/zinit.zsh" ]]; then
 fi; source "$ZINIT_HOME/bin/zinit.zsh"
 (( ${+_comps} )) && _comps[zinit]=_zinit
 autoload -Uz _zinit
+
 module_path+=( "${HOME}/.zinit/bin/zmodules/Src" )
 dotsvar=( gtkrc-2.0 kwinrulesrc '\.\./' \.config/gtk-3\.0/settings\.ini )
 fpath+=( "${ZFUNCTIONS}" )
@@ -168,8 +174,7 @@ as"program" pick"src/batdiff.sh" \
 
 zpack for ls_colors
 zpack for @asciidoctor
-#zinit pack"default" git for pyenv
-#zinit load zdharma/zinit-configs
+
 # ============================================================================= #
 # *** ➜ ➜ ➜ [THEMES]
 # ============================================================================= #

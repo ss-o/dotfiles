@@ -1,0 +1,329 @@
+#!/usr/bin/env bash
+trap '' SIGINT SIGQUIT SIGTERM
+# ============================================================================= #
+#  ➜ ➜ ➜ CONFIG
+# ============================================================================= #
+DOSYNC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# ============================================================================= #
+#  ➜ ➜ ➜ VARIABLES
+# ============================================================================= #
+DOSYNC_VERSION="v0.3"
+DOTFILES="$HOME/.dotfiles"
+DOTFILES_BIN="$DOTFILES/bin"
+SYNCFILE="$DOTFILES/sync.config"
+BACKUP_DIR="$HOME/.backup"
+GITOPT="-q"
+GITSUB="--quiet"
+GITSUBOPT="--quiet"
+INSTALL_FONTS="${INSTALL_FONTS:-no}"
+INSTALL_DOSYNC="${INSTALL_DOSYNC:-no}"
+INSTALL_NOTEBOOK="${INSTALL_NOTEBOOK:-no}"
+NO_TTY="${NOTTY:-no}"
+PIPED="${PIPED:-no}"
+# CHSHZSH="chsh -s $(which zsh)"
+# RELOAD_SHELL="exec $SHELL -l"
+if [ ! -f "$HOME/.dotfiles/lib/toolbox/utilities.sh" ]; then
+    git submodule update --init --recursive "$DOTFILES/lib/toolbox"
+fi
+# shellcheck source=/dev/null
+. "$DOTFILES/lib/toolbox/utilities.sh"
+CHECK_COLOR_SUPPORT
+: "${green:=}"
+: "${red:=}"
+: "${reset:=}"
+# ============================================================================= #
+#  ➜ ➜ ➜ FUNCTIONS
+# ============================================================================= #
+EXECUTE() {
+    echo "Proceed? [y/N]"
+    read -r response
+    case $response in
+    y/Y) return 0 ;;
+    *) exit 1 ;;
+    esac
+}
+PRE_CHECKS() {
+    if [ "$DOTFILES" != "$DOSYNC_DIR" ]; then
+        echo "Dotfiles directory different as expected"
+    fi
+}
+HAS_TERMINAL() {
+    [ -t 0 ]
+}
+IS_TTY() {
+    HAS_TERMINAL
+}
+IS_PIPED() {
+    ! [ -t 1 ]
+}
+IS_GIT() {
+    if [[ ! -d .git ]]; then
+        echo "Not a git repository"
+        exit 1
+    fi
+}
+USAGE() {
+    tput bold
+    cat <<EOF
+    -===============================================================================-
+    Usage: ./install [option] or dosync [option] (If installed option: --dosync)
+    -===============================================================================-
+    Options:
+    -U | --pull       - Update dotfiles repository and submodules
+    -D | --add        - Add all changes
+    -C | --commit     - Commit changes
+    -P | --push       - Push to repository
+    -A | --all        - Add all changes, commit and push to repository
+    --micro           - Install micro editor
+    --notebook        - Install notebook (nb.sh)
+    --fonts           - Install extra fonts
+    -===============================================================================-
+    --dosync          - Install dotfiles base and add command 'dosync'
+    -===============================================================================-
+    -H | --help       - Show this help message
+EOF
+    stput sgr0
+}
+RM_BROKEN_LINKS() {
+    #    if [[ "$VERBOSE" == True ]]; then
+    MSG_INFO "Removing broken symlinks from $HOME"
+    #    fi
+    find "$HOME" -maxdepth 1 -name ".*" -type l | while read -r f; do if [ ! -e "$f" ]; then rm -f "$f"; fi; done
+    #    if [[ "$VERBOSE" == True ]]; then
+    MSG_INFO "Removing broken symlinks from $HOME/.config"
+    #    fi
+    find "$HOME/.config" -maxdepth 1 -name "*" -type l | while read -r f; do if [ ! -e "$f" ]; then rm -f "$f"; fi; done
+}
+INIT_LOCAL() {
+    cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
+    IS_GIT
+    git submodule $GITSUB update --init --recursive
+    cd || return 0
+}
+GET_GIT_ORIGIN() {
+    cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
+    if [[ -d .git ]]; then
+        ORIGIN=$(git config -l | grep remote.origin.url | awk -F'=' '{print $2}')
+    fi
+    cd || return 0
+}
+GIT_PULL() {
+    GET_GIT_ORIGIN
+    cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
+    IS_GIT
+    MSG_INFO "Pulling latest changes from $ORIGIN"
+    git pull $GITOPT
+    MSG_INFO "Pulling latest changes for submodules"
+    # Required if a submodule origin changed
+    git submodule "$GITSUBOPT" sync
+    git submodule "$GITSUBOPT" foreach --recursive git fetch
+    git submodule "$GITSUBOPT" update --init --recursive
+    cd || return 0
+}
+GIT_COMMIT() {
+    GET_GIT_ORIGIN
+    cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
+    MSG_INFO "Committing latest changes to the repository"
+    git commit -a $GITOPT
+    cd || return 0
+}
+GIT_PUSH() {
+    GET_GIT_ORIGIN
+    cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
+    MSG_INFO "Pushing changes upstream to $ORIGIN" &&
+        git push $GITOPT
+    cd || return 0
+}
+GIT_ADD() {
+    cd "$DOTFILES" || ERROR "Failed to enter dotfiles directory"
+    git add .
+    cd || return 0
+}
+GIT_CHECK_ALL() {
+    GET_GIT_ORIGIN
+    GIT_ADD
+    GIT_COMMIT
+    GIT_PUSH
+}
+GET_SYNCFILE() {
+    if [[ ! -s $SYNCFILE ]]; then
+        if [[ -s "$DOTFILES/sync.config" ]]; then
+            SYNCFILE="$DOTFILES/sync.config"
+        else
+            echo "File $DOTFILES/sync.config doesnt exist, exiting"
+            exit 1
+        fi
+    fi
+}
+GET_FILES_LIST() {
+    SRCFILES="$(sed -n '/\[files\]/,/\[endfiles\]/p' "$SYNCFILE" | grep -v '^\[.*files]' | grep -v '^#')"
+    CONFIG_FILES="$(sed -n '/\[configfiles\]/,/\[endconfigfiles\]/p' "$SYNCFILE" | grep -v '^\[.*configfiles]' | grep -v '^#')"
+    if [[ -z "$SRCFILES" ]]; then
+        echo "Specify files to sync in $DOTFILES/sync.config file"
+        exit 1
+    fi
+    if [[ -z "$CONFIG_FILES" ]]; then
+        echo "No files specified to sync from $DOTFILES/config"
+    fi
+}
+GET_FILE() {
+    srcfile="$(echo "$file" | awk -F: '{print $1}')"
+    dstfile="$(echo "$file" | awk -F: '{print $2}')"
+    DOTSRC="$DOTFILES/$srcfile"
+
+    srcconfig="$(echo "$config_file" | awk -F: '{print $1}')"
+    dstconfig="$(echo "$config_file" | awk -F: '{print $2}')"
+    CONFIG_DOTSRC="$DOTFILES/$srcconfig"
+
+    if [[ $dstfile = "" ]]; then
+        dstfile=".$(basename "$srcfile")"
+    fi
+    DOTFILE="$HOME/$dstfile"
+
+    if [[ $dstconfig = "" ]]; then
+        dstconfig="$(basename "$srcconfig")"
+    fi
+    CONFIG_DOTFILE="$HOME/.config/$dstconfig"
+}
+GET_OPTIONS() {
+    if [ "$NO_TTY" = yes ]; then
+        echo "No tty"
+    fi
+    if [ "$INSTALL_FONTS" = yes ]; then
+        builtin cd "$DOTFILES/lib/install" || ERROR
+        ./install-fonts.sh || ERROR "Failed to install"
+    fi
+    if [ "$INSTALL_DOSYNC" = yes ]; then
+        ACTION="install"
+        DO_ACTION
+    fi
+    if [ "$INSTALL_NOTEBOOK" = yes ]; then
+        builtin cd "$DOTFILES/lib/install" || ERROR
+        ./nb.sh || ERROR "Failed to install"
+    fi
+    if [ "$INSTALL_MICRO" = yes ]; then
+        builtin cd "$DOTFILES/lib/install" || ERROR
+        ./micro.sh || ERROR "Failed to install"
+    fi
+}
+DO_OPTIONS() {
+    if HAS_TERMINAL; then
+        export TERM="xterm-256color"
+    fi
+    if ! IS_TTY; then
+        NO_TTY=yes
+    fi
+    if IS_PIPED; then
+        PIPED=yes
+    fi
+    while [ $# = 0 ]; do
+        ACTION='sync'
+        DO_ACTION
+    done
+    while [ $# -gt 0 ]; do
+        case $1 in
+        --unattended) NO_TTY=yes ;;
+        --dosync) INSTALL_DOSYNC=yes ;;
+        --micro) INSTALL_MICRO=yes ;;
+        --fonts) INSTALL_FONTS=yes ;;
+        --notebook) INSTALL_NOTEBOOK=yes ;;
+        -U | --pull)
+            GIT_PULL
+            ;;
+        -D | --add)
+            GIT_ADD
+            ;;
+        -C | --commit)
+            GIT_COMMIT
+            ;;
+        -P | --push)
+            GIT_PUSH
+            ;;
+        -A | --all)
+            GIT_CHECK_ALL
+            ;;
+        -H | --help)
+            USAGE
+            exit 0
+            ;;
+        *) ERROR "Unknown action, run: './install -H' for help." ;;
+        esac
+        shift
+    done
+    GET_OPTIONS "$@"
+    DO_ACTION
+}
+DO_SYNC() {
+    RM_BROKEN_LINKS
+    GET_SYNCFILE
+    GET_FILES_LIST
+    for config_file in $CONFIG_FILES; do
+        GET_FILE "$config_file"
+        if [[ -e "$CONFIG_DOTFILE" ]] && [[ ! -L "$CONFIG_DOTFILE" ]]; then
+            [[ ! -d "$BACKUP_DIR/config" ]] && mkdir -p "$BACKUP_DIR/config"
+            CONFIG_BACKUP="$BACKUP_DIR/config/$(basename "$config_file")"
+            MSG_INFO "$CONFIG_DOTFILE already exists, backing up -> $CONFIG_BACKUP"
+            cp -r "$CONFIG_DOTFILE" "$CONFIG_BACKUP"
+            rm -rf "$CONFIG_DOTFILE"
+            ln -s "$CONFIG_DOTSRC" "$CONFIG_DOTFILE"
+            MSG_OK "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
+        elif [[ -e "$CONFIG_DOTFILE" ]]; then
+            rm -f "$CONFIG_DOTFILE"
+            ln -s "$CONFIG_DOTSRC" "$CONFIG_DOTFILE"
+            MSG_OK "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
+        else
+            ln -s "$CONFIG_DOTSRC" "$CONFIG_DOTFILE"
+            MSG_OK "Symlinked: $CONFIG_DOTSRC -> $CONFIG_DOTFILE"
+        fi
+    done
+    for file in $SRCFILES; do
+        GET_FILE "$file"
+        if [[ -e "$DOTFILE" ]] && [[ ! -L "$DOTFILE" ]]; then
+            [[ ! -d "$BACKUP_DIR" ]] && mkdir -p "$BACKUP_DIR"
+            BACKUP="$BACKUP_DIR/$(basename "$file")"
+            MSG_INFO "$DOTFILE already exists, backing up -> $BACKUP"
+            cp -r "$DOTFILE" "$BACKUP"
+            rm -rf "$DOTFILE"
+            ln -s "$DOTSRC" "$DOTFILE"
+            MSG_OK "Symlinked: $DOTSRC -> $DOTFILE"
+        elif [[ -e "$DOTFILE" ]]; then
+            rm -f "$DOTFILE"
+            ln -s "$DOTSRC" "$DOTFILE"
+            MSG_OK "Symlinked: $DOTSRC -> $DOTFILE"
+        else
+            ln -s "$DOTSRC" "$DOTFILE"
+            MSG_OK "Symlinked: $DOTSRC -> $DOTFILE"
+        fi
+        $reset
+    done
+}
+DO_ACTION() {
+    case $ACTION in
+    sync)
+        if DO_SYNC; then
+            SUCCESS "Synchronised"
+        else
+            ERROR "Sync failed"
+        fi
+        ;;
+    install)
+        export PATH="$PATH:$DOTFILES_BIN"
+        if DO_SYNC; then
+            SUCCESS "Installed"
+        else
+            ERROR "Install failed"
+        fi
+        ;;
+    esac
+    exit 0
+}
+MAIN() {
+    CHECK_COLOR_SUPPORT
+    NO_ROOT
+    TITLE "DoSync Version: $DOSYNC_VERSION"
+    DO_OPTIONS "${@}"
+    exit 0
+}
+while true; do
+    MAIN "${@}"
+done
