@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # shellcheck source=/dev/null
-. "$HOME/.dotfiles/lib/.utils/utilities.sh"
+. "$HOME/.dotfiles/lib/toolbox/utilities.sh"
 
 echo "Your choice?"
 SHOW_OPTIONS() {
@@ -60,11 +60,11 @@ CHECK_FONT_DIR() {
     if ! [[ "$OSTYPE" == "darwin"* ]]; then
         fc-cache -f -v
     fi
-    builtin cd "$HOME/.dotfiles/lib/.tmp" || ERROR
+    builtin cd "/tmp" || ERROR
 }
 
 DO_ALL() {
-    git clone https://github.com/ryanoasis/nerd-fonts.git "$HOME/.dotfiles/lib/.tmp/nerd-fonts"
+    git clone https://github.com/ryanoasis/nerd-fonts.git "/tmp/nerd-fonts"
     cd nerd-fonts && ./install.sh
     builtin cd .. || ERROR
 }

@@ -1,8 +1,0 @@
-sso-set() {
-    for sso_set in "$HOME/.dotfiles/**/.set/*"; do
-        if [ -r "$sso_set" ]; then
-            source "$sso_set" || return 0
-        fi
-    done
-    unset sso_set
-}

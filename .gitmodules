@@ -1,3 +1,4 @@
 [submodule "lib/toolbox"]
 	path = lib/toolbox
 	url = https://github.com/ss-o/toolbox.git
+    branch = dotfiles

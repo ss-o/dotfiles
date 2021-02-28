@@ -1,0 +1,5 @@
+{
+  "taskbookDirectory": "~/.dotfiles",
+  "displayCompleteTasks": true,
+  "displayProgressOverview": true
+}
