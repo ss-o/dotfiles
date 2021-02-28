@@ -71,10 +71,14 @@ zinit light-mode for \
 # *** ➜ ➜ ➜ OH-MY-ZSH
 # ============================================================================= #
 #emulate -LR zsh 
-setopt promptsubst
-
 zt 0a light-mode for \
         OMZ::lib/git.zsh \
+        OMZP::git
+zinit cdclear -q
+
+setopt promptsubst
+zinit snippet OMZT::robbyrussell
+zt 0a light-mode for \
         OMZ::lib/bzr.zsh \
         OMZ::lib/cli.zsh \
         OMZ::plugins/git/git.plugin.zsh \
@@ -87,17 +91,23 @@ zt 0a light-mode for \
         OMZ::lib/spectrum.zsh \
         OMZ::lib/nvm.zsh \
         OMZ::lib/theme-and-appearance.zsh \
+        OMZ::lib/prompt_info_functions.zsh \
         OMZ::lib/key-bindings.zsh
 
 zt 0a light-mode for \
         OMZ::plugins/systemd/systemd.plugin.zsh \
+        OMZ::plugins/git-extras/git-extras.plugin.zsh \
         OMZ::plugins/sudo/sudo.plugin.zsh \
         OMZ::plugins/extract/extract.plugin.zsh \
         OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh \
     atload'zstyle ":completion:*" special-dirs false' \
         OMZL::completion.zsh \
     atload"zpcompinit" as"completion" \
-        OMZ::plugins/docker/_docker
+        OMZ::plugins/docker/_docker \
+        OMZ::plugins/nvm/nvm.plugin.zsh \
+    atload"zpcompinit" as"completion" \
+        OMZ::plugins/nvm/_nvm \
+        OMZ::plugins/git-prompt/git-prompt.plugin.zsh 
 
 if_cmd 'npm' && zsnippet OMZ::plugins/npm/npm.plugin.zsh 
 if_cmd 'pip' && zsnippet OMZ::plugins/pip/pip.plugin.zsh 
@@ -135,7 +145,8 @@ zt 0b light-mode for \
         MichaelAquilina/zsh-you-should-use \
         RobSis/zsh-reentry-hook
 
-#zlight marlonrichert/zsh-autocomplete
+zlight lukechilds/zsh-nvm
+zlight marlonrichert/zsh-autocomplete
 
 zt 0b light-mode for \
 pick'autoenv.zsh' nocompletions \
@@ -149,7 +160,7 @@ as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
     atpull"%atclone" src"zpyenv.zsh" nocompile'!' \
         pyenv/pyenv
 
-zt 0b light-mode for lukechilds/zsh-nvm \
+zt 0b light-mode for \
 from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
     mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
         yarnpkg/yarn \
@@ -181,9 +192,8 @@ zpack for @asciidoctor
 # ============================================================================= #
 # *** ➜ ➜ ➜ [THEMES]
 # ============================================================================= #
-#zinit ice for load'![[ $MYPROMPT = 1 ]]' unload'![[ $MYPROMPT != 1 ]]' \
-#depth='1'; zinit light romkatv/powerlevel10k
-zinit snippet OMZT::robbyrussell
+zinit ice for load'![[ $MYPROMPT = 1 ]]' unload'![[ $MYPROMPT != 1 ]]' \
+depth='1'; zinit light romkatv/powerlevel10k
 
 # Load when MYPROMPT == 2
 zinit ice load'![[ $MYPROMPT = 2 ]]' unload'![[ $MYPROMPT != 2 ]]' \
