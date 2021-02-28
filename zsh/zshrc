@@ -4,10 +4,9 @@
 # ============================================================================= #
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-#emulate -LR zsh
-#setopt extendedglob warncreateglobal typesetsilent noshortloops rcquotes
 fi; MYPROMPT='1'
-export DOTFILES="$HOME/.dotfiles"
+[[ -z "$ZSH" ]] && export ZSH="${${(%):-%x}:a:h}"
+[[ -z "$DOTFILES" ]] && export DOTFILES="$HOME/.dotfiles"
 export ZSH_HOME="$HOME/.zsh"
 export ZINIT_HOME="$HOME/.zinit"
 ZFUNCTIONS="$DOTFILES/zsh/functions"
@@ -32,7 +31,7 @@ if [[ ! -f "$ZINIT_HOME/bin/zinit.zsh" ]]; then
 fi; source "$ZINIT_HOME/bin/zinit.zsh"
 (( ${+_comps} )) && _comps[zinit]=_zinit
 autoload -Uz _zinit
-
+#setopt extendedglob warncreateglobal typesetsilent noshortloops rcquotes
 module_path+=( "${HOME}/.zinit/bin/zmodules/Src" )
 dotsvar=( gtkrc-2.0 kwinrulesrc '\.\./' \.config/gtk-3\.0/settings\.ini )
 fpath+=( "${ZFUNCTIONS}" )
@@ -57,7 +56,7 @@ zmodload zdharma/zui &>/dev/null
         autoload -Uz ${func:t}
     done
 unset func
-autoload -Uz chpwd_recent_dirs add-zsh-hook
+autoload -Uz chpwd_recent_dirs add-zsh-hook dotsvar
 add-zsh-hook chpwd chpwd_recent_dirs
 # ============================================================================= #
 zinit light-mode for \
@@ -71,10 +70,13 @@ zinit light-mode for \
 # ============================================================================= #
 # *** ➜ ➜ ➜ OH-MY-ZSH
 # ============================================================================= #
+#emulate -LR zsh 
 setopt promptsubst
 
 zt 0a light-mode for \
         OMZ::lib/git.zsh \
+        OMZ::lib/bzr.zsh \
+        OMZ::lib/cli.zsh \
         OMZ::plugins/git/git.plugin.zsh \
         OMZ::lib/history.zsh \
         OMZ::lib/clipboard.zsh \
@@ -83,6 +85,7 @@ zt 0a light-mode for \
         OMZ::lib/grep.zsh \
         OMZ::lib/termsupport.zsh \
         OMZ::lib/spectrum.zsh \
+        OMZ::lib/nvm.zsh \
         OMZ::lib/theme-and-appearance.zsh \
         OMZ::lib/key-bindings.zsh
 
@@ -134,18 +137,19 @@ zt 0b light-mode for \
 
 #zlight marlonrichert/zsh-autocomplete
 
-zt 0c light-mode for \
+zt 0b light-mode for \
 pick'autoenv.zsh' nocompletions \
-        Tarrasch/zsh-autoenv \
-as"program" make'!' atclone'./direnv hook zsh > zhook.zsh' \
-    atpull'%atclone' src"zhook.zsh" \
-        direnv/direnv \
+        Tarrasch/zsh-autoenv
+#as"program" make'!' atclone'./direnv hook zsh > zhook.zsh' \
+#    atpull'%atclone' src"zhook.zsh" \
+#        direnv/direnv \
+zt 0b light-mode for \
 as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
     atclone'PYENV_ROOT="$PWD" ./libexec/pyenv init - > zpyenv.zsh' \
     atpull"%atclone" src"zpyenv.zsh" nocompile'!' \
         pyenv/pyenv
 
-zt 0c light-mode for lukechilds/zsh-nvm \
+zt 0b light-mode for lukechilds/zsh-nvm \
 from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
     mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
         yarnpkg/yarn \
@@ -174,12 +178,12 @@ as"program" pick"src/batdiff.sh" \
 
 zpack for ls_colors
 zpack for @asciidoctor
-
 # ============================================================================= #
 # *** ➜ ➜ ➜ [THEMES]
 # ============================================================================= #
-zinit ice for load'![[ $MYPROMPT = 1 ]]' unload'![[ $MYPROMPT != 1 ]]' \
-depth='1'; zinit light romkatv/powerlevel10k
+#zinit ice for load'![[ $MYPROMPT = 1 ]]' unload'![[ $MYPROMPT != 1 ]]' \
+#depth='1'; zinit light romkatv/powerlevel10k
+zinit snippet OMZT::robbyrussell
 
 # Load when MYPROMPT == 2
 zinit ice load'![[ $MYPROMPT = 2 ]]' unload'![[ $MYPROMPT != 2 ]]' \

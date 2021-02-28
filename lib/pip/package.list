@@ -3,3 +3,4 @@ pip install -U tqdm
 pip install asciinema
 pip install spotdl
 pip install youtube-dl
+pip install buku
