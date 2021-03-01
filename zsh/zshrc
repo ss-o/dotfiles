@@ -4,21 +4,12 @@
 # ============================================================================= #
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi; MYPROMPT='1'
+fi;
 [[ -z "$ZSH" ]] && export ZSH="${${(%):-%x}:a:h}"
 [[ -z "$DOTFILES" ]] && export DOTFILES="$HOME/.dotfiles"
 export ZSH_HOME="$HOME/.zsh"
 export ZINIT_HOME="$HOME/.zinit"
 ZFUNCTIONS="$DOTFILES/zsh/functions"
-DIRSTACKFILE="$HOME/.cache/zsh/dirs"
-if [[ ! -a $DIRSTACKFILE ]]; then
-    mkdir -p $DIRSTACKFILE[0,-5]
-    touch $DIRSTACKFILE
-fi
-if [[ -f $DIRSTACKFILE ]] && [[ $#dirstack -eq 0 ]]; then
-    dirstack=( ${(f)"$(< $DIRSTACKFILE)"} )
-fi
-DIRSTACKSIZE=20
 #============================================================================== #
 # *** ➜ ➜ ➜ ZINIT
 # ============================================================================= #
@@ -36,11 +27,6 @@ module_path+=( "${HOME}/.zinit/bin/zmodules/Src" )
 dotsvar=( gtkrc-2.0 kwinrulesrc '\.\./' \.config/gtk-3\.0/settings\.ini )
 fpath+=( "${ZFUNCTIONS}" )
 # ============================================================================= #
-chpwd() {
-    print -l $PWD ${(u)dirstack} >>$DIRSTACKFILE
-    local d="$(sort -u $DIRSTACKFILE )"
-    echo "$d" > $DIRSTACKFILE
-}
 zt()       { zinit depth'3' lucid ${1/#[0-9][a-c]/wait"${1}"} "${@:2}"; }
 zload()    { zinit load                           "${@}"; }
 zpack()    { zinit pack                           "${@}"; }
@@ -56,8 +42,6 @@ zmodload zdharma/zui &>/dev/null
         autoload -Uz ${func:t}
     done
 unset func
-autoload -Uz chpwd_recent_dirs add-zsh-hook dotsvar
-add-zsh-hook chpwd chpwd_recent_dirs
 # ============================================================================= #
 zinit light-mode for \
         zpm-zsh/ls \
@@ -73,15 +57,15 @@ zinit light-mode for \
 #emulate -LR zsh 
 zt 0a light-mode for \
         OMZ::lib/git.zsh \
-        OMZP::git
-zinit cdclear -q
+        OMZ::plugins/git/git.plugin.zsh \
+        OMZ::plugins/git-prompt/git-prompt.plugin.zsh
+            zinit cdclear -q
+            setopt promptsubst
+#zinit snippet OMZT::robbyrussell
 
-setopt promptsubst
-zinit snippet OMZT::robbyrussell
 zt 0a light-mode for \
         OMZ::lib/bzr.zsh \
         OMZ::lib/cli.zsh \
-        OMZ::plugins/git/git.plugin.zsh \
         OMZ::lib/history.zsh \
         OMZ::lib/clipboard.zsh \
         OMZ::lib/directories.zsh \
@@ -100,15 +84,13 @@ zt 0a light-mode for \
         OMZ::plugins/sudo/sudo.plugin.zsh \
         OMZ::plugins/extract/extract.plugin.zsh \
         OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh \
-    atload'zstyle ":completion:*" special-dirs false' \
+            atload'zstyle ":completion:*" special-dirs false' \
         OMZL::completion.zsh \
-    atload"zpcompinit" as"completion" \
+            atload"zpcompinit" as"completion" \
         OMZ::plugins/docker/_docker \
         OMZ::plugins/nvm/nvm.plugin.zsh \
-    atload"zpcompinit" as"completion" \
-        OMZ::plugins/nvm/_nvm \
-        OMZ::plugins/git-prompt/git-prompt.plugin.zsh 
-
+            atload"zpcompinit" as"completion" \
+        OMZ::plugins/nvm/_nvm
 if_cmd 'npm' && zsnippet OMZ::plugins/npm/npm.plugin.zsh 
 if_cmd 'pip' && zsnippet OMZ::plugins/pip/pip.plugin.zsh 
 if_cmd 'pyenv' && zsnippet OMZ::plugins/pyenv/pyenv.plugin.zsh
@@ -143,10 +125,9 @@ zt 0b light-mode for \
         denysdovhan/gitio-zsh \
         unixorn/git-extra-commands \
         MichaelAquilina/zsh-you-should-use \
-        RobSis/zsh-reentry-hook
-
-zlight lukechilds/zsh-nvm
-zlight marlonrichert/zsh-autocomplete
+        RobSis/zsh-reentry-hook \
+        lukechilds/zsh-nvm
+#zlight marlonrichert/zsh-autocomplete
 
 zt 0b light-mode for \
 pick'autoenv.zsh' nocompletions \
@@ -192,9 +173,7 @@ zpack for @asciidoctor
 # ============================================================================= #
 # *** ➜ ➜ ➜ [THEMES]
 # ============================================================================= #
-zinit ice for load'![[ $MYPROMPT = 1 ]]' unload'![[ $MYPROMPT != 1 ]]' \
-depth='1'; zinit light romkatv/powerlevel10k
-
+zinit ice for depth='1'; zinit light romkatv/powerlevel10k
 # Load when MYPROMPT == 2
 zinit ice load'![[ $MYPROMPT = 2 ]]' unload'![[ $MYPROMPT != 2 ]]' \
     pick"/dev/null" multisrc"{async,pure}.zsh" \
@@ -206,11 +185,7 @@ zinit ice load'![[ $MYPROMPT = 3 ]]' unload'![[ $MYPROMPT != 3 ]]' \
     atload'!geometry::prompt' lucid nocd
 zinit load geometry-zsh/geometry
 # ============================================================================= #
-# *** ➜ ➜ ➜ [LOCAL]
-# ============================================================================= #
 zinit is-snippet for if"[[ -f $HOME/.localrc  ]]" $HOME/.localrc
 # ============================================================================= #
-# *** ➜ ➜ ➜ [END]
-# ============================================================================= #
 unset -f zt zload zpack zlight zsnippet if_cmd
-zinit ice if"[[ $MYPROMPT = 1  ]]"; source "$DOTFILES/zsh/themes/p10k.zsh"
+source "$DOTFILES/zsh/themes/p10k.zsh"

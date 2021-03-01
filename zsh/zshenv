@@ -12,8 +12,7 @@ export GPG_TTY="$(tty)"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:=$HOME/.cache}"
 export GOPATH="$HOME/go"
-
-#export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 
 if [ -z "$DOTFILES" ]; then
     export DOTFILES="$HOME/.dotfiles"
