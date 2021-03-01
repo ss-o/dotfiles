@@ -13,8 +13,8 @@ CHECK_LISTS() {
 [ ! -d "$XDG_CONFIG_HOME" ] && mkdir -p "$XDG_CONFIG_HOME"
 [ -z "$DOTFILES" ] && DOTFILES="$HOME/.dotfiles"
 [ -z "$TERM" ] && TERM='xterm-256color'
-[[ "$(command -v curl)" ]] || echo "Curl - missing" |tee -a log.txt
-[[ "$(command -v python)" ]] || echo "Python - missing" |tee -a log.txt
+[[ "$(command -v curl)" ]] || echo "Curl - missing" && sleep 2
+[[ "$(command -v python)" ]] || echo "Python - missing" && sleep 2
 }
 
 INSTALL() {
