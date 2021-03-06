@@ -9,23 +9,31 @@ fi;
 [[ -z "$DOTFILES" ]] && export DOTFILES="$HOME/.dotfiles"
 export ZSH_HOME="$HOME/.zsh"
 export ZINIT_HOME="$HOME/.zinit"
-ZFUNCTIONS="$DOTFILES/zsh/functions"
+# Fancy auto-complete
+autoload -Uz compinit
+zstyle ':completion:*' menu select=0
+zmodload zsh/complist
+zstyle ':completion:*' format '>>> %d'
+compinit
+_comp_options+=(globdots) # hidden files are included
 #============================================================================== #
 # *** ➜ ➜ ➜ ZINIT
 # ============================================================================= #
 if [[ ! -f "$ZINIT_HOME/bin/zinit.zsh" ]]; then
-    print -P "%F{33}▓▒░ %F{220}Installing %F{33}DHARMA%F{220} Initiative Plugin Manager (%F{33}zdharma/zinit%F{220})…%f"
+    print -P "%F{33}▓▒░ %F{160}Installing %F{33}DHARMA%F{160} Initiative Plugin Manager (%F{33}zdharma/zinit%F{160})…%f"
     command mkdir -p "$HOME/.zinit" && command chmod g-rwX "$HOME/.zinit"
     command git clone --quiet https://github.com/zdharma/zinit "$HOME/.zinit/bin" && \
         print -P "%F{33}▓▒░ %F{34}Installation successful.%f%b" || \
         print -P "%F{160}▓▒░ The clone has failed.%f%b"
 fi; source "$ZINIT_HOME/bin/zinit.zsh"
 (( ${+_comps} )) && _comps[zinit]=_zinit
-autoload -Uz _zinit
-#setopt extendedglob warncreateglobal typesetsilent noshortloops rcquotes
+autoload -Uz _zinit 
+autoload -U colors && colors
 module_path+=( "${HOME}/.zinit/bin/zmodules/Src" )
-dotsvar=( gtkrc-2.0 kwinrulesrc '\.\./' \.config/gtk-3\.0/settings\.ini )
+ZFUNCTIONS="${DOTFILES}/zsh/functions"
 fpath+=( "${ZFUNCTIONS}" )
+# ============================================================================= #
+
 # ============================================================================= #
 zt()       { zinit depth'3' lucid ${1/#[0-9][a-c]/wait"${1}"} "${@:2}"; }
 zload()    { zinit load                           "${@}"; }
@@ -46,6 +54,11 @@ unset func
 zinit light-mode for \
         zpm-zsh/ls \
         zpm-zsh/material-colors \
+        mafredri/zsh-async \
+        denysdovhan/gitio-zsh \
+        unixorn/git-extra-commands \
+        MichaelAquilina/zsh-you-should-use \
+        RobSis/zsh-reentry-hook \
         zinit-zsh/z-a-patch-dl \
         zinit-zsh/z-a-as-monitor \
         zinit-zsh/z-a-bin-gem-node \
@@ -73,7 +86,11 @@ zt 0a light-mode for \
         OMZ::lib/grep.zsh \
         OMZ::lib/termsupport.zsh \
         OMZ::lib/spectrum.zsh \
+        lukechilds/zsh-nvm \
         OMZ::lib/nvm.zsh \
+        OMZ::plugins/nvm/nvm.plugin.zsh \
+            atload"zpcompinit" as"completion" \
+        OMZ::plugins/nvm/_nvm \
         OMZ::lib/theme-and-appearance.zsh \
         OMZ::lib/prompt_info_functions.zsh \
         OMZ::lib/key-bindings.zsh
@@ -85,18 +102,17 @@ zt 0a light-mode for \
         OMZ::plugins/extract/extract.plugin.zsh \
         OMZ::plugins/gpg-agent/gpg-agent.plugin.zsh \
             atload'zstyle ":completion:*" special-dirs false' \
-        OMZL::completion.zsh \
+        OMZ::lib/completion.zsh \
             atload"zpcompinit" as"completion" \
-        OMZ::plugins/docker/_docker \
-        OMZ::plugins/nvm/nvm.plugin.zsh \
-            atload"zpcompinit" as"completion" \
-        OMZ::plugins/nvm/_nvm
+        OMZ::plugins/docker/_docker
+
 if_cmd 'npm' && zsnippet OMZ::plugins/npm/npm.plugin.zsh 
 if_cmd 'pip' && zsnippet OMZ::plugins/pip/pip.plugin.zsh 
 if_cmd 'pyenv' && zsnippet OMZ::plugins/pyenv/pyenv.plugin.zsh
 if_cmd 'thefuck' && zsnippet OMZ::plugins/thefuck/thefuck.plugin.zsh
 # ============================================================================= #
 # Additional completion definitions
+#zlight marlonrichert/zsh-autocomplete
 zt 0a light-mode for \
     blockf atload"zpcompinit" as"completion" \
         lukechilds/zsh-better-npm-completion \
@@ -120,18 +136,9 @@ zt 0a light-mode for \
     atinit"ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20" atload"_zsh_autosuggest_start" \
         zsh-users/zsh-autosuggestions
 # ============================================================================= #
-zt 0b light-mode for \
-        mafredri/zsh-async \
-        denysdovhan/gitio-zsh \
-        unixorn/git-extra-commands \
-        MichaelAquilina/zsh-you-should-use \
-        RobSis/zsh-reentry-hook \
-        lukechilds/zsh-nvm
-#zlight marlonrichert/zsh-autocomplete
-
-zt 0b light-mode for \
-pick'autoenv.zsh' nocompletions \
-        Tarrasch/zsh-autoenv
+#zt 0b light-mode for \
+#pick'autoenv.zsh' nocompletions \
+#        Tarrasch/zsh-autoenv
 #as"program" make'!' atclone'./direnv hook zsh > zhook.zsh' \
 #    atpull'%atclone' src"zhook.zsh" \
 #        direnv/direnv \
@@ -145,14 +152,10 @@ zt 0b light-mode for \
 from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
     mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
         yarnpkg/yarn \
-from"gh-r" as"program" mv"docker* -> docker-compose" bpick"*linux*" \
-        docker/compose \
-from"gh-r" as"program" mv"micro* -> micro" bpick"*linux64*" atpull'%atclone' \
-        zyedidia/micro \
-from"gh-r" as"program" \
-        junegunn/fzf-bin
+from"gh-r" as"program" mv"docker* -> docker-compose" docker/compose \
+from"gh-r" as"program" junegunn/fzf-bin
 
-zt 0c light-mode for \
+zt 0b light-mode for \
 from"gh-r" atclone'./just --completions zsh > _just' atpull'%atclone' \
         casey/just \
 from"gh-r" as"program" mv"bat* -> bat" pick"bat/bat" atload"alias cat=bat" \
@@ -171,21 +174,9 @@ as"program" pick"src/batdiff.sh" \
 zpack for ls_colors
 zpack for @asciidoctor
 # ============================================================================= #
-# *** ➜ ➜ ➜ [THEMES]
-# ============================================================================= #
 zinit ice for depth='1'; zinit light romkatv/powerlevel10k
-# Load when MYPROMPT == 2
-zinit ice load'![[ $MYPROMPT = 2 ]]' unload'![[ $MYPROMPT != 2 ]]' \
-    pick"/dev/null" multisrc"{async,pure}.zsh" \
-    atload'!prompt_pure_precmd' lucid nocd
-zinit load sindresorhus/pure
-
-# Load when MYPROMPT == 3
-zinit ice load'![[ $MYPROMPT = 3 ]]' unload'![[ $MYPROMPT != 3 ]]' \
-    atload'!geometry::prompt' lucid nocd
-zinit load geometry-zsh/geometry
 # ============================================================================= #
 zinit is-snippet for if"[[ -f $HOME/.localrc  ]]" $HOME/.localrc
-# ============================================================================= #
 unset -f zt zload zpack zlight zsnippet if_cmd
 source "$DOTFILES/zsh/themes/p10k.zsh"
+# ============================================================================= #
