@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # shellcheck source=/dev/null
-. "$HOME/.dotfiles/lib/.utils/utilities.sh"
-
+. "$HOME/.dotfiles/lib/toolbox/utilities.sh"
+tput setaf 2
 INSTALL() {
   echo "Installing NoteBook (nb.sh)"
   if CMD npm; then
-    npm install -g nb.sh
+    sudo npm install -g nb.sh
     sudo "$(which nb)" completions install
   elif CMD brew; then
     brew install nb
@@ -15,9 +15,10 @@ INSTALL() {
       sudo nb completions install --download
   fi
 }
-echo "Install requires 'sudo' access, continue?"
+echo "Terminal notebook: requires 'sudo' access, continue?"
 if CONTINUE; then
   INSTALL
 else
   echo "Install cancelled"
 fi
+tput sgr0

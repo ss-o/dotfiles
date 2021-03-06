@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # shellcheck source=/dev/null
-. "$HOME/.dotfiles/lib/.utils/utilities.sh"
-
+. "$HOME/.dotfiles/lib/toolbox/utilities.sh"
+tput setaf 2
 INSTALL_FROM_GIT() {
   git clone https://github.com/zyedidia/micro
   cd micro || ERROR
@@ -17,9 +17,10 @@ INSTALL() {
     INSTALL_FROM_GIT
   fi
 }
-echo "Install requires 'sudo' access, continue?"
+echo "Micro editor: requires 'sudo' access, continue?"
 if CONTINUE; then
   INSTALL
 else
   echo "Install cancelled"
 fi
+tput sgr0
