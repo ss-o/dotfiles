@@ -1,4 +1,6 @@
 pip install beets
 pip install -U tqdm
-
-sudo pip3 install asciinema
+pip install asciinema
+pip install spotdl
+pip install youtube-dl
+pip install buku

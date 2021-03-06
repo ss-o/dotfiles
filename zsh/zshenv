@@ -12,8 +12,7 @@ export GPG_TTY="$(tty)"
 export XDG_CONFIG_HOME="${HOME}/.config"
 export XDG_CACHE_HOME="${XDG_CACHE_HOME:=$HOME/.cache}"
 export GOPATH="$HOME/go"
-
-#export XDG_RUNTIME_DIR="/run/user/$(id -u)"
+export XDG_RUNTIME_DIR="/run/user/$(id -u)"
 
 if [ -z "$DOTFILES" ]; then
     export DOTFILES="$HOME/.dotfiles"
@@ -46,10 +45,4 @@ if [ -d "$HOME/.cargo/bin" ]; then
     export PATH="$PATH:$HOME/.cargo/bin"
     alias exa-grid='exa --long --grid'
     alias exa-tree='exa --long --tree'
-fi
-
-# https://github.com/sorin-ionescu/prezto/blob/master/runcoms/zshenv
-# Ensure that a non-login, non-interactive shell has a defined environment.
-if [[ ("$SHLVL" -eq 1 && ! -o LOGIN) && -s "${ZDOTDIR:-$HOME}/.zprofile" ]]; then
-    source "${ZDOTDIR/:-$HOME/}/.zprofile"
 fi
