@@ -97,6 +97,7 @@ zt 0a light-mode for \
 
 zt 0a light-mode for \
         OMZ::plugins/systemd/systemd.plugin.zsh \
+        OMZ::plugins/ansible/ansible.plugin.zsh \
         OMZ::plugins/git-extras/git-extras.plugin.zsh \
         OMZ::plugins/sudo/sudo.plugin.zsh \
         OMZ::plugins/extract/extract.plugin.zsh \
@@ -105,7 +106,10 @@ zt 0a light-mode for \
         OMZ::lib/completion.zsh \
             atload"zpcompinit" as"completion" \
         OMZ::plugins/docker/_docker
-
+if_cmd 'docker-machine' && zt 0a light-mode for \
+        OMZ::plugins/docker-machine/docker-machine.plugin.zsh \
+            atload"zpcompinit" as"completion" OMZ::plugins/docker-machine/_docker-machine
+if_cmd 'doctl' && zsnippet OMZ::plugins/doctl/doctl.plugin.zsh
 if_cmd 'npm' && zsnippet OMZ::plugins/npm/npm.plugin.zsh 
 if_cmd 'pip' && zsnippet OMZ::plugins/pip/pip.plugin.zsh 
 if_cmd 'pyenv' && zsnippet OMZ::plugins/pyenv/pyenv.plugin.zsh
