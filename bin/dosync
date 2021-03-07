@@ -7,7 +7,7 @@ DOSYNC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # ============================================================================= #
 #  ➜ ➜ ➜ VARIABLES
 # ============================================================================= #
-DOSYNC_VERSION="v0.3"
+DOSYNC_VERSION="v0.4"
 DOTFILES="$HOME/.dotfiles"
 DOTFILES_BIN="$DOTFILES/bin"
 SYNCFILE="$DOTFILES/sync.config"
@@ -27,10 +27,6 @@ if [ ! -f "$HOME/.dotfiles/lib/toolbox/utilities.sh" ]; then
 fi
 # shellcheck source=/dev/null
 . "$DOTFILES/lib/toolbox/utilities.sh"
-CHECK_COLOR_SUPPORT
-: "${green:=}"
-: "${red:=}"
-: "${reset:=}"
 # ============================================================================= #
 #  ➜ ➜ ➜ FUNCTIONS
 # ============================================================================= #
@@ -82,7 +78,7 @@ USAGE() {
     -===============================================================================-
     -H | --help       - Show this help message
 EOF
-    stput sgr0
+    put sgr0
 }
 RM_BROKEN_LINKS() {
     #    if [[ "$VERBOSE" == True ]]; then
@@ -318,7 +314,6 @@ DO_ACTION() {
     exit 0
 }
 MAIN() {
-    CHECK_COLOR_SUPPORT
     NO_ROOT
     TITLE "DoSync Version: $DOSYNC_VERSION"
     DO_OPTIONS "${@}"
