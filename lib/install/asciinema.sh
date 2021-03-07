@@ -34,6 +34,7 @@ INSTALL() {
 git clone https://github.com/asciinema/asciinema.git
 cd asciinema
 python3 -m asciinema --version || ERROR
+rm -rf asciinema 
 SUCCESS
 }
 
