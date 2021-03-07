@@ -153,6 +153,7 @@ as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
         pyenv/pyenv
 
 zt 0b light-mode for \
+urbainvaes/fzf-marks \
 from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
     mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
         yarnpkg/yarn \
