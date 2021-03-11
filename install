@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# ============================================================================= #
+# Copyright (c) 2021 Salvydas Lukosius
+# ============================================================================= #
 trap '' SIGINT SIGQUIT SIGTERM
 # ============================================================================= #
 #  ➜ ➜ ➜ INSTALL
@@ -56,14 +59,10 @@ INTERACTIVE() {
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
 }
 MAIN() {
-    #while [ "$#" -gt 0 ]; do
         case "$1" in
         --interactive) INTERACTIVE ;;
         *) INSTALL ;;
         esac
-        shift
-    #done
-
 }
 
 while true; do
