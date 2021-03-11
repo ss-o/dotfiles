@@ -134,8 +134,9 @@ zt 0b light-mode for \
     from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
         mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
             yarnpkg/yarn \
-    from"gh-r" as"program" mv"docker* -> docker-compose" docker/compose \
     from"gh-r" as"program" junegunn/fzf-bin
+
+#    from"gh-r" as"program" mv"docker* -> docker-compose" docker/compose 
 
 zt 0b light-mode for \
     from"gh-r" atclone'./just --completions zsh > _just' atpull'%atclone' \
