@@ -1,9 +1,18 @@
 #!/usr/bin/env bash
+# ============================================================================= #
+# Copyright (c) 2021 Salvydas Lukosius
+# ============================================================================= #
 trap '' SIGINT SIGQUIT SIGTERM
 # ============================================================================= #
 #  ➜ ➜ ➜ INSTALL
 # ============================================================================= #
-# VARIABLES
+# TODO: Move variables from 'dosync' file to 'install'.
+# !!! If it's defined in install script, 'dosync' not required environment vars.
+# !!! Separate interactive execution from installation.
+# ============================================================================= #
+[ -z "$DOTFILES" ] && DOTFILES="${HOME}/.dotfiles"
+# shellcheck source=/dev/null
+. "$HOME/.dotfiles/lib/toolbox/utilities.sh"
 # ============================================================================= #
 XDG_CONFIG_HOME="${HOME}/.config"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:=$HOME/.cache}"
@@ -23,15 +32,10 @@ CHECK_LISTS() {
 }
 EXEC_LOG() {
 if [ -s "$LOG_FILE" ]; then
-tput setaf 1
-tput bold
-    echo "Seems dependencies are missing, auto installation not supported yet."
-tput setaf 1
-    echo "Installation may fail, proceed? [y/N]"
-tput setaf 3
+    NSG_INFO "Seems dependencies are missing, auto installation not supported yet."
+    NOTIFY "Installation may fail, proceed? [y/N]"
     cat "$LOG_FILE"
-tput sgr0
-    read -r response
+    read -r response    
     case $response in
     y|Y) rm "$LOG_FILE" && return ;;
     n|N) rm "$LOG_FILE" && exit 0 ;;
@@ -42,28 +46,26 @@ fi
 INSTALL() {
 CHECK_LISTS 
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
-    exit 0
 }
 INTERACTIVE() {
     CHECK_LISTS
     EXEC_LOG
+    tput setaf 2
     "${DOTFILES}/lib/install/install-fonts.sh"
     "${DOTFILES}/lib/install/nb.sh"
-    "${DOTFILES}/lib/install/micro.sh" 
+    "${DOTFILES}/lib/install/micro.sh"
+    "${DOTFILES}/lib/install/asciinema.sh"
+    tput sgr0
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
-    exit 0
 }
 MAIN() {
-        while [ $# -gt 0 ]; do
-        case $1 in
+        case "$1" in
         --interactive) INTERACTIVE ;;
-        *)             INSTALL ;;
+        *) INSTALL ;;
         esac
-        shift
-    done
 }
 
 while true; do
     MAIN "${@}"
+    FINISHED "Successfully installed"
 done
-unset MAIN

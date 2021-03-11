@@ -4,18 +4,10 @@
 # ============================================================================= #
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
     source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
-fi;
-[[ -z "$ZSH" ]] && export ZSH="${${(%):-%x}:a:h}"
+fi
 [[ -z "$DOTFILES" ]] && export DOTFILES="$HOME/.dotfiles"
 export ZSH_HOME="$HOME/.zsh"
 export ZINIT_HOME="$HOME/.zinit"
-# Fancy auto-complete
-autoload -Uz compinit
-zstyle ':completion:*' menu select=0
-zmodload zsh/complist
-zstyle ':completion:*' format '>>> %d'
-compinit
-_comp_options+=(globdots) # hidden files are included
 #============================================================================== #
 # *** ➜ ➜ ➜ ZINIT
 # ============================================================================= #
@@ -28,12 +20,11 @@ if [[ ! -f "$ZINIT_HOME/bin/zinit.zsh" ]]; then
 fi; source "$ZINIT_HOME/bin/zinit.zsh"
 (( ${+_comps} )) && _comps[zinit]=_zinit
 autoload -Uz _zinit 
-autoload -U colors && colors
-module_path+=( "${HOME}/.zinit/bin/zmodules/Src" )
-ZFUNCTIONS="${DOTFILES}/zsh/functions"
-fpath+=( "${ZFUNCTIONS}" )
+fpath+=( "${DOTFILES}/zsh/functions" )
 # ============================================================================= #
-
+    for func in ${DOTFILES}/zsh/functions/*; do
+        autoload -Uz ${func:t}
+    done
 # ============================================================================= #
 zt()       { zinit depth'3' lucid ${1/#[0-9][a-c]/wait"${1}"} "${@:2}"; }
 zload()    { zinit load                           "${@}"; }
@@ -44,39 +35,15 @@ if_cmd()   { command -v "${@}" >/dev/null 2>&1            }
 auto-ls()  { ls; }
 # ============================================================================= #
 [[ ${chpwd_functions[(r)auto-ls]} == auto-ls ]] || chpwd_functions=( auto-ls $chpwd_functions )
-zmodload zdharma/zplugin &>/dev/null
-zmodload zdharma/zui &>/dev/null
-    for func in $ZFUNCTIONS/*; do
-        autoload -Uz ${func:t}
-    done
-unset func
-# ============================================================================= #
-zinit light-mode for \
-        zpm-zsh/ls \
-        zpm-zsh/material-colors \
-        mafredri/zsh-async \
-        denysdovhan/gitio-zsh \
-        unixorn/git-extra-commands \
-        MichaelAquilina/zsh-you-should-use \
-        RobSis/zsh-reentry-hook \
-        zinit-zsh/z-a-patch-dl \
-        zinit-zsh/z-a-as-monitor \
-        zinit-zsh/z-a-bin-gem-node \
-        zinit-zsh/z-a-submods \
-        zinit-zsh/z-a-rust
 # ============================================================================= #
 # *** ➜ ➜ ➜ OH-MY-ZSH
 # ============================================================================= #
-#emulate -LR zsh 
+setopt promptsubst
+
 zt 0a light-mode for \
         OMZ::lib/git.zsh \
         OMZ::plugins/git/git.plugin.zsh \
-        OMZ::plugins/git-prompt/git-prompt.plugin.zsh
-            zinit cdclear -q
-            setopt promptsubst
-#zinit snippet OMZT::robbyrussell
-
-zt 0a light-mode for \
+        OMZ::plugins/git-prompt/git-prompt.plugin.zsh \
         OMZ::lib/bzr.zsh \
         OMZ::lib/cli.zsh \
         OMZ::lib/history.zsh \
@@ -91,6 +58,7 @@ zt 0a light-mode for \
         OMZ::plugins/nvm/nvm.plugin.zsh \
             atload"zpcompinit" as"completion" \
         OMZ::plugins/nvm/_nvm \
+        OMZ::plugins/pyenv/pyenv.plugin.zsh \
         OMZ::lib/theme-and-appearance.zsh \
         OMZ::lib/prompt_info_functions.zsh \
         OMZ::lib/key-bindings.zsh
@@ -112,12 +80,26 @@ if_cmd 'docker-machine' && zt 0a light-mode for \
 if_cmd 'doctl' && zsnippet OMZ::plugins/doctl/doctl.plugin.zsh
 if_cmd 'npm' && zsnippet OMZ::plugins/npm/npm.plugin.zsh 
 if_cmd 'pip' && zsnippet OMZ::plugins/pip/pip.plugin.zsh 
-if_cmd 'pyenv' && zsnippet OMZ::plugins/pyenv/pyenv.plugin.zsh
 if_cmd 'thefuck' && zsnippet OMZ::plugins/thefuck/thefuck.plugin.zsh
+# ============================================================================= #
+zinit light-mode for \
+        zdharma/history-search-multi-word \
+        zpm-zsh/ls \
+        zpm-zsh/material-colors \
+        mafredri/zsh-async \
+        denysdovhan/gitio-zsh \
+        unixorn/git-extra-commands \
+        MichaelAquilina/zsh-you-should-use \
+        RobSis/zsh-reentry-hook \
+        zinit-zsh/z-a-patch-dl \
+        zinit-zsh/z-a-as-monitor \
+        zinit-zsh/z-a-bin-gem-node \
+        zinit-zsh/z-a-submods \
+        zinit-zsh/z-a-rust
 # ============================================================================= #
 # Additional completion definitions
 #zlight marlonrichert/zsh-autocomplete
-zt 0a light-mode for \
+zt 0c light-mode for \
     blockf atload"zpcompinit" as"completion" \
         lukechilds/zsh-better-npm-completion \
     blockf atpull'zinit creinstall -q .' \
@@ -130,11 +112,7 @@ __bind_history_keys() {
     bindkey '^[[A' history-substring-search-up
     bindkey '^[[B' history-substring-search-down
 }
-zt 0a light-mode for \
-    atload'__bind_history_keys' atload'bindkey "${terminfo[kcuu1]}" history-substring-search-up; \
-    bindkey "${terminfo[kcud1]}" history-substring-search-down' \
-        zsh-users/zsh-history-substring-search \
-        zdharma/history-search-multi-word \
+zt 0c light-mode for \
     atinit"ZINIT[COMPINIT_OPTS]='-i' zpcompinit; zpcdreplay" \
         zdharma/fast-syntax-highlighting \
     atinit"ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20" atload"_zsh_autosuggest_start" \
@@ -153,35 +131,44 @@ as'command' pick'bin/pyenv' atinit'export PYENV_ROOT="$PWD"' \
         pyenv/pyenv
 
 zt 0b light-mode for \
+<<<<<<< HEAD
 urbainvaes/fzf-marks \
 from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
     mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
         yarnpkg/yarn \
 from"gh-r" as"program" mv"docker* -> docker-compose" docker/compose \
 from"gh-r" as"program" junegunn/fzf-bin
+=======
+    from'gh-r' as'command' atinit'export PATH="$HOME/.yarn/bin:$PATH"' \
+        mv'yarn* -> yarn' pick"yarn/bin/yarn" bpick'*.tar.gz' \
+            yarnpkg/yarn \
+    from"gh-r" as"program" mv"docker* -> docker-compose" docker/compose \
+    from"gh-r" as"program" junegunn/fzf-bin
+>>>>>>> main
 
 zt 0b light-mode for \
-from"gh-r" atclone'./just --completions zsh > _just' atpull'%atclone' \
+    from"gh-r" atclone'./just --completions zsh > _just' atpull'%atclone' \
         casey/just \
-from"gh-r" as"program" mv"bat* -> bat" pick"bat/bat" atload"alias cat=bat" \
+    from"gh-r" as"program" mv"bat* -> bat" pick"bat/bat" atload"alias cat=bat" \
         sharkdp/bat \
-atclone'mv -f **/*.zsh _bat' atpull'%atclone' \
+    atclone'mv -f **/*.zsh _bat' atpull'%atclone' \
         @sharkdp/bat \
         @sharkdp/hyperfine \
         @sharkdp/fd \
-as"program" pick"src/batgrep.sh" \
-as"program" pick"src/batdiff.sh" \
+    as"program" pick"src/batgrep.sh" \
+    as"program" pick"src/batdiff.sh" \
             'eth-p/bat-extras'
     alias rg=batgrep.sh
     alias bd=batdiff.sh
     alias man=batman.sh
 
-zpack for ls_colors
-zpack for @asciidoctor
+#zpack for ls_colors
+#zpack for @asciidoctor
 # ============================================================================= #
 zinit ice for depth='1'; zinit light romkatv/powerlevel10k
 # ============================================================================= #
 zinit is-snippet for if"[[ -f $HOME/.localrc  ]]" $HOME/.localrc
-unset -f zt zload zpack zlight zsnippet if_cmd
-source "$DOTFILES/zsh/themes/p10k.zsh"
+unset -f func zt zload zpack zlight zsnippet if_cmd
 # ============================================================================= #
+# To customize prompt, run `p10k configure` or edit ~/.dotfiles/zsh/themes/p10k.zsh.
+[[ ! -f ~/.dotfiles/zsh/themes/p10k.zsh ]] || source ~/.dotfiles/zsh/themes/p10k.zsh

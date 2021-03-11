@@ -8,13 +8,7 @@ trap '' SIGINT SIGQUIT SIGTERM
 # shellcheck source=/dev/null
 . "$HOME/.dotfiles/lib/toolbox/utilities.sh"
 
-if ! CMD python3; then
-    MSG_ERR "Python3 is required. Exiting..."
-    sleep 3
-    exit 1
-fi
-
-INFORM_MSG()       { echo -e "Asciinema will be installed"; }
+#INFORM_MSG()       { echo -e ""; }
 #PRE_INSTALL_MSG()  { echo -e ""; }
 #INSTALL_MSG()      { echo -e ""; }
 #POST_INSTALL()     { echo -e ""; }
@@ -22,25 +16,18 @@ INFORM_MSG()       { echo -e "Asciinema will be installed"; }
 
 PRE_INSTALL() {
 # Agree/confirm installation.
-INFORM_MSG
 if CONTINUE; then
-INSTALL
+
 else
-exit 0
+
 fi
 }
 INSTALL() {
-# Execution  
-git clone https://github.com/asciinema/asciinema.git
-cd asciinema
-python3 -m asciinema --version || ERROR
-rm -rf asciinema 
-SUCCESS
+# Execution    
 }
 
 POST_INSTALL() {
 # Complete installation or (if requires) display installation details    
-MSG_INFO "Asciinema documentation: https://asciinema.org/docs/usage"
 }
 
 MAIN() {
@@ -54,3 +41,6 @@ while true; do
     MAIN "${@}" || ERROR "Failed to install"
     FINISHED
 done
+
+
+
