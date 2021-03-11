@@ -37,7 +37,7 @@ if [ "$OS" = Ubuntu ]; then
     libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
 elif [ "$OS" = Arch ]; then
     ADD_KEYSERVERS_PACMAN
-    ARCH_INSTALL base-devel openssl zlib
+    ARCH_INSTALL base-devel openssl zlib ruby python3 ruby
 fi
 }
 INSTALL() {
