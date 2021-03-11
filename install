@@ -59,6 +59,7 @@ DEPENDS_PYENV() {
 INSTALL() {
 CHECK_LISTS 
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
+    exit 0
 }
 INTERACTIVE() {
     CHECK_LISTS
@@ -70,6 +71,7 @@ INTERACTIVE() {
     "${DOTFILES}/lib/install/asciinema.sh"
     tput sgr0
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
+    exit 0
 }
 MAIN() {
 DEPENDS_PYENV
