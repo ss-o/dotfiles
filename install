@@ -35,7 +35,7 @@ DEPENDS_INSTALL() {
 if [ "$OS" = Ubuntu ]; then
     UBUNTU_INSTALL make python3 ruby bzr golang-go build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev \
     libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
-    wget curl apt-transport-https ca-certificates gnupg-agent software-properties-common
+    apt-transport-https ca-certificates gnupg-agent software-properties-common
 elif [ "$OS" = Arch ]; then
     ADD_KEYSERVERS_PACMAN
     ARCH_INSTALL base-devel openssl zlib ruby python3 ruby curl wget bzr
