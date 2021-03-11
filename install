@@ -11,6 +11,9 @@ trap '' SIGINT SIGQUIT SIGTERM
 # !!! Separate interactive execution from installation.
 # ============================================================================= #
 [ -z "$DOTFILES" ] && DOTFILES="${HOME}/.dotfiles"
+if [ ! -f "$HOME/.dotfiles/lib/toolbox/utilities.sh" ]; then
+    git submodule update --init --recursive "$DOTFILES/lib/toolbox"
+fi
 # shellcheck source=/dev/null
 . "$HOME/.dotfiles/lib/toolbox/utilities.sh"
 # ============================================================================= #
