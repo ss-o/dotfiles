@@ -14,6 +14,7 @@ trap '' SIGINT SIGQUIT SIGTERM
 if [ ! -f "$HOME/.dotfiles/lib/toolbox/utilities.sh" ]; then
     git submodule update --init --recursive "$DOTFILES/lib/toolbox"
 fi
+git submodule update --init --recursive
 # shellcheck source=/dev/null
 . "$HOME/.dotfiles/lib/toolbox/utilities.sh"
 # shellcheck source=/dev/null
