@@ -11,54 +11,40 @@ trap '' SIGINT SIGQUIT SIGTERM
 # !!! Separate interactive execution from installation.
 # ============================================================================= #
 [ -z "$DOTFILES" ] && DOTFILES="${HOME}/.dotfiles"
+if [ ! -f "$HOME/.dotfiles/lib/toolbox/utilities.sh" ]; then
+    git submodule update --init --recursive "$DOTFILES/lib/toolbox"
+fi
+git submodule update --init --recursive
 # shellcheck source=/dev/null
 . "$HOME/.dotfiles/lib/toolbox/utilities.sh"
+# shellcheck source=/dev/null
+. "$HOME/.dotfiles/lib/toolbox/installer.sh"
 # ============================================================================= #
 XDG_CONFIG_HOME="${HOME}/.config"
 XDG_CACHE_HOME="${XDG_CACHE_HOME:=$HOME/.cache}"
-LOG_FILE="log.txt"
 # ============================================================================= #
-WARN() { echo "$@" |tee -a "$LOG_FILE"; }
 CHECK_LISTS() {
 [ ! -d "$XDG_CACHE_HOME"  ] && mkdir -p "$XDG_CACHE_HOME"
 [ ! -d "$XDG_CONFIG_HOME" ] && mkdir -p "$XDG_CONFIG_HOME"
 [ -z "$DOTFILES" ] && DOTFILES="$HOME/.dotfiles"
 [ -z "$TERM" ] && TERM='xterm-256color'
-[[ "$(command -v curl)" ]] || WARN "Curl - missing"
-[[ "$(command -v python)" ]] || WARN "Python - missing"
-[[ "$(command -v ruby)" ]] || WARN "Ruby - missing"
-[[ "$(command -v zsh)" ]] || WARN "Zsh - missing"
-[[ "$(command -v go)" ]] || WARN "Go - missing"
 }
-EXEC_LOG() {
-if [ -s "$LOG_FILE" ]; then
-    NSG_INFO "Seems dependencies are missing, auto installation not supported yet."
-    NOTIFY "Installation may fail, proceed? [y/N]"
-    cat "$LOG_FILE"
-    read -r response    
-    case $response in
-    y|Y) rm "$LOG_FILE" && return ;;
-    n|N) rm "$LOG_FILE" && exit 0 ;;
-    *) rm "$LOG_FILE" && exit 0 ;;
-    esac
+DEPENDS_INSTALL() {
+    ADD_KEYSERVERS
+    UPDATE 
+if [ "$OS" = Ubuntu ]; then
+    UBUNTU_INSTALL make python3 ruby bzr golang-go build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev \
+    libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev \
+    apt-transport-https ca-certificates gnupg-agent software-properties-common
+elif [ "$OS" = Arch ]; then
+    ADD_KEYSERVERS_PACMAN
+    ARCH_INSTALL base-devel openssl zlib ruby python3 ruby curl wget bzr
 fi
-}
-DEPENDS_PYENV() {
-    if CMD apt; then
-    sudo apt-get update
-    sudo apt-get install --no-install-recommends make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev \
-    libsqlite3-dev wget curl llvm libncurses5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev
-    fi
-    if CMD pacman; then
-    sudo pacman -S base-devel openssl zlib
-    fi
-    if CMD brew; then
-    brew install bzip2 libffi libxml2 libxmlsec1 openssl readline sqlite xz zlib
-    fi
 }
 INSTALL() {
 CHECK_LISTS 
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
+    exit 0
 }
 INTERACTIVE() {
     CHECK_LISTS
@@ -70,9 +56,10 @@ INTERACTIVE() {
     "${DOTFILES}/lib/install/asciinema.sh"
     tput sgr0
     "${DOTFILES}/bin/dosync" "--dosync" || exit 1
+    exit 0
 }
 MAIN() {
-DEPENDS_PYENV
+DEPENDS_INSTALL
         case "$1" in
         --interactive) INTERACTIVE ;;
         *) INSTALL ;;
