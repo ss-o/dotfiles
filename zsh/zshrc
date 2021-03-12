@@ -133,7 +133,6 @@ zt 0c light-mode for \
     zsh-users/zsh-autosuggestions \
     zdharma/history-search-multi-word \
     Aloxaf/fzf-tab \
-    skywind3000/z.lua \
     wfxr/forgit \
     romkatv/zsh-prompt-benchmark \
     MichaelAquilina/zsh-you-should-use \
