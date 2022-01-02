@@ -1,0 +1,4 @@
+#!/usr/bin/env sh
+
+# Set ZI Loader
+sh -c "$(curl -fsSL https://git.io/get-zi)" -- -a loader
