@@ -16,9 +16,7 @@ Plugins[CODELOAD_REPO_DIR]="${0:h}"
 autoload_func() {
   fpath=("${Plugins[CODELOAD_REPO_DIR]}/functions" "${fpath[@]}")
   autoload -Uz $fpath[1]/*(.:t)
+  ZI[CODELOAD]="${ZI[PLUGINS]}/_local---config" 
   ZState[autoload_func]=1
+  return 0
 }
-
-if [[ "$ZState[autoload_func]" == 1 ]]; then
-  ZI[CODELOAD]="${ZI[PLUGINS]}/_local---config"
-fi
