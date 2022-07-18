@@ -1,0 +1,16 @@
+#autoload
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+palette() {
+  builtin emulate -L zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+
+  local colors n
+
+  for n in {000..255}
+  do
+    colors+=("%F{$n}$n%f")
+  done
+  print -cP $colors
+}

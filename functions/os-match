@@ -1,0 +1,45 @@
+#autoload
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Return first installed util. e.g:: `fpick most less more`.
+
+os-match() {
+  builtin emulate -L zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+
+	local OS="$(command -v uname)"
+	case $("${OS}" | tr '[:upper:]' '[:lower:]') in
+  	android*)
+	  	OS='android'
+	  ;;
+	  darwin*)
+		  OS='darwin'
+		;;
+	  linux*)
+		  OS='linux'
+		;;
+	  freebsd*)
+		  OS='freebsd'
+		;;
+	  netbsd*)
+		  OS='netbsd'
+		;;
+	  openbsd*)
+		  OS='openbsd'
+		;;
+	  sunos*)
+		  OS='solaris'
+		;;
+	  msys* | cygwin* | mingw*)
+		  OS='windows'
+		;;
+  	nt | win*)
+	  	OS='windows'
+		;;
+	  *)
+		  OS='Unknown'
+		;;
+	esac
+  print -Pr "$OS"
+}

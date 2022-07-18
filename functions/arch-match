@@ -1,0 +1,63 @@
+#autoload
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Return first installed util. e.g:: `fpick most less more`.
+
+arch-match() {
+  builtin emulate -L zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+
+	local ARCH="$(uname -m)"
+	case "${ARCH}" in
+	  x86_64 | amd64)
+		  ARCH='amd64'
+		;;
+	  i?86 | x86)
+		  ARCH='386'
+		;;
+	  armv8* | aarch64 | arm64)
+		  ARCH='arm64'
+		;;
+	  armv7*)
+		  ARCH='armv7'
+		;;
+	  armv6*)
+		  ARCH='armv6'
+		;;
+	  arm*)
+		  ARCH='arm'
+		;;
+	  mips64le*)
+		  ARCH='mips64le'
+		;;
+	  mips64*)
+		  ARCH='mips64'
+		;;
+	  mipsle*)
+		  ARCH='mipsle'
+		;;
+	  mips*)
+		  ARCH='mips'
+		;;
+	  ppc64le*)
+		  ARCH='ppc64le'
+		;;
+	  ppc64*)
+		  ARCH='ppc64'
+		;;
+	  ppcle*)
+		  ARCH='ppcle'
+		;;
+	  ppc*)
+		  ARCH='ppc'
+		;;
+	  s390*)
+		  ARCH='s390x'
+		;;
+    *)
+		  ARCH='Unknown'
+		;;
+	esac
+  print -Pr "$ARCH"
+}

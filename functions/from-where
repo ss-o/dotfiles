@@ -1,0 +1,11 @@
+#autoload
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+from-where() {
+  builtin emulate -L zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+
+  echo $^fpath/$_comps[$1](N)
+  whence -v $_comps[$1]
+}

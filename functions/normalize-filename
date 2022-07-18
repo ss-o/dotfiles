@@ -1,0 +1,15 @@
+#autoload
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Return first installed util. e.g:: `fpick most less more`.
+
+normalise-filename() {
+  builtin emulate -L zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+
+  local filename=$1
+  local normalized_name=$(echo $1 | iconv -f utf8 -t ascii//TRANSLIT//IGNORE)
+
+  command mv $filename $normalized_name
+}

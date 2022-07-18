@@ -1,0 +1,18 @@
+#autoload
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Return first installed util. e.g:: `fpick most less more`.
+
+fpick() {
+  builtin emulate -L zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+
+  local cmd
+  for cmd in "$@"; do
+    if type ${cmd} &>/dev/null; then
+      builtin print -Pn ${cmd}
+      break
+    fi
+  done
+}
