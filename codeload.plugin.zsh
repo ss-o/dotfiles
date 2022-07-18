@@ -4,12 +4,13 @@
 # https://z.digitalclouds.dev/community/zsh_plugin_standard#zero-handling
 0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
 0="${${(M)0:#/*}:-$PWD/$0}"
+
 # https://z.digitalclouds.dev/community/zsh_plugin_standard#standard-plugins-hash
 typeset -gA Plugins
+Plugins[CODELOAD_REPO_DIR]="${0:h}"
+
 # https://z.digitalclouds.dev/community/zsh_plugin_standard#preventing-parameter-pollution
 typeset -A ZState
-
-Plugins[MY_PLUGIN_REPO_DIR]="${0:h}"
 
 autoload_func() {
   fpath=("${0:h}/functions" "${fpath[@]}")
