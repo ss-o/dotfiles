@@ -10,4 +10,4 @@ fpath=("${0:h}/functions" "${fpath[@]}")
 autoload -Uz $fpath[1]/*(.:t)
 
 typeset -gA ZI
-ZI[CODELOAD]="${0:h}"
+ZI[CODELOAD]="${ZI[PLUGINS]}/_local---config"
