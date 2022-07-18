@@ -12,7 +12,7 @@ builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc
 # https://z.digitalclouds.dev/community/zsh_plugin_standard#standard-plugins-hash
 typeset -gA ZI Plugins ZState
 Plugins[CODELOAD_REPO_DIR]="${0:h}"
-ZI[CODELOAD]="${$ZI[PLUGINS_DIR]}/_local---config" 
+ZI[CODELOAD]="${ZI[PLUGINS_DIR]}/_local---config" 
 
 autoload_func() {
   fpath=("${Plugins[CODELOAD_REPO_DIR]}/functions" "${fpath[@]}")
