@@ -10,8 +10,7 @@ builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc
 0="${${(M)0:#/*}:-$PWD/$0}"
 
 # https://z.digitalclouds.dev/community/zsh_plugin_standard#standard-plugins-hash
-typeset -gA Plugins
-typeset -A ZState
+typeset -gA Plugins ZState
 Plugins[CODELOAD_REPO_DIR]="${0:h}"
 
 autoload_func() {
