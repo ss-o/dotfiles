@@ -9,8 +9,5 @@
 fpath=("${0:h}/functions" "${fpath[@]}")
 autoload -Uz $fpath[1]/*(.:t)
 
-typeset -gA Local
-Local[CONFIG_DIR]="${0:h}"
-Local[THEMES_DIR]="${0:h}/themes"
-Local[COMPLETIONS_DIR]="${0:h}/completions"
-Local[COOL_STUFF_HERE_DIR]="${0:h}/some_cool_stuff"
+typeset -gA ZI
+ZI[CODELOAD]="${0:h}"
