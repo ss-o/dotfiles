@@ -15,7 +15,7 @@ codeload() {
     [[ ! -d "${ZI[PLUGINS_DIR]}/_local---config" ]] && command mkdir -p "${ZI[PLUGINS_DIR]}/_local---config"
     if (( $+commands[curl] )) || (( $+commands[tar] )); then
       command curl -fsSL "https://codeload.github.com/${user}/${repo}/tar.gz/${branch}" | \
-      tar -xz -C "${ZI[PLUGINS_DIR]}/_local---config" --strip-components=3 "${repo}-${branch}/codeload/_local---config"
+      tar -xz -C "${ZI[PLUGINS_DIR]}/_local---config" --strip-components=3 "${repo}-${branch}/.codeload/_local---config"
       got_code=$?
       if [[ $got_code = 0 ]]; then
         .zi-ice id-as'_local/config' nocompile
