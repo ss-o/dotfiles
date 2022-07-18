@@ -11,12 +11,12 @@ typeset -A ZState
 
 Plugins[MY_PLUGIN_REPO_DIR]="${0:h}"
 
-autoload_func() {
-  typeset -g codeloadf
-  codeloadf=( ${(k)functions} )
-  trap "unset -f -- \"\${(k)functions[@]:|codeloadf}\" &>/dev/null; unset codeloadf" EXIT
-  trap "unset -f -- \"\${(k)functions[@]:|codeloadf}\" &>/dev/null; unset codeloadf; return 1" INT
+typeset -g codeloadf
+codeloadf=( ${(k)functions} )
+trap "unset -f -- \"\${(k)functions[@]:|codeloadf}\" &>/dev/null; unset codeloadf" EXIT
+trap "unset -f -- \"\${(k)functions[@]:|codeloadf}\" &>/dev/null; unset codeloadf; return 1" INT
 
+autoload_func() {
   fpath=("${0:h}/functions" "${fpath[@]}")
   autoload -Uz $fpath[1]/*(.:t)
   ZState[autoload_func]=1
