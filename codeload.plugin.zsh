@@ -19,4 +19,4 @@ if [[ $AF_OFF != 1 ]]; then
   autoload -Uz $fpath[1]/*(.:t)
   ZState[autoload_func]=1
   return 0
-}
+fi
