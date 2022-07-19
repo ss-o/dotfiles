@@ -13,7 +13,6 @@ builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc
 typeset -gA ZI Plugins ZState
 Plugins[CODELOAD_REPO_DIR]="${0:h}"
 ZI[CODELOAD]="${ZI[PLUGINS_DIR]}/_local---config"
-ZI[CODELOAD_ALIASES]="${ZI[CODELOAD]}/zsh/aliases"
 
 if [[ $AF_OFF != 1 ]]; then
   fpath=("${Plugins[CODELOAD_REPO_DIR]}/functions" "${fpath[@]}")
