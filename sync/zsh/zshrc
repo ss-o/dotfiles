@@ -8,13 +8,13 @@ fi
   source <(curl -sL init.zshell.dev); zzinit;
 }
 
-# ‑‑‑‑‑‑ ⸨ Environment ⸩ ‑‑‑‑‑‑
+# ‑‑‑‑‑‑ ⸨ Pre Env ⸩ ‑‑‑‑‑‑
 
 COMPLETION_WAITING_DOTS=true
 typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
 
-(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" }
 [[ $COLORTERM = *(24bit|truecolor)* ]] || zmodload zsh/nearcolor
+(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" }
 
 # ‑‑‑‑‑‑ ⸨ Zsh Options ⸩ ‑‑‑‑‑‑
 
@@ -57,7 +57,8 @@ zi has'svn' blockf for svn \
   id-as'user:aliases' multisrc'{general,edit}.zsh' pick'/dev/null' \
     https://github.com/ss-o/dotfiles/trunk/sync/zsh/aliases/user
 # ANNEX ============================================================================================================== #
-zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
+zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes \
+  atinit'Z_A_USECOMP=1' compile'functions/.*ev*~*.zwc' z-shell/z-a-eval
 # META-PLUGINS ======================================================================================================= #
 zi lucid for light-mode \
   skip'F-Sy-H' @z-shell @romkatv \
@@ -86,27 +87,4 @@ zi-turbo '0b' for \
     MichaelAquilina/zsh-you-should-use
 
 zi load z-shell/functions-manager
-
-ps-grep() {
-  builtin emulate -L zsh
-  unsetopt ksh_arrays
-  if [[ -z "$1" ]] ; then
-    echo "any - grep for process(es) by keyword" >&2
-    echo "Usage: any " >&2 ; return 1
-  else
-    ps xauwww | grep -i --color=auto "[${1[1]}]${1[2,-1]}"
-  fi
-}
-
-show-paths() {
-  autoload -U colors && colors
-  echo $PATH | tr ":" "\n" | \
-    awk "{ sub(\"/usr\",   \"$fg_no_bold[green]/usr$reset_color\"); \
-           sub(\"/bin\",   \"$fg_no_bold[blue]/bin$reset_color\"); \
-           sub(\"/opt\",   \"$fg_no_bold[cyan]/opt$reset_color\"); \
-           sub(\"/sbin\",  \"$fg_no_bold[magenta]/sbin$reset_color\"); \
-           sub(\"/local\", \"$fg_no_bold[yellow]/local$reset_color\"); \
-           print }"
-}
-
 source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"

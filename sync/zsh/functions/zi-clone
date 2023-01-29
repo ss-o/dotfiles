@@ -14,5 +14,5 @@ fi
 
 local git_repo="$1" clone_target="$2"
 
-command git clone --progress https://github.com/$git_repo $clone_target 2>&1 | { ${HOME}/.config/zi/git-process.zsh; }
+command git clone --verbose --progress https://github.com/$git_repo $clone_target |& { command ${HOME}/.config/zi/git-process.zsh || cat; }
 
