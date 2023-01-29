@@ -86,5 +86,9 @@ zi-turbo '0b' for \
     zplugin/zsh-exa \
     MichaelAquilina/zsh-you-should-use
 
-zi load z-shell/functions-manager
+#zi load z-shell/functions-manager
+#zi load z-shell/declare-zsh
+zi ice ver'main-1.0.1'
+zi load z-shell/zsh-cmd-architect
+
 source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
