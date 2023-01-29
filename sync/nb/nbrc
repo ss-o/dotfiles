@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+export NB_AUTO_SYNC="${NB_AUTO_SYNC:-1}"
+export NB_COLOR_THEME="${NB_COLOR_THEME:-console}"
+export NB_ENCRYPTION_TOOL="${NB_ENCRYPTION_TOOL:-gpg}"
+export NB_COLOR_PRIMARY="${NB_COLOR_PRIMARY:-46}"
+export NB_DEFAULT_EXTENSION="${NB_DEFAULT_EXTENSION:-md}"
+export NB_COLOR_SECONDARY="${NB_COLOR_SECONDARY:-8}"
+export EDITOR="micro"
+export NB_FOOTER="${NB_FOOTER:-1}"
+export NB_HEADER="${NB_HEADER:-1}"
+export NB_SYNTAX_THEME="${NB_SYNTAX_THEME:-ansi-dark}"
+export NB_DIR="${NB_DIR:-${HOME}/.nb}"

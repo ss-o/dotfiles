@@ -1,0 +1,99 @@
+[user]
+  useConfigOnly = true
+[include]
+  path = ~/.gitconfig.d/ss-o.gitconfig
+[includeIf "gitdir:~/Codespace/GitHub/digital-teams/"]
+  path = ~/.gitconfig.d/digital-teams.gitconfig
+[includeIf "gitdir:~/Codespace/SourceForge/"]
+  path = ~/.gitconfig.d/sallsource.gitconfig
+
+[commit]
+	gpgsign = true
+[credential "https://github.com"]
+	helper = gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = gh auth git-credential
+[credential "microsoft.visualstudio.com"]
+  authority = AAD
+[credential "visualstudio.com"]
+  authority = MSA
+[url "ssh://git@github.com/"]
+  insteadOf = https://github.com/
+
+[core]
+  editor = micro
+  filemode = true
+	pager = diff-so-fancy | less --tabs=4 -RFXS
+[diff-so-fancy]
+	first-run = false
+[interactive]
+	diffFilter = diff-so-fancy --patch
+[format]
+  signoff = true
+[help]
+    autocorrect = 20
+[diff]
+  mnemonicPrefix = true
+  renames = true
+  submodule = log
+	color = true
+[diff "bin"]
+  textconv = hexdump -v -C
+[grep]
+  break = true
+  heading = true
+  lineNumber = true
+  extendedRegexp = true
+[mergetool]
+  keepBackup = false
+  keepTemporaries = false
+  writeToTemp = true
+  prompt = false
+[fetch]
+	prune = true
+[pull]
+  rebase = merges
+  rebase = true
+[push]
+	default = current
+  rebase = true
+  followTags = true
+[status]
+  submoduleSummary = true
+  showUntrackedFiles = all
+[log]
+  follow = true
+  decorate = true
+[init]
+  defaultBranch = main
+[filter "lfs"]
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+  required = true
+[hub]
+  protocol = git
+[advice]
+  skippedCherryPicks = false
+[include]
+  path = ~/.gitconfig.d/alias.gitconfig
+
+[color]
+	ui = true
+  status = auto
+  branch = auto
+  diff = auto
+  interactive = auto
+  grep = auto
+[color "diff-highlight"]
+	oldNormal = red bold
+	oldHighlight = red bold 52
+	newNormal = green bold
+	newHighlight = green bold 22
+[color "diff"]
+	meta = yellow
+	frag = magenta bold
+	commit = yellow bold
+	old = red bold
+	new = green bold
+	whitespace = red reverse

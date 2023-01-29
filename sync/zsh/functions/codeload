@@ -1,0 +1,26 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
+builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
+
+local -a match mbegin mend reply got_code
+local user="$1" repo="$2" branch="$3"
+
+    if [[ -z "$user" || -z "$repo" || -z "$branch" ]]; then
+      +zi-message "Usage{ehi}:{rst} zi codeload {uname}<user>{rst} {pname}<repo>{rst} {id-as}<branch>{rst}"
+      return 1
+    fi
+    [[ -d "${ZI[PLUGINS_DIR]}/_local---config" ]] || command mkdir -p "${ZI[PLUGINS_DIR]}/_local---config"
+    if (( ${+commands[curl]} )) && (( ${+commands[tar]} )); then
+      command curl -fsSL "https://codeload.github.com/${user}/${repo}/tar.gz/${branch}" | \
+      tar -xz -C "${ZI[PLUGINS_DIR]}/_local---config" --strip-components=3 "${repo}-${branch}/.codeload/_local---config"
+      got_code=$?
+      if [[ $got_code = 0 ]]; then
+        if [[ -f "${ZI[PLUGINS_DIR]}/_local---config/config.plugin.zsh" ]]; then
+          zi silent compile'config.plugin.zsh' id-as'_local/config' for "${ZI[PLUGINS_DIR]}/_local---config"
+          return 0
+        fi
+      fi
+    fi
+

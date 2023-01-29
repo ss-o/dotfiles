@@ -1,0 +1,18 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+# Description: Clone git repositories in Zi style.
+
+builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
+builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
+
+if [[ ! -e ${HOME}/.config/zi/git-process.zsh ]]; then
+  curl -sL https://github.com/z-shell/zi-src/raw/main/lib/zsh/git-progress.zsh -o ${HOME}/.config/zi/git-process.zsh
+  chmod +x ${HOME}/.config/zi/git-process.zsh
+fi
+
+# {ZI[BIN_DIR]}/lib/zsh/git-process-output.zsh
+
+local git_repo="$1" clone_target="$2"
+
+command git clone --progress https://github.com/$git_repo $clone_target 2>&1 | { ${HOME}/.config/zi/git-process.zsh; }
+

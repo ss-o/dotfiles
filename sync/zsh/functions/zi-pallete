@@ -1,0 +1,14 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Description: Zi color pallete
+
+builtin emulate -L zsh
+builtin setopt extended_glob warn_create_global
+autoload colors ; colors
+
+local k i
+for k ( "${(A@kon)ZI[(I)col-*]}" ); do
+  i=$ZI[$k]
+  print -P "$reset_color${(r:14:: :):-$k:} $i===#ZI#==="
+done
