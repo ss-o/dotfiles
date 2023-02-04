@@ -1,30 +1,30 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
 #
-# DESC: Execute code that does not affect the current session in the background.
+# Description: Execute code that does not affect the current session in the background.
 
 {
-builtin emulate -LR zsh
-builtin setopt extended_glob warn_create_global typeset_silent
-autoload -U zrecompile
+  builtin emulate -LR zsh
+  builtin setopt extended_glob warn_create_global typeset_silent
+  autoload -U zrecompile
 
-local zshrc_file="${HOME}/.zshrc"
-local zcompdump_file="$ZI[ZCOMPDUMP_PATH]"
+  local zshrc_file="${HOME}/.zshrc"
+  local zcompdump_file="$ZI[ZCOMPDUMP_PATH]"
 
-zrecompile -p -R $zshrc_file -- -M $zcompdump_file --  > /dev/null
+  zrecompile -p -R $zshrc_file -- -M $zcompdump_file --  > /dev/null
 
-for ((i=1; i <= $#fpath; ++i)); do
-  local dir=$fpath[i]
-  local zwc=${dir:t}.zwc
-  if [[ $dir == (.|..) || $dir == (.|..)/* ]]; then
-    continue
-  fi
-  local files=($dir/*(N-.))
-  if [[ -w $dir:h && -n $files ]]; then
-    files=(${${(M)files%/*/*}#/})
-    if ( cd $dir:h && zrecompile -p -U -z $zwc $files ); then
-      fpath[i]=$fpath[i].zwc
+  for ((i=1; i <= $#fpath; ++i)); do
+    local dir=$fpath[i]
+    local zwc=${dir:t}.zwc
+    if [[ $dir == (.|..) || $dir == (.|..)/* ]]; then
+      continue
     fi
-  fi
-done
+    local files=($dir/*(N-.))
+    if [[ -w $dir:h && -n $files ]]; then
+      files=(${${(M)files%/*/*}#/})
+      if ( cd $dir:h && zrecompile -p -U -z $zwc $files ); then
+        fpath[i]=$fpath[i].zwc
+      fi
+    fi
+  done
 } &!

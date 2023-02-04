@@ -2,6 +2,8 @@
 alias add-editorconfig="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/editorconfig > .editorconfig"
 alias add-gitattributes="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/gitattributes >> .gitattributes"
 alias add-gitignore="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/gitignore >> .gitignore"
+alias add-cloudflare-ca-pem="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.pem > Cloudflare_CA.pem"
+alias add-cloudflare-ca-crt="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.crt > Cloudflare_CA.crt"
 
 # Arch Linux
 #alias paru="paru --bottomup"
@@ -11,6 +13,7 @@ alias freemem='sudo /sbin/sysctl -w vm.drop_caches=3'
 alias reload!='exec "$SHELL" -l'
 alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
 alias mm='micro'
+alias my-ip='curl ifconfig.me'
 alias host-ips="ip addr | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | sort"
 alias history-topcmd='fc -ln 0 | awk '{print $1}' | sort | uniq -c | sort -nr | head'
 alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'

@@ -14,7 +14,7 @@ COMPLETION_WAITING_DOTS=true
 typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
 
 [[ $COLORTERM = *(24bit|truecolor)* ]] || zmodload zsh/nearcolor
-(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" }
+(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" 2>/dev/null }
 
 # ‑‑‑‑‑‑ ⸨ Zsh Options ⸩ ‑‑‑‑‑‑
 
@@ -49,7 +49,9 @@ autoload -Uz $fpath[1]/*(.:t)
 EDITOR=$(smart-pick vim micro nano)
 
 # DEVOPS ============================================================================================================ #
-source /opt/google-cloud-sdk/path.zsh.inc
+if [[ -z ${path[(re)/opt/google-cloud-sdk/bin]} ]] && [[ -d /opt/google-cloud-sdk/bin ]]; then
+  source /opt/google-cloud-sdk/path.zsh.inc
+fi
 zi ice id-as'gcloud-completion'
 zi snippet /opt/google-cloud-sdk/completion.zsh.inc
 
@@ -57,18 +59,14 @@ zi has'svn' blockf for svn \
   id-as'user:aliases' multisrc'{general,edit}.zsh' pick'/dev/null' \
     https://github.com/ss-o/dotfiles/trunk/sync/zsh/aliases/user
 # ANNEX ============================================================================================================== #
-zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes \
-  atinit'Z_A_USECOMP=1' compile'functions/.*ev*~*.zwc' z-shell/z-a-eval
+zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
 # META-PLUGINS ======================================================================================================= #
 zi lucid for light-mode \
+  skip'ripgrep peco tig bat hyperfine fd' @console-tools \
+  skip'dircolors-materia' @console-style \
   skip'F-Sy-H' @z-shell @romkatv \
-  skip'dircolors-material ripgrep peco tig hexyl bat hyperfine fd' @console-tools \
   skip'fzy peco skim' @fuzzy \
   @zsh-users+fast
-# OH-MY-ZSH LIBRARY ================================================================================================== #
-#sni=({git,clipboard}.zsh)
-#zi is-snippet has'svn' svn multisrc'${sni[*]}' pick'/dev/null' for \
-#    OMZ::lib; unset sni
 # OH-MY-ZSH PLUGINS ================================================================================================== #
 zi-turbo '0a' for \
   atload"unalias grv g" OMZP::git OMZP::systemd \
@@ -76,7 +74,7 @@ zi-turbo '0a' for \
     if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
 # PLUGINS ============================================================================================================ #
 zi-turbo '0b' for \
-  sbin'bin/*' blockf \
+  as'null' sbin'bin/*' blockf \
     z-shell/nb \
 	as'null' from"gh-r" sbin \
 		ajeetdsouza/zoxide \
@@ -86,9 +84,5 @@ zi-turbo '0b' for \
     zplugin/zsh-exa \
     MichaelAquilina/zsh-you-should-use
 
-#zi load z-shell/functions-manager
-#zi load z-shell/declare-zsh
-zi ice ver'main-1.0.1'
-zi load z-shell/zsh-cmd-architect
-
+zi for ss-o/zsh-functions z-shell/zsh-log-lines
 source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"

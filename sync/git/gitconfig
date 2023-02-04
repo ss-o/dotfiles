@@ -58,6 +58,8 @@
 	default = current
   rebase = true
   followTags = true
+	default = current
+	autoSetupRemote = true
 [status]
   submoduleSummary = true
   showUntrackedFiles = all

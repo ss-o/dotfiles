@@ -1,18 +1,27 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
-# Description: Clone git repositories in Zi style.
+#
+# Description: Clone git repositories in Zi style
 
 builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
 builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
 
-if [[ ! -e ${HOME}/.config/zi/git-process.zsh ]]; then
-  curl -sL https://github.com/z-shell/zi-src/raw/main/lib/zsh/git-progress.zsh -o ${HOME}/.config/zi/git-process.zsh
-  chmod +x ${HOME}/.config/zi/git-process.zsh
+if [[ $# = 0 ]]; then
+  builtin print -r "Usage:"
+  builtin print -r "    zi-clone <user/repo> <optional target location>"
+  return 1
+elif [[ $# -gt 0 ]]; then
+  if [[ -d $ZI[BIN_DIR] ]]
+    local show_process
+    show_process="${ZI[BIN_DIR]}/lib/zsh/git-process-output.zsh"
+  elif [[ ! -e ${HOME}/.config/zi/git-process.zsh ]]; then
+    command curl -sL https://github.com/z-shell/zi-src/raw/main/lib/zsh/git-progress.zsh -o ${HOME}/.config/zi/git-process.zsh
+    command chmod +x ${HOME}/.config/zi/git-process.zsh
+    show_process="${HOME}/.config/zi/git-process.zsh"
+  fi
+
+  local git_repo="$1" clone_target="$2"
+  command git clone --verbose --progress https://github.com/${git_repo} $clone_target |& { command $show_process || cat; }
+
+  return 0
 fi
-
-# {ZI[BIN_DIR]}/lib/zsh/git-process-output.zsh
-
-local git_repo="$1" clone_target="$2"
-
-command git clone --verbose --progress https://github.com/$git_repo $clone_target |& { command ${HOME}/.config/zi/git-process.zsh || cat; }
-
