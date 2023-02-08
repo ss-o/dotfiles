@@ -1,10 +1,8 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
 
-function color() {
-  local color=$1 style=$2 b=0
-
-  shift
+color() {
+  local color=$1 style=$2 b=0; shift
 
   case $style in
     bold|b)           b=1; shift ;;

@@ -13,9 +13,15 @@ alias freemem='sudo /sbin/sysctl -w vm.drop_caches=3'
 alias reload!='exec "$SHELL" -l'
 alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
 alias mm='micro'
-alias my-ip='curl ifconfig.me'
-alias host-ips="ip addr | grep inet | awk '{ print $2; }' | sed 's/\/.*$//' | sort"
-alias history-topcmd='fc -ln 0 | awk '{print $1}' | sort | uniq -c | sort -nr | head'
+alias get-ipv4='curl -sf https://ipv4.icanhazip.com || curl -sf https://ifconfig.me'
+alias get-ipv6='curl -sf https://ipv6.icanhazip.com'
+alias get-cidr='ip addr | grep inet | awk '{print $2}' | sed 's/\/.*$//' | sort'
+alias get-local-tasks-listen='lsof -i -P | grep -i listen'
+alias get-local-tasks-established='lsof -i -P | grep -i established'
+alias get-local-tcp-listen='netstat -an | grep LISTEN | grep tcp'
+alias get-local-unix-listen='netstat -an | grep LISTEN | grep unix'
+alias dirs-size='du -h --max-depth=1 | sort -hr'
+alias history-cmd-top='fc -ln 0 | awk '{print $1}' | sort | uniq -c | sort -nr | head'
 alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 
 # Lychee
@@ -41,5 +47,5 @@ alias cloud-shell-mount='gcloud cloud-shell get-mount-command ${HOME}/.sshfs/clo
 alias cloud-shell='gcloud cloud-shell ssh --authorize-session'
 # ---compute
 alias ssh-e2-set='gcloud compute config-ssh'
-alias ssh-e2='gcloud compute ssh --zone "us-central1-a" "e2"  --project "digital-clouds"'
+alias ssh-e2='gcloud compute ssh --zone "us-central1-a" "e2" --project "digital-clouds"'
 alias list-e2='gcloud compute instances list --filter="zone:us-central1-a"'

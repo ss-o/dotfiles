@@ -129,10 +129,6 @@ _remove_broken_links() {
       command rm -f "${f2}" && say_info "Removed dangling symlink: ${f2}"
     fi
   done
-  #if [ "$_force_clean_symlinks" = "true" ]; then
-  #  findmnt --real -ecruno TARGET | xargs -I % find "${_user_home}" -xdev -xtype l -print | while read -r f3
-  #  do command rm -f "${f3}" && say_info "Removed dangling symlink: ${f3}"; done
-  #fi
 }
 
 _init_local() {

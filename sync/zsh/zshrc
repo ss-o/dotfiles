@@ -13,8 +13,8 @@ fi
 COMPLETION_WAITING_DOTS=true
 typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
 
-[[ $COLORTERM = *(24bit|truecolor)* ]] || zmodload zsh/nearcolor
-(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" 2>/dev/null }
+[[ $COLORTERM = *(24bit|truecolor)* ]] || { zmodload zsh/nearcolor 2> /dev/null }
+(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" 2> /dev/null }
 
 # ‑‑‑‑‑‑ ⸨ Zsh Options ⸩ ‑‑‑‑‑‑
 
@@ -76,13 +76,12 @@ zi-turbo '0a' for \
 zi-turbo '0b' for \
   as'null' sbin'bin/*' blockf \
     z-shell/nb \
-	as'null' from"gh-r" sbin \
-		ajeetdsouza/zoxide \
-	has'zoxide' \
-		z-shell/zsh-zoxide \
+  as'null' from"gh-r" sbin \
+    ajeetdsouza/zoxide \
+  has'zoxide' \
+    z-shell/zsh-zoxide \
   has'exa' atinit'AUTOCD=1' \
     zplugin/zsh-exa \
     MichaelAquilina/zsh-you-should-use
 
-zi for ss-o/zsh-functions z-shell/zsh-log-lines
 source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
