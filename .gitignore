@@ -1,3 +1,6 @@
+# Sync configuration
+sync.config
+
 # Exclude for security reasons
 .history/
 .dccache
