@@ -92,29 +92,8 @@ Mkfile.old
 dkms.conf
 
 # Repository specific files
-test/
-txt/
-*.txt
 *.zwc
 *.zini
-*lib/zsh/*zwc
-.ycm_extra_conf.py
-*deploy*key*
-*.bundle
-site*/
-other
-TODO*
-tags
-TAGS
-*.o
-*.o.c
-*.orig
-*.a
-*.so
-*.dll
-*~
-.*.sw?
-\#*
 
 CVS
 .#*
