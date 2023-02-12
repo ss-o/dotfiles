@@ -1,5 +1,5 @@
 # Sync configuration
-sync.config
+*sync.config
 
 # Exclude for security reasons
 .history/
