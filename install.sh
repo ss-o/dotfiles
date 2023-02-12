@@ -20,6 +20,9 @@ _git_opt="-q"
 _git_sub="-q"
 _git_sub_opt="-q"
 _required_cmds="zsh git i_am_required me_too"
+_supported_os="linux darwin"
+_supported_cpu="x86_64 aarch64"
+# ============================================================================== #
 
 # Check environment ™
 _is_tty="${_is_tty:-no}"
@@ -104,6 +107,76 @@ say_log() {
   say_info "$1 -- $(date)" | tee -a "${_logfile}" >/dev/null
 }
 # ============================================================================== #
+_get_os() {
+  _current_os="$(command -v uname)"
+  case $("${_current_os}" | tr '[:upper:]' '[:lower:]') in
+  android*)
+    _current_os='android'
+    ;;
+  darwin*)
+    _current_os='darwin'
+    ;;
+  linux*)
+    _current_os='linux'
+    ;;
+  freebsd*)
+    _current_os='freebsd'
+    ;;
+  netbsd*)
+    _current_os='netbsd'
+    ;;
+  openbsd*)
+    _current_os='openbsd'
+    ;;
+  sunos*)
+    _current_os='solaris'
+    ;;
+  msys* | cygwin* | mingw*)
+    _current_os='windows'
+    ;;
+  nt | win*)
+    _current_os='windows'
+    ;;
+  *)
+    _current_os='Unknown'
+    ;;
+  esac
+  say "$_supported_os" | grep -q "$_current_os"
+  match=$?
+  if [ $match -eq 0 ]; then
+    say -n "${_current_os}"
+    return 0
+  else
+    say_err "Unsupported OS: ${_current_os}"
+  fi
+}
+
+_get_arch() {
+  _current_arch="$(command -v uname)"
+  case $("${_current_arch}" -m | tr '[:upper:]' '[:lower:]') in
+  x86_64 | amd64)
+    _current_arch='x86_64'
+    ;;
+  i?86 | x86)
+    _current_arch='386'
+    ;;
+  armv8* | aarch64 | arm64)
+    _current_arch='aarch64'
+    ;;
+  *)
+    _current_arch='Unknown'
+    ;;
+  esac
+  say "$_supported_cpu" | grep -q "$_current_arch"
+  match=$?
+  if [ $match -eq 0 ]; then
+    say -n "${_current_arch}"
+    return 0
+  else
+    say_err "Unsupported CPU: ${_current_arch}"
+  fi
+}
+
 _is_git() { [ ! -d .git ] && say_err "Not a git repository"; }
 _has_terminal() { [ -t 0 ]; }
 _is_tty() { _has_terminal; }
@@ -290,6 +363,8 @@ _do_options() {
   [ $# = 0 ] && dosync
   while [ $# -gt 0 ]; do
     case $1 in
+    -cu | --get-cpu) _get_arch ;;
+    -os | --get-os) _get_os ;;
     -pl | --pull) _git_pull ;;
     -ga | --add) _git_add ;;
     -gc | --commit) _git_commit ;;

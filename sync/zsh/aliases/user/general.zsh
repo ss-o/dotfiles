@@ -4,6 +4,7 @@ alias add-gitattributes="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/g
 alias add-gitignore="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/gitignore >> .gitignore"
 alias add-cloudflare-ca-pem="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.pem > Cloudflare_CA.pem"
 alias add-cloudflare-ca-crt="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.crt > Cloudflare_CA.crt"
+alias add-trunk='curl https://get.trunk.io -fsSL | bash'
 
 # Arch Linux
 #alias paru="paru --bottomup"
@@ -12,6 +13,7 @@ alias add-cloudflare-ca-crt="wget -O - https://developers.cloudflare.com/cloudfl
 alias freemem='sudo /sbin/sysctl -w vm.drop_caches=3'
 alias reload!='exec "$SHELL" -l'
 alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
+alias machine-id='cat /var/lib/dbus/machine-id | '
 alias mm='micro'
 alias get-ipv4='curl -sf https://ipv4.icanhazip.com || curl -sf https://ifconfig.me'
 alias get-ipv6='curl -sf https://ipv6.icanhazip.com'

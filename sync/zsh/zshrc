@@ -1,3 +1,4 @@
+
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -45,7 +46,7 @@ setopt share_history            # share command history data
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
 fpath=( "${HOME}/.dotfiles/sync/zsh/functions" "${fpath[@]}" )
-autoload -Uz $fpath[1]/*(.:t)
+builtin autoload -Uz $fpath[1]/*(.:t)
 EDITOR=$(smart-pick vim micro nano)
 
 # DEVOPS ============================================================================================================ #
@@ -65,15 +66,15 @@ zi lucid for light-mode \
   skip'ripgrep peco tig bat hyperfine fd' @console-tools \
   skip'dircolors-materia' @console-style \
   skip'F-Sy-H' @z-shell @romkatv \
-  skip'fzy peco skim' @fuzzy \
+  skip'fzf fzy peco skim' @fuzzy \
   @zsh-users+fast
 # OH-MY-ZSH PLUGINS ================================================================================================== #
-zi-turbo '0a' for \
+zi-turbo '0a' light-mode for \
   atload"unalias grv g" OMZP::git OMZP::systemd \
     if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
     if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
 # PLUGINS ============================================================================================================ #
-zi-turbo '0b' for \
+zi-turbo '0b' light-mode for \
   as'null' sbin'bin/*' blockf \
     z-shell/nb \
   as'null' from"gh-r" sbin \
@@ -83,5 +84,8 @@ zi-turbo '0b' for \
   has'exa' atinit'AUTOCD=1' \
     zplugin/zsh-exa \
     MichaelAquilina/zsh-you-should-use
+
+zi load z-shell/zui
+zi load z-shell/zbrowse
 
 source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
