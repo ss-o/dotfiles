@@ -205,22 +205,22 @@ _remove_broken_links() {
 }
 
 _init_local() {
-  builtin cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
+  command cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
   _is_git
-  builtin cd || return 1
+  command cd || return 1
 }
 
 _git_origin() {
-  builtin cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
+  command cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
   if [ -d .git ]; then
     ORIGIN=$(git config -l | grep remote.origin.url | awk -F'=' '{print $2}') || true
   fi
-  builtin cd || return 1
+  command cd || return 1
 }
 
 _git_pull() {
   _git_origin
-  builtin cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
+  command cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
   _is_git
   say -cyan "Pulling latest changes from ${ORIGIN}"
   command git pull "${_git_opt}"
@@ -230,32 +230,32 @@ _git_pull() {
   command git submodule "${_git_sub_opt}" update --init --recursive
   command git submodule "${_git_sub_opt}" update --remote --merge
   command git submodule "${_git_sub_opt}" foreach --recursive git fetch
-  builtin cd || return 1
+  command cd || return 1
 }
 
 _git_commit() {
   _git_origin
-  builtin cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
+  command cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
   say -cyan "Committing latest changes to the repository"
   command git commit -a "${_git_opt}"
-  builtin cd || return 1
+  command cd || return 1
 }
 
 _git_push() {
   _git_origin
-  builtin cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
+  command cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
   say -cyan "Pushing changes upstream to ${ORIGIN}"
   command git push "${_git_opt}"
   say -cyan "Pushing changes for submodules"
   command git push "${_git_sub_opt}" --recurse-submodules=on-demand
   command git submodule "${_git_sub_opt}" foreach --recursive git push
-  builtin cd || return 1
+  command cd || return 1
 }
 
 _git_add() {
-  builtin cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
+  command cd "${dosync_dir}" || say_err "Failed to enter dotfiles directory"
   command git add .
-  builtin cd || return 1
+  command cd || return 1
 }
 
 _git_check_all() {
