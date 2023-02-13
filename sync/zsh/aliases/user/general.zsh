@@ -6,16 +6,23 @@ alias add-cloudflare-ca-pem="wget -O - https://developers.cloudflare.com/cloudfl
 alias add-cloudflare-ca-crt="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.crt > Cloudflare_CA.crt"
 alias add-trunk='curl https://get.trunk.io -fsSL | bash'
 
+# Utilities
+alias palette='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done'
+alias run-python-server='python -m http.server 8888'
+
 # Arch Linux
 #alias paru="paru --bottomup"
 
 # System
-alias freemem='sudo /sbin/sysctl -w vm.drop_caches=3'
+alias freem='sudo /sbin/sysctl -w vm.drop_caches=3'
+alias freemem='echo 3 | sudo tee /proc/sys/vm/drop_caches'
 alias reload!='exec "$SHELL" -l'
 alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
-alias machine-id='cat /var/lib/dbus/machine-id | '
+alias machine-id='cat /var/lib/dbus/machine-id | md5sum'
+alias check-macpath='[[ -n "${(j::)${(M)path[@]:#/opt/local/bin}}" ]]'
 alias mm='micro'
-alias get-ipv4='curl -sf https://ipv4.icanhazip.com || curl -sf https://ifconfig.me'
+alias kate='command kate "${@}" &!'
+alias get-ipv4='curl -sf https://ipv4.icanhazip.com || curl -sf https://ifconfig.me || curl -sF zx2c4.com/ip'
 alias get-ipv6='curl -sf https://ipv6.icanhazip.com'
 alias get-cidr="ip addr | grep inet | awk '{print $2}' | sort"
 alias get-local-tasks-listen='lsof -i -P | grep -i listen'

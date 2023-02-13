@@ -10,8 +10,14 @@
 
   local zshrc_file="${HOME}/.zshrc"
   local zcompdump_file="$ZI[ZCOMPDUMP_PATH]"
-
   zrecompile -p -R $zshrc_file -- -M $zcompdump_file --  > /dev/null
+
+  # Set environment variables for launchd processes.
+  if [[ "$OSTYPE" == darwin* ]]; then
+    for env_var in PATH MANPATH; do
+      launchctl setenv "$env_var" "${(P)env_var}" 2>/dev/null
+    done
+  fi
 
   for ((i=1; i <= $#fpath; ++i)); do
     local dir=$fpath[i]

@@ -74,7 +74,7 @@ zi-turbo '0a' light-mode for \
     if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
     if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
 # PLUGINS ============================================================================================================ #
-zi-turbo '0b' light-mode for \
+zi-turbo '0b' for \
   as'null' sbin'bin/*' blockf \
     z-shell/nb \
   as'null' from"gh-r" sbin \
@@ -86,6 +86,14 @@ zi-turbo '0b' light-mode for \
     MichaelAquilina/zsh-you-should-use
 
 zi load z-shell/zui
+
+zi ice ver'main'
 zi load z-shell/zbrowse
 
-source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
+#zi ice lucid id-as'z-shell/p10k-theme'
+#zi snippet "$HOME/.dotfiles/sync/zsh/themes/p10k-classic.zsh"
+
+#source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
+
+# To customize prompt, run `p10k configure` or edit ~/.zi/snippets/z-shell/p10k-theme/p10k-theme.
+[[ ! -f ~/.zi/snippets/z-shell/p10k-theme/p10k-theme ]] || source ~/.zi/snippets/z-shell/p10k-theme/p10k-theme

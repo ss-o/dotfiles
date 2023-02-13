@@ -1,4 +1,10 @@
 cygwin
+LBUFFER
 logfile
+MANPATH
 msys
+setenv
+shfunc
 sunos
+zcompdump
+zrecompile
