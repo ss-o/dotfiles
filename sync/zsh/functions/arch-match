@@ -1,55 +1,51 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
 
-	local ARCH="$(uname -m)"
-	case "${ARCH}" in
+  local arch
+  arch="$(uname -m | tr '[:upper:]' '[:lower:]')"
+
+  case "${arch}" in
 	  x86_64 | amd64)
-		  ARCH='amd64'
+		  arch='amd64'
 		;;
 	  i?86 | x86)
-		  ARCH='386'
+		  arch='386'
 		;;
 	  armv8* | aarch64 | arm64)
-		  ARCH='arm64'
-		;;
-	  armv7*)
-		  ARCH='armv7'
-		;;
-	  armv6*)
-		  ARCH='armv6'
+		  arch='arm64'
 		;;
 	  arm*)
-		  ARCH='arm'
+		  arch='arm'
 		;;
 	  mips64le*)
-		  ARCH='mips64le'
+		  arch='mips64le'
 		;;
 	  mips64*)
-		  ARCH='mips64'
+		  arch='mips64'
 		;;
 	  mipsle*)
-		  ARCH='mipsle'
+		  arch='mipsle'
 		;;
 	  mips*)
-		  ARCH='mips'
+		  arch='mips'
 		;;
 	  ppc64le*)
-		  ARCH='ppc64le'
+		  arch='ppc64le'
 		;;
 	  ppc64*)
-		  ARCH='ppc64'
+		  arch='ppc64'
 		;;
 	  ppcle*)
-		  ARCH='ppcle'
+		  arch='ppcle'
 		;;
 	  ppc*)
-		  ARCH='ppc'
+		  arch='ppc'
 		;;
 	  s390*)
-		  ARCH='s390x'
+		  arch='s390x'
 		;;
     *)
-		  ARCH='Unknown'
+		  arch='unknown'
 		;;
 	esac
-  print -Pr "$ARCH"
+  print -Pr "$arch"
