@@ -284,8 +284,8 @@ _read_sync_config() {
 }
 
 _read() {
-  srcfile="$(echo "${file}" | awk -F: '{print $1}')"
-  dstfile="$(echo "${file}" | awk -F: '{print $2}')"
+  srcfile="$(echo "${file}" | awk '{print $1}')"
+  dstfile="$(echo "${file}" | awk '{print $2}')"
   srcconfig="$(echo "${configfile}" | awk -F: '{print $1}')"
   dstconfig="$(echo "${configfile}" | awk -F: '{print $2}')"
 
