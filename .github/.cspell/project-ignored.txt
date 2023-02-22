@@ -3,4 +3,7 @@ configfile
 dstconfig
 endconfig
 HISTCMD
+optchar
+optspec
+qcuaspl
 srcconfig

@@ -6,6 +6,8 @@ alias add-cloudflare-ca-pem="wget -O - https://developers.cloudflare.com/cloudfl
 alias add-cloudflare-ca-crt="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.crt > Cloudflare_CA.crt"
 alias add-trunk='curl https://get.trunk.io -fsSL | bash'
 
+alias get-origin='command git config -l| grep remote.origin.url | awk -F'=' '{print $2}''
+
 # Utilities
 alias palette='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done'
 alias run-python-server='python -m http.server 8888'

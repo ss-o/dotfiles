@@ -25,8 +25,9 @@ _supported_cpu="x86_64 aarch64"
 # ============================================================================== #
 
 # Check environment ™
-_is_tty="${_is_tty:-no}"
-_is_piped="${_is_piped:-no}"
+_is_quiet="${_is_quiet:-false}"
+_is_tty="${_is_tty:-false}"
+_is_piped="${_is_piped:-false}"
 # ============================================================================== #
 info_block() {
   printf "\033[1;46m"
@@ -98,7 +99,7 @@ say_err() {
 
 say_info() {
   printf "\033[34;1m▓▒░\033[32;01m ✔ \033[00m» "
-  say -cyan "$1"
+  say -yellow "$1"
   printf "\033[00m"
 }
 
@@ -138,12 +139,12 @@ _get_os() {
     _current_os='windows'
     ;;
   *)
-    _current_os='Unknown'
+    _current_os='unknown'
     ;;
   esac
   say "$_supported_os" | grep -q "$_current_os"
   match=$?
-  if [ $match -eq 0 ]; then
+  if [ "$match" -eq 0 ]; then
     say -n "${_current_os}"
     return 0
   else
@@ -169,7 +170,7 @@ _get_arch() {
   esac
   say "$_supported_cpu" | grep -q "$_current_arch"
   match=$?
-  if [ $match -eq 0 ]; then
+  if [ "$match" -eq 0 ]; then
     say -n "${_current_arch}"
     return 0
   else
@@ -184,9 +185,9 @@ _is_piped() { ! [ -t 1 ]; }
 _is_root() { [ "$(id -u)" -eq 0 ]; }
 
 _check_commands() {
-  for cdps in ${_required_cmds}; do
-    command -v "${cdps}" >/dev/null 2>&1 || {
-      say_err "Required: ${cdps}"
+  for deps in ${_required_cmds}; do
+    command -v "${deps}" >/dev/null 2>&1 || {
+      say_err "Required: ${deps}"
     }
   done
 }
@@ -276,36 +277,25 @@ _sync_config() {
 }
 
 _read_sync_config() {
-  _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#')"
-  _config_src="$(sed -n '/\[config\]/,/\[endconfig\]/p' "${_sync_file}" | grep -v '^\[.*config]' | grep -v '^#')"
+  _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#' | grep -v '^$' | sort -u)"
+  _config_src="$(sed -n '/\[config\]/,/\[endconfig\]/p' "${_sync_file}" | grep -v '^\[.*config]' | grep -v '^#' | grep -v '^$' | sort -u)"
   if [ -z "${_files_src}" ] && [ -z "${_config_src}" ]; then
     say_err "Specify files to sync in ${dosync_dir}/sync.config file"
   fi
 }
 
 _read() {
-  srcfile="$(echo "${file}" | awk '{print $1}')"
-  dstfile="$(echo "${file}" | awk '{print $2}')"
-  srcconfig="$(echo "${configfile}" | awk -F: '{print $1}')"
-  dstconfig="$(echo "${configfile}" | awk -F: '{print $2}')"
+  input="$1"
+  srcfile="$(echo "${input}" | awk -F: '{print $1}')"
+  dstfile="$(echo "${input}" | awk -F: '{print $2}')"
 
-  [ "${dstfile}" = "" ] && dstfile=".$(basename "${srcfile}")"
-  [ "${dstconfig}" = "" ] && dstconfig="$(basename "${srcconfig}")"
+  [ -z "${dstfile}" ] && dstfile=".$(basename "${srcfile}")"
+  [ -z "${dstconfig}" ] && dstconfig="$(basename "${srcfile}")"
 
   _sync_src="${dosync_dir}/${srcfile}"
-  _sync_config_src="${dosync_dir}/${srcconfig}"
-
-  if [ -e "${_sync_src}" ]; then
-    _sync_target="${_user_home}/${dstfile}"
-  else
-    _sync_target=""
-  fi
-
-  if [ -e "${_sync_config_src}" ]; then
-    _sync_config_target="${_user_home_config}/${dstconfig}"
-  else
-    _sync_config_target=""
-  fi
+  _sync_config_src="${dosync_dir}/${srcfile}"
+  _sync_target="${_user_home}/${dstfile}"
+  _sync_config_target="${_user_home_config}/${dstfile}"
 }
 
 dosync() {
@@ -313,23 +303,23 @@ dosync() {
   _sync_config
   _read_sync_config
   _remove_broken_links
-  for file in ${_files_src}; do
+  for file in $_files_src; do
     _read "${file}"
-    if [ -e "${_sync_target}" ] && ! [ -L "${_sync_target}" ]; then
+    if [ -e "${_sync_src}" ] && [ -e "${_sync_target}" ] && ! [ -L "${_sync_target}" ]; then
       [ ! -d "${_backup_dir}" ] && command mkdir -p "${_backup_dir}"
       _make_backup="${_backup_dir}/$(basename "${file}")"
-      say_log "Backup: ${_sync_target} -> ${_make_backup}"
+      say_log "Backup: ${_sync_target} ➤ ${_make_backup}"
       command cp -r "${_sync_target}" "${_make_backup}"
       command rm -rf "${_sync_target}"
       command ln -si "${_sync_src}" "${_sync_target}"
-      say_ok "SymLink: ${_sync_src} -> ${_sync_target}"
+      say_ok "SymLink: ${_sync_src} ➤ ${_sync_target}"
     elif [ -e "${_sync_target}" ]; then
       command rm -f "${_sync_target}"
       command ln -si "${_sync_src}" "${_sync_target}"
       say_ok "SymLink: ${srcfile} ➤ ${_sync_target}"
     elif [ "${_sync_target}" != "" ]; then
       command ln -si "${_sync_src}" "${_sync_target}"
-      say_ok "SymLink:${_sync_src} -> ${_sync_target}"
+      say_ok "SymLink:${_sync_src} ➤ ${_sync_target}"
     else
       say_log "Source file ${_sync_config_src} doesn't exist, skipping"
     fi
@@ -337,21 +327,21 @@ dosync() {
   done
   for configfile in ${_config_src}; do
     _read "${configfile}"
-    if [ -e "${_sync_config_target}" ] && ! [ -L "${_sync_config_target}" ]; then
+    if [ -e "${_sync_config_src}" ] && [ -e "${_sync_config_target}" ] && ! [ -L "${_sync_config_target}" ]; then
       [ ! -d "${_backup_dir}" ] && command mkdir -p "${_backup_dir}"
       _make_backup="${_backup_dir}/$(basename "${configfile}")"
-      say_log "Backup: ${_sync_config_target} -> ${_make_backup}"
+      say_log "Backup: ${_sync_config_target} ➤ ${_make_backup}"
       command cp -r "${_sync_config_target}" "${_make_backup}"
       command rm -rf "${_sync_config_target}"
       command ln -si "${_sync_config_src}" "${_sync_config_target}"
-      say_ok "SymLink:${srcconfig} ➤ ➤ ${_sync_config_target}"
+      say_ok "SymLink:${srcfile} ➤ ${_sync_config_target}"
     elif [ -e "${_sync_config_target}" ]; then
       command rm -f "${_sync_config_target}"
       command ln -si "${_sync_config_src}" "${_sync_config_target}"
-      say_ok "SymLink: ${_sync_config_src} -> ${_sync_config_target}"
+      say_ok "SymLink: ${_sync_config_src} ➤ ${_sync_config_target}"
     elif [ "${_sync_config_target}" != "" ]; then
       command ln -si "${_sync_config_src}" "${_sync_config_target}"
-      say_ok "SymLink: ${_sync_config_src} -> ${_sync_config_target}"
+      say_ok "SymLink: ${_sync_config_src} ➤ ${_sync_config_target}"
     else
       say_log "Source file ${_sync_config_src} doesn't exist, skipping"
     fi
@@ -360,30 +350,52 @@ dosync() {
 }
 
 _do_options() {
-  [ $# = 0 ] && dosync
-  while [ $# -gt 0 ]; do
-    case $1 in
-    -cu | --get-cpu) _get_arch ;;
-    -os | --get-os) _get_os ;;
-    -pl | --pull) _git_pull ;;
-    -ga | --add) _git_add ;;
-    -gc | --commit) _git_commit ;;
-    -gp | --push) _git_push ;;
-    -aa | --all) _git_check_all ;;
-    -bl | --broken-links) _remove_broken_links ;;
-    -cc | --check-commands) _check_commands "${@}" ;;
-    *)
-      say_err "Unknown option."
-      ;;
+  cmd="$1"
+
+  if [ "$cmd" = git ]; then
+    case "$2" in
+    pull) _git_pull ;;
+    add) _git_add ;;
+    commit) _git_commit ;;
+    push) _git_push ;;
+    check) _git_check_all ;;
+    *) err "unknown subcommand: $2" ;;
     esac
-    shift
-  done
+  fi
+  if [ "$cmd" = clean ]; then
+    case "$2" in
+    symlink) _remove_broken_links ;;
+    *) err "unknown subcommand: $2" ;;
+    esac
+  fi
+
+  shift 2
 }
 
 main() {
-  _do_options "${@}"
-  exit 0
+  [ $# = 0 ] && dosync && exit 0
+  # Parse options
+  optspec=":qcg-:"
+  while getopts "$optspec" optchar; do
+    case "${optchar}" in
+    # Short options
+    q) _is_quiet=true ;;
+    c) _do_options "clean" "$2" ;;
+    g) _do_options "git" "$2" ;;
+
+    -)
+      case "${OPTARG}" in
+      # Long options
+      quiet) _is_quiet=true ;;
+      git) _do_options "git" "$2" ;;
+      clean) _do_options "clean" "$2" ;;
+      *) err "Unknown option --${OPTARG}" ;;
+      esac
+      ;;
+    *) err "Unknown option -${OPTARG}" ;;
+    esac
+  done
+  shift $((OPTIND - 1))
 }
-while true; do
-  main "${@}"
-done
+
+main "$@"
