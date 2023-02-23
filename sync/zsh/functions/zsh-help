@@ -8,7 +8,7 @@ usage: $0 [--help] [--zsh-help-debug] [--all] search term(s)
 Options:
     --all - search for the term anywhere, not just at the start of a line.
     --help - show this help message
-    --zsh-help-debug - print out the regex search choosenq instead of searching
+    --zsh-help-debug - print out the regex search chosen instead of searching
 Looks up things in the zsh documentation. --all must come after --zsh-help-debug
 if used together.
 Uses less as the pager. Press 'n' to search forward 'N' to search backwards.

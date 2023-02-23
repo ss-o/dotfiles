@@ -8,6 +8,10 @@ alias add-trunk='curl https://get.trunk.io -fsSL | bash'
 
 alias get-origin='command git config -l| grep remote.origin.url | awk -F'=' '{print $2}''
 
+# SSH
+# --- <tunnel port>:<destination address>:<destination port>
+alias ssh-forward-3000='ssh -L 3000:localhost:3000'
+
 # Utilities
 alias palette='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done'
 alias run-python-server='python -m http.server 8888'
@@ -64,6 +68,11 @@ alias gcloud-interactive='gcloud beta interactive'
 alias cloud-shell-mount='gcloud cloud-shell get-mount-command ${HOME}/.sshfs/cloud-shell'
 alias cloud-shell='gcloud cloud-shell ssh --authorize-session'
 # --- compute
-alias ssh-e2-set='gcloud compute config-ssh'
-alias ssh-e2='gcloud compute ssh --zone "us-central1-a" "e2" --project "digital-clouds"'
-alias list-e2='gcloud compute instances list --filter="zone:us-central1-a"'
+alias compute-ssh-config='gcloud compute config-ssh'
+alias compute-ssh-e2='gcloud compute ssh --zone "us-central1-a" "e2" --project "digital-clouds"'
+alias compute-list-us-central='gcloud compute instances list --filter="zone:us-central1-a"'
+
+# API
+# --- Check Licenses
+alias gh-api-available-licenses='gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /licenses'
+

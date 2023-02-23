@@ -12,10 +12,11 @@ fi
 # ‑‑‑‑‑‑ ⸨ Pre Env ⸩ ‑‑‑‑‑‑
 
 COMPLETION_WAITING_DOTS=true
-typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
-[[ $COLORTERM = *(24bit|truecolor)* ]] || { zmodload zsh/nearcolor 2> /dev/null }
-(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" 2> /dev/null }
+typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
+[[ $COLORTERM = *(24bit|truecolor)* ]] || { zmodload zsh/nearcolor 2> /dev/null; }
+(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
 # ‑‑‑‑‑‑ ⸨ Zsh Options ⸩ ‑‑‑‑‑‑
 
@@ -24,8 +25,8 @@ setopt append_history       	  # allow multiple terminal sessions to all append 
 setopt auto_cd                  # cd by typing the directory name if it's not a command
 setopt auto_list                # automatically lists choices on an ambiguous completion
 setopt auto_menu                # automatically use menu completion
-#setopt auto_pushd               # make cd push the old directory onto the directory stack
-#setopt bang_hist                # treat the '!' character, especially during expansion.
+setopt auto_pushd               # make cd push the old directory onto the directory stack
+setopt bang_hist                # treat the '!' character, especially during expansion.
 setopt extended_glob            # treat #, ~, and ^ as part of patterns for filename generation
 setopt extended_history         # record timestamp of command in HISTFILE
 setopt glob_dots                # show dotfiles in completions
@@ -43,10 +44,12 @@ setopt no_beep                  # don't beep on error
 setopt prompt_subst             # enable parameter expansion, command substitution, and arithmetic expansion in the prompt
 setopt pushd_ignore_dups        # don't push multiple copies of the same directory onto the directory stack
 setopt share_history            # share command history data
+unsetopt rm_star_silent         # ask for confirmation for rm * and rm path/
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
 fpath=( "${HOME}/.dotfiles/sync/zsh/functions" "${fpath[@]}" )
 builtin autoload -Uz $fpath[1]/*(.:t)
+
 EDITOR=$(smart-pick vim micro nano)
 
 # DEVOPS ============================================================================================================ #
@@ -57,7 +60,7 @@ zi ice id-as'gcloud-completion'
 zi snippet /opt/google-cloud-sdk/completion.zsh.inc
 
 zi has'svn' blockf for svn \
-  id-as'user:aliases' multisrc'{general,edit}.zsh' pick'/dev/null' \
+  id-as'user:aliases' multisrc'{general,systemd}.zsh' pick'/dev/null' \
     https://github.com/ss-o/dotfiles/trunk/sync/zsh/aliases/user
 # ANNEX ============================================================================================================== #
 zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
@@ -70,34 +73,21 @@ zi lucid for light-mode \
   @zsh-users+fast
 # OH-MY-ZSH PLUGINS ================================================================================================== #
 zi-turbo '0a' light-mode for \
-  atload"unalias grv g" OMZP::git OMZP::systemd \
+  atload"unalias grv g" OMZP::git \
     if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
     if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
 # PLUGINS ============================================================================================================ #
 zi-turbo '0b' for \
   binary sbin'bin/*' \
     z-shell/nb \
-  as'null' from"gh-r" sbin \
+  from"gh-r" sbin \
     ajeetdsouza/zoxide \
+  has'lsd' atinit'AUTOCD=1' \
+    z-shell/zsh-lsd \
   has'zoxide' \
     z-shell/zsh-zoxide \
-  has'exa' atinit'AUTOCD=1' \
-    zplugin/zsh-exa \
     MichaelAquilina/zsh-you-should-use
 
+#zi load ss-o/zsh-functions
 
-zi light z-shell/zsh-log-lines
-
-zi load z-shell/zui
-zi load z-shell/zbrowse
-
-zi ice id-as'zsh-func'
-zi load ss-o/zsh-functions
-
-#zi ice lucid id-as'z-shell/p10k-theme'
-#zi snippet "$HOME/.dotfiles/sync/zsh/themes/p10k-classic.zsh"
-
-#source "$HOME/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
-
-# To customize prompt, run `p10k configure` or edit ~/.zi/snippets/z-shell/p10k-theme/p10k-theme.
-[[ ! -f ~/.zi/snippets/z-shell/p10k-theme/p10k-theme ]] || source ~/.zi/snippets/z-shell/p10k-theme/p10k-theme
+source "${HOME}/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
