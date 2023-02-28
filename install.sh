@@ -351,24 +351,26 @@ dosync() {
 
 _do_options() {
   cmd="$1"
+  shift 1
 
   if [ "$cmd" = git ]; then
-    case "$2" in
+    case "$1" in
     pull) _git_pull ;;
     add) _git_add ;;
     commit) _git_commit ;;
     push) _git_push ;;
     check) _git_check_all ;;
-    *) err "unknown subcommand: $2" ;;
+    *) err "unknown argument: $1" ;;
     esac
   fi
   if [ "$cmd" = clean ]; then
-    case "$2" in
+    [ ! "$1" ] && _remove_broken_links && exit 0
+
+    case "$1" in
     symlink) _remove_broken_links ;;
-    *) err "unknown subcommand: $2" ;;
+    *) err "unknown argument: $1" ;;
     esac
   fi
-
   shift 2
 }
 
@@ -380,8 +382,8 @@ main() {
     case "${optchar}" in
     # Short options
     q) _is_quiet=true ;;
-    c) _do_options "clean" "$2" ;;
     g) _do_options "git" "$2" ;;
+    c) _do_options "clean" "$2" ;;
 
     -)
       case "${OPTARG}" in
@@ -398,4 +400,6 @@ main() {
   shift $((OPTIND - 1))
 }
 
-main "$@"
+while true; do
+  main "$@"
+done

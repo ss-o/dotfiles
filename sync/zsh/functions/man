@@ -1,0 +1,44 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
+builtin setopt extended_glob warn_create_global typeset_silent no_short_loops rc_quotes no_auto_pushd
+
+# https://wiki.zshell.dev/community/zsh_plugin_standard#zero-handling
+0="${ZERO:-${${0:#$ZSH_ARGZERO}:-${(%):-%N}}}"
+0="${${(M)0:#/*}:-$PWD/$0}"
+
+typeset -AHg less_termcap
+
+# bold & blinking mode
+less_termcap[mb]="${fg_bold[red]}"
+less_termcap[md]="${fg_bold[red]}"
+less_termcap[me]="${reset_color}"
+
+# standout mode
+less_termcap[so]="${fg_bold[yellow]}${bg[blue]}"
+less_termcap[se]="${reset_color}"
+
+# underlining
+less_termcap[us]="${fg_bold[green]}"
+less_termcap[ue]="${reset_color}"
+
+  local -a environment
+
+  # Convert associative array to plain array of NAME=VALUE items.
+  local k v
+  for k v in "${(@kv)less_termcap}"; do
+    environment+=( "LESS_TERMCAP_${k}=${v}" )
+  done
+
+  # Prefer `less` whenever available, since we specifically configured environment for it.
+  environment+=( PAGER="${commands[less]:-$PAGER}" )
+
+  # TODO: ./nroff script.
+  #if [[ "$OSTYPE" = solaris* ]]; then
+  #   # Absolute path to this file's directory.
+  #   typeset -g __colored_man_pages_dir="${0:A:h}"
+  #   environment+=( PATH="${__colored_man_pages_dir}:$PATH" )
+  #fi
+
+  command env $environment man "$@"

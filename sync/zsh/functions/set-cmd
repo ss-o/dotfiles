@@ -1,0 +1,10 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Description: Pick first available command, e.g: EDITOR=$(set-cmd vim micro nano).
+
+builtin setopt local_options extended_glob no_short_loops rc_quotes no_auto_pushd
+
+local c; for c in "$@"; do
+  (( $+commands[$c] )) && { builtin print -Pn -- ${c}; break; }
+done
