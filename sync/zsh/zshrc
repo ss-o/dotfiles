@@ -50,9 +50,11 @@ setopt share_history            # share command history data
 unsetopt rm_star_silent         # ask for confirmation for rm * and rm path/
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
-fpath=( "${HOME}/.dotfiles/sync/zsh/functions" "${fpath[@]}" )
+if [[ -z "${fpath[(re)${HOME}/.dotfiles/sync/zsh/functions]}" ]]; then
+  typeset -gxU fpath FPATH
+  fpath=( "${HOME}/.dotfiles/sync/zsh/functions" "${fpath[@]}" )
+fi
 builtin autoload -Uz $fpath[1]/*(.:t)
-
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
 
