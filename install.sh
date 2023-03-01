@@ -7,9 +7,10 @@ trap '' INT QUIT TERM
 # shellcheck source=/dev/null
 dosync_dir="$(cd -P -- "$(dirname -- "$(command -v -- "$0" || true)")" && pwd -P)"
 [ -z "${sync_dir}" ] && sync_dir=${dosync_dir}
+[ -z "${_user_home}" ] && _user_home="${HOME}"
+
 _time_stamp=$(date +%D)
 
-_user_home="${HOME}"
 _backup_dir="${_user_home}/.backup/${_time_stamp}"
 _logfile="${_user_home}/.backup/${_time_stamp}/install.log"
 _user_home_config="${_user_home}/.config"

@@ -6,5 +6,6 @@ msys
 setenv
 shfunc
 sunos
+unfunction
 zcompdump
 zrecompile
