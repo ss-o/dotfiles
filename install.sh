@@ -259,7 +259,12 @@ _git_add() {
   command cd || return 1
 }
 
-_git_check_all() { _git_origin; _git_add; _git_commit; _git_push; }
+_git_check_all() {
+  _git_origin
+  _git_add
+  _git_commit
+  _git_push
+}
 
 _sync_config() {
   if [ ! -s "${_sync_file}" ]; then
@@ -281,8 +286,8 @@ _read_sync_config() {
 
 _read() {
   input="$1"
-  srcfile="$(echo "${input}" | awk -F: '{print $1}')"
-  dstfile="$(echo "${input}" | awk -F: '{print $2}')"
+  srcfile="$(printf '%s' "${input}" | awk -F: '{print $1}')"
+  dstfile="$(printf '%s' "${input}" | awk -F: '{print $2}')"
 
   [ -z "${dstfile}" ] && dstfile=".$(basename "${srcfile}")"
   [ -z "${dstconfig}" ] && dstconfig="$(basename "${srcfile}")"
@@ -298,6 +303,7 @@ dosync() {
   _sync_config
   _read_sync_config
   _remove_broken_links
+
   for file in $_files_src; do
     _read "${file}"
     if [ -e "${_sync_src}" ] && [ -e "${_sync_target}" ] && ! [ -L "${_sync_target}" ]; then
@@ -320,6 +326,7 @@ dosync() {
     fi
     ${reset:-}
   done
+
   for configfile in ${_config_src}; do
     _read "${configfile}"
     if [ -e "${_sync_config_src}" ] && [ -e "${_sync_config_target}" ] && ! [ -L "${_sync_config_target}" ]; then
