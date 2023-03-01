@@ -259,12 +259,7 @@ _git_add() {
   command cd || return 1
 }
 
-_git_check_all() {
-  _git_origin
-  _git_add
-  _git_commit
-  _git_push
-}
+_git_check_all() { _git_origin; _git_add; _git_commit; _git_push; }
 
 _sync_config() {
   if [ ! -s "${_sync_file}" ]; then
@@ -355,11 +350,11 @@ _do_options() {
 
   if [ "$cmd" = git ]; then
     case "$1" in
-    pull) _git_pull ;;
-    add) _git_add ;;
-    commit) _git_commit ;;
-    push) _git_push ;;
-    check) _git_check_all ;;
+    pull) _git_pull && exit 0 ;;
+    add) _git_add && exit 0 ;;
+    commit) _git_commit && exit 0 ;;
+    push) _git_push && exit 0 ;;
+    check) _git_check_all && exit 0 ;;
     *) err "unknown argument: $1" ;;
     esac
   fi
@@ -367,11 +362,10 @@ _do_options() {
     [ ! "$1" ] && _remove_broken_links && exit 0
 
     case "$1" in
-    symlink) _remove_broken_links ;;
+    symlink) _remove_broken_links && exit 0 ;;
     *) err "unknown argument: $1" ;;
     esac
   fi
-  shift 2
 }
 
 main() {

@@ -1,0 +1,11 @@
+[files][endfiles]
+
+[config][endconfig]
+
+# --- ⸨ INFO ⸩
+
+# Source file path in dotfiles and destination in user home.
+
+# source_file/path:destination_file/path
+
+# If destination_file not specified, then .source_file will be used by default.
