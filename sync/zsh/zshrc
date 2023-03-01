@@ -64,7 +64,7 @@ zi ice id-as'gcloud-completion'
 zi snippet /opt/google-cloud-sdk/completion.zsh.inc
 
 zi has'svn' blockf for svn \
-  id-as'user:aliases' multisrc'{general,systemd}.zsh' pick'/dev/null' \
+  id-as'user:aliases' multisrc'{general,systemd/systemd}.zsh' pick'/dev/null' \
     https://github.com/ss-o/dotfiles/trunk/sync/zsh/aliases/user
 # ANNEX ============================================================================================================== #
 zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes

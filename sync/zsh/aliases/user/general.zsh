@@ -20,7 +20,6 @@ alias options-status='setopt ksh_option_print && setopt'
 alias zstyle-status='zstyle -L'
 
 # System
-alias sys-boot-duration='command systemd-analyze | awk '{print $(NF-1)" "$NF;exit}''
 alias exec-cmds='function() {for i in `seq 50` ; $1; [[ ! $? = 0 ]] && break ; done;}'
 alias freemem='echo 3 | sudo tee /proc/sys/vm/drop_caches'
 alias reload!='exec "$SHELL" -l'
@@ -33,8 +32,6 @@ alias history-cmd-top="fc -ln 0 | awk '{print $1}' | sort | uniq -c | sort -nr |
 alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 
 # Files & Directories
-# --- [ find duplicate files (based on MD5 hash) ]
-alias files-dedupe='find -type f -exec md5sum '{}' ';' | sort | uniq --all-repeated=separate -w 33'
 alias dirs-size='du -h --max-depth=1 | sort -hr'
 
 # Lychee
