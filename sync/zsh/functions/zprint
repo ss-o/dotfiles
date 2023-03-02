@@ -24,7 +24,7 @@
 #
 #   zprint -n "Test$fg[yellow]MSG$reset_color"
 #   zprint "${reply[@]}" "\nLength of the above message: $REPLY"
-#   zprint "${reply[@]}" "\nFinished::)\n" --print
+#   zprint "${reply[@]}" "\nFinished\n" --print
 #
 #   By passing the $reply from previous call one accumulates multiple
 #   prints. The last one does the whole aggregated data displying, by
@@ -32,7 +32,7 @@
 #
 #     TestMSG
 #     Length of the above message: 7
-#     Finished::)
+#     Finished
 #
 #   One problem - above example will wrongly print the bars, with e.g.
 #   --both-bars passed, because it will have the length of the sum of
@@ -98,7 +98,7 @@ zprint() {
           builtin print -r -- ARGUMENT-ONLY-OPTIONS: "${(kv@)opthash[(I)(${(~j:|:)arg_keys[@]})]}"
 
           builtin print
-	      builtin print -r -- "The command to be run in case of --print option:"
+          builtin print -r -- "The command to be run in case of --print option:"
           builtin print -r -- print "${(kv@)opthash[(I)(${(~j:|:)arg_keys[@]})]}" "${optarray[@]}" "${(q-)@}"
         }
 

@@ -50,14 +50,20 @@ setopt share_history            # share command history data
 unsetopt rm_star_silent         # ask for confirmation for rm * and rm path/
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
-if [[ -z "${fpath[(re)${HOME}/.dotfiles/sync/zsh/functions]}" ]]; then
+if [[ -z ${fpath[(re)${HOME}/.dotfiles/sync/zsh/functions]} ]]; then
   typeset -gxU fpath FPATH
   fpath=( "${HOME}/.dotfiles/sync/zsh/functions" "${fpath[@]}" )
 fi
-builtin autoload -Uz $fpath[1]/*(.:t)
+
+for fnc in ${HOME}/.dotfiles/sync/zsh/functions/*; do
+  builtin autoload -Uz $fnc
+done
+for sni in ${HOME}/.dotfiles/sync/zsh/snippets/*; do
+  builtin source $sni
+done
+unset sni fnc
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
-
 # DEVOPS ============================================================================================================ #
 if [[ -z ${path[(re)/opt/google-cloud-sdk/bin]} ]] && [[ -d /opt/google-cloud-sdk/bin ]]; then
   source /opt/google-cloud-sdk/path.zsh.inc
@@ -96,7 +102,7 @@ export _ZO_CMD_PREFIX=''
 zi ice  has'zoxide' ver'31-bug-incorrect-regex-matching-for-_zo_cmd_prefix-when-empty'
 zi light z-shell/zsh-zoxide
 
-#zi load ss-o/zsh-functions
+zi load ss-o/zsh-functions
 
 # **
 # 亂 勇 勉 勒 勞 卑 墨 屢 履 廒廬 復 拉 敏 暑 易 擄 摒 僚 寮 尿 料 樂 燎 療 蓼 遼 龍 暈 阮 劉 杻 柳 流 溜 璘 藺 隣 鱗 麟 林 淋 臨 立 笠 粒 狀 炙 識 什 茶 
