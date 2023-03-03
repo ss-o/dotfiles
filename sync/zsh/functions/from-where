@@ -4,5 +4,5 @@
 builtin emulate -L zsh
 builtin setopt extended_glob warn_create_global typeset_silent
 
-print $^fpath/$_comps[$1](N)
+builtin print $^fpath/$_comps[$1](N)
 whence -v $_comps[$1]

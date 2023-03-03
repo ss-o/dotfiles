@@ -37,9 +37,9 @@ runtimes:
     - node@18.12.1
 actions:
   disabled:
+    - trunk-check-pre-push
     - trunk-fmt-pre-commit
   enabled:
     - trunk-announce
-    - trunk-check-pre-push
     - trunk-upgrade-available
     - trunk-cache-prune
