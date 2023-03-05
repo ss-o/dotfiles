@@ -1,4 +1,3 @@
-
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -45,29 +44,36 @@ setopt interactive_comments     # allow comments even in interactive shells
 setopt multios                  # perform implicit tees or cats when multiple redirections are attempted
 setopt no_beep                  # don't beep on error
 setopt prompt_subst             # enable parameter expansion, command substitution, and arithmetic expansion in the prompt
+setopt transient_rprompt        # only show the rprompt on the current prompt
 setopt pushd_ignore_dups        # don't push multiple copies of the same directory onto the directory stack
 setopt share_history            # share command history data
 unsetopt rm_star_silent         # ask for confirmation for rm * and rm path/
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
-if [[ -z ${fpath[(re)${HOME}/.dotfiles/sync/zsh/functions]} ]]; then
+typeset -gA DOTFILES
+DOTFILES[ZSH]="${HOME}/.dotfiles/sync/zsh"
+
+if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
   typeset -gxU fpath FPATH
-  fpath=( "${HOME}/.dotfiles/sync/zsh/functions" "${fpath[@]}" )
+  fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
 fi
 
-for fnc in ${HOME}/.dotfiles/sync/zsh/functions/*; do
-  builtin autoload -Uz $fnc
-done
-for sni in ${HOME}/.dotfiles/sync/zsh/snippets/*; do
-  builtin source $sni
-done
-unset sni fnc
+() {
+  local fnc sni
+  for fnc in ${DOTFILES[ZSH]}/functions/*; do
+    builtin autoload -Uz ${fnc:t}
+  done
+  for sni in ${DOTFILES[ZSH]}/snippets/*; do
+    builtin source $sni
+  done
+}
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
 # DEVOPS ============================================================================================================ #
 if [[ -z ${path[(re)/opt/google-cloud-sdk/bin]} ]] && [[ -d /opt/google-cloud-sdk/bin ]]; then
   source /opt/google-cloud-sdk/path.zsh.inc
 fi
+
 zi ice id-as'gcloud-completion'
 zi snippet /opt/google-cloud-sdk/completion.zsh.inc
 
@@ -109,4 +115,6 @@ reload_z() {
 	done
 }
 
-source "${HOME}/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
+reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
+
+builtin source "${HOME}/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
