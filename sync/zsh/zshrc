@@ -31,7 +31,7 @@ setopt auto_pushd               # make cd push the old directory onto the direct
 setopt bang_hist                # treat the '!' character, especially during expansion.
 setopt extended_glob            # treat #, ~, and ^ as part of patterns for filename generation
 setopt extended_history         # record timestamp of command in HISTFILE
-setopt glob_dots                # show dotfiles in completions
+setopt no_glob_dots             # show dotfiles in completions
 setopt hist_expire_dups_first   # delete duplicates first when HISTFILE size exceeds HISTSIZE
 setopt hist_ignore_all_dups     # remove older duplicate entries from the history
 setopt hist_ignore_dups         # ignore duplicated commands history list
@@ -47,6 +47,11 @@ setopt prompt_subst             # enable parameter expansion, command substituti
 setopt transient_rprompt        # only show the rprompt on the current prompt
 setopt pushd_ignore_dups        # don't push multiple copies of the same directory onto the directory stack
 setopt share_history            # share command history data
+setopt long_list_jobs           # display PID when suspending processes as well
+setopt notify                   # report the status of backgrounds jobs immediately
+setopt no_sh_word_split         # use zsh style word splitting
+setopt unset                    # don't error out when unset parameters are used
+setopt nohup                    # don't send SIGHUP to background processes when the shell exits.
 unsetopt rm_star_silent         # ask for confirmation for rm * and rm path/
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
