@@ -5,5 +5,7 @@ endconfig
 HISTCMD
 optchar
 optspec
+pfxs
+qcsg
 qcuaspl
 srcconfig
