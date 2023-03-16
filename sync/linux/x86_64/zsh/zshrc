@@ -18,7 +18,7 @@ COMPLETION_WAITING_DOTS=true
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
 [[ $COLORTERM = *(24bit|truecolor)* ]] || { zmodload zsh/nearcolor 2> /dev/null; }
-(( $+commands[vivid] )) && { export LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
+(( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
 typeset -gA DOTFILES
