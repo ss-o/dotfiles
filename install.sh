@@ -86,8 +86,24 @@ err() {
 }
 
 say_ok() {
+  # Don't print anything if we're in quiet mode
+  if [ "${_is_quiet}" = "true" ]; then
+    return 0
+  fi
+
   printf "\033[34;1m▓▒░\033[32;01m ✔ \033[00m» "
   say -green "$1"
+  printf "\033[00m"
+}
+
+say_info() {
+  # Don't print anything if we're in quiet mode
+  if [ "${_is_quiet}" = "true" ]; then
+    return 0
+  fi
+
+  printf "\033[34;1m▓▒░\033[32;01m ✔ \033[00m» "
+  say -yellow "$1"
   printf "\033[00m"
 }
 
@@ -98,15 +114,9 @@ say_err() {
   exit 1
 }
 
-say_info() {
-  printf "\033[34;1m▓▒░\033[32;01m ✔ \033[00m» "
-  say -yellow "$1"
-  printf "\033[00m"
-}
-
 say_log() {
-  [ -d "${_backup_dir}" ] || mkdir -p "${_backup_dir}"
-  say_info "$1 -- $(date)" | tee -a "${_logfile}" >/dev/null
+  [ -d "${_backup_dir}" ] || command mkdir -p "${_backup_dir}"
+  say_info "$1 -- $(date || true)" | command tee -a "${_logfile}" >/dev/null
 }
 # ============================================================================== #
 _get_os() {
@@ -143,9 +153,9 @@ _get_os() {
     _current_os='unknown'
     ;;
   esac
-  say "$_supported_os" | grep -q "$_current_os"
+  say "${_supported_os}" | grep -q "${_current_os}"
   match=$?
-  if [ "$match" -eq 0 ]; then
+  if [ "${match}" -eq 0 ]; then
     say -n "${_current_os}"
     return 0
   else
@@ -169,9 +179,9 @@ _get_arch() {
     _current_arch='Unknown'
     ;;
   esac
-  say "$_supported_cpu" | grep -q "$_current_arch"
+  say "${_supported_cpu}" | grep -q "${_current_arch}"
   match=$?
-  if [ "$match" -eq 0 ]; then
+  if [ "${match}" -eq 0 ]; then
     say -n "${_current_arch}"
     return 0
   else
@@ -183,7 +193,7 @@ _is_git() { [ ! -d .git ] && say_err "Not a git repository"; }
 _has_terminal() { [ -t 0 ]; }
 _is_tty() { _has_terminal; }
 _is_piped() { ! [ -t 1 ]; }
-_is_root() { [ "$(id -u)" -eq 0 ]; }
+_is_root() { [ "$(id -u || true)" -eq 0 ]; }
 
 _check_commands() {
   for deps in ${_required_cmds}; do
@@ -194,16 +204,29 @@ _check_commands() {
 }
 
 _remove_broken_links() {
-  find "${_user_home}" -maxdepth 2 -name ".*" -type l | while read -r f1; do
-    if [ -L "$f1" ] && ! [ -e "$f1" ]; then
+  find "${_user_home}" -maxdepth 1 -name ".*" -type l | while read -r f1; do
+    if [ -L "${f1}" ] && [ ! -e "${f1}" ]; then
       command rm -f "${f1}" && say_info "Removed dangling symlink: ${f1}"
+    else
+      say_ok "No dangling symlinks found in ${_user_home}"
     fi
   done
-  find "${_user_home_config}" -maxdepth 2 -name "*" -type l | while read -r f2; do
-    if [ -L "$f2" ] && ! [ -e "$f2" ]; then
+  find "${_user_home}" -maxdepth 2 -name "*" -type l | while read -r f2; do
+    if [ -L "${f2}" ] && [ ! -e "${f2}" ]; then
       command rm -f "${f2}" && say_info "Removed dangling symlink: ${f2}"
+    else
+      say_ok "No dangling symlinks found in ${_user_home}"
     fi
   done
+  find "${_user_home_config}" -maxdepth 3 -name "*" -type l | while read -r f3; do
+    if [ -L "${f3}" ] && [ ! -e "${f3}" ]; then
+      command rm -f "${f3}" && say_info "Removed dangling symlink: ${f3}"
+    else
+      say_ok "No dangling symlinks found in ${_user_home_config}/*/*"
+    fi
+  done
+
+  return 0
 }
 
 _init_local() {
@@ -275,9 +298,7 @@ _sync_config() {
       say_err "File ${dosync_dir}/sync.config doesn't exist, exiting"
     fi
   fi
-}
 
-_read_sync_config() {
   _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#' | grep -v '^$' | sort -u)"
   _config_src="$(sed -n '/\[config\]/,/\[endconfig\]/p' "${_sync_file}" | grep -v '^\[.*config]' | grep -v '^#' | grep -v '^$' | sort -u)"
   if [ -z "${_files_src}" ] && [ -z "${_config_src}" ]; then
@@ -294,7 +315,9 @@ _read() {
   [ -z "${dstconfig}" ] && dstconfig="$(basename "${srcfile}")"
 
   _sync_src="${dosync_dir}/${srcfile}"
+  _sync_src_dir=$(dirname "${_sync_src}")
   _sync_config_src="${dosync_dir}/${srcfile}"
+  _sync_config_src_dir=$(dirname "${_sync_config_src}")
   _sync_target="${_user_home}/${dstfile}"
   _sync_config_target="${_user_home_config}/${dstfile}"
 }
@@ -302,12 +325,10 @@ _read() {
 dosync() {
   _init_local
   _sync_config
-  _read_sync_config
-  _remove_broken_links
 
-  for file in $_files_src; do
+  for file in ${_files_src}; do
     _read "${file}"
-    if [ -e "${_sync_src}" ] && [ -e "${_sync_target}" ] && ! [ -L "${_sync_target}" ]; then
+    if [ -e "${_sync_target}" ] && [ ! -h "${_sync_target}" ]; then
       [ ! -d "${_backup_dir}" ] && command mkdir -p "${_backup_dir}"
       _make_backup="${_backup_dir}/$(basename "${file}")"
       say_log "Backup: ${_sync_target} ➤ ${_make_backup}"
@@ -319,34 +340,32 @@ dosync() {
       command rm -f "${_sync_target}"
       command ln -si "${_sync_src}" "${_sync_target}"
       say_ok "SymLink: ${srcfile} ➤ ${_sync_target}"
-    elif [ "${_sync_target}" != "" ]; then
+    else
+      command mkdir -p "${_sync_src_dir}"
       command ln -si "${_sync_src}" "${_sync_target}"
       say_ok "SymLink:${_sync_src} ➤ ${_sync_target}"
-    else
-      say_log "Source file ${_sync_config_src} doesn't exist, skipping"
     fi
     ${reset:-}
   done
 
   for configfile in ${_config_src}; do
     _read "${configfile}"
-    if [ -e "${_sync_config_src}" ] && [ -e "${_sync_config_target}" ] && ! [ -L "${_sync_config_target}" ]; then
+    if [ -e "${_sync_config_target}" ] && [ ! -h "${_sync_config_target}" ]; then
       [ ! -d "${_backup_dir}" ] && command mkdir -p "${_backup_dir}"
       _make_backup="${_backup_dir}/$(basename "${configfile}")"
       say_log "Backup: ${_sync_config_target} ➤ ${_make_backup}"
       command cp -r "${_sync_config_target}" "${_make_backup}"
       command rm -rf "${_sync_config_target}"
-      command ln -si "${_sync_config_src}" "${_sync_config_target}"
+      command ln -s "${_sync_config_src}" "${_sync_config_target}"
       say_ok "SymLink:${srcfile} ➤ ${_sync_config_target}"
     elif [ -e "${_sync_config_target}" ]; then
       command rm -f "${_sync_config_target}"
-      command ln -si "${_sync_config_src}" "${_sync_config_target}"
-      say_ok "SymLink: ${_sync_config_src} ➤ ${_sync_config_target}"
-    elif [ "${_sync_config_target}" != "" ]; then
-      command ln -si "${_sync_config_src}" "${_sync_config_target}"
+      command ln -s "${_sync_config_src}" "${_sync_config_target}"
       say_ok "SymLink: ${_sync_config_src} ➤ ${_sync_config_target}"
     else
-      say_log "Source file ${_sync_config_src} doesn't exist, skipping"
+      command mkdir -p "${_sync_config_src_dir}"
+      command ln -s "${_sync_config_src}" "${_sync_config_target}"
+      say_ok "SymLink: ${_sync_config_src} ➤ ${_sync_config_target}"
     fi
     ${reset:-}
   done
@@ -354,38 +373,46 @@ dosync() {
 
 _do_options() {
   cmd="$1"
-  shift 1
+  arg="$2"
 
-  if [ "$cmd" = git ]; then
-    case "$1" in
-    pull) _git_pull && exit 0 ;;
-    add) _git_add && exit 0 ;;
-    commit) _git_commit && exit 0 ;;
-    push) _git_push && exit 0 ;;
-    check) _git_check_all && exit 0 ;;
-    *) err "unknown argument: $1" ;;
+  [ "${cmd}" = sync ] && dosync
+
+  if [ "${cmd}" = git ]; then
+    case "${arg}" in
+    pull) _git_pull ;;
+    add) _git_add ;;
+    commit) _git_commit ;;
+    push) _git_push ;;
+    check) _git_check_all ;;
+    *) err "unknown argument: ${arg}" ;;
     esac
   fi
-  if [ "$cmd" = clean ]; then
-    [ ! "$1" ] && _remove_broken_links && exit 0
+  if [ "${cmd}" = clean ]; then
+    # If no argument is given, remove all broken links by default
+    [ -z "${arg}" ] && _remove_broken_links
 
-    case "$1" in
-    symlink) _remove_broken_links && exit 0 ;;
-    *) err "unknown argument: $1" ;;
+    case "${arg}" in
+    symlinks) _remove_broken_links ;;
+    *) err "unknown argument: ${arg}" ;;
     esac
   fi
+
+  return 0
 }
 
 main() {
-  [ $# = 0 ] && dosync && exit 0
+  # If no arguments are given, run sync by default
+  [ $# = 0 ] && dosync && return 0
+
   # Parse options
-  optspec=":qcg-:"
-  while getopts "$optspec" optchar; do
+  optspec=":qcgs-:"
+  while getopts "${optspec}" optchar; do
     case "${optchar}" in
     # Short options
     q) _is_quiet=true ;;
     g) _do_options "git" "$2" ;;
     c) _do_options "clean" "$2" ;;
+    s) _do_options "sync" ;;
 
     -)
       case "${OPTARG}" in
@@ -393,6 +420,7 @@ main() {
       quiet) _is_quiet=true ;;
       git) _do_options "git" "$2" ;;
       clean) _do_options "clean" "$2" ;;
+      sync) _do_options "sync" ;;
       *) err "Unknown option --${OPTARG}" ;;
       esac
       ;;
@@ -402,6 +430,4 @@ main() {
   shift $((OPTIND - 1))
 }
 
-while true; do
-  main "$@"
-done
+main "${@}"

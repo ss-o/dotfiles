@@ -7,14 +7,14 @@ builtin setopt local_options extended_glob
 
 local -a pfxs lines desc files
 pfxs=( zsh user system )                                                # grouped commands
-pfxs+=( "*~$HOME/.dotfiles/sync/zsh/functions/(${(j:|:)pfxs}|lps)" )    # ungrouped commands
-pfxs+=( local )                                                         # local, uncommited commands
+pfxs+=( "*~$HOME/.dotfiles/sync/linux/x86_64/zsh/functions/(${(j:|:)pfxs}|lps)" )    # ungrouped commands
+pfxs+=( local )                                                         # local, uncommitted commands
 
 integer pass longest=0 longest2=0
 local p file header="# Description: "
 for (( pass = 1; pass <= 2; ++ pass )); do
     for p in "${pfxs[@]}"; do
-        files=( $HOME/.dotfiles/sync/zsh/functions/${~p}*(N) )
+        files=( $HOME/.dotfiles/sync/linux/x86_64/zsh/functions/${~p}*(N) )
         if (( pass == 2 )); then
             if (( ${#files[@]} )); then
                 if [[ "$p" = "lps" ]]; then

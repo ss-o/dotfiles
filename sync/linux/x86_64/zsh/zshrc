@@ -56,7 +56,7 @@ unsetopt rm_star_silent         # ask for confirmation for rm * and rm path/
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
 typeset -gA DOTFILES
-DOTFILES[ZSH]="${HOME}/.dotfiles/sync/zsh"
+DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/x86_64/zsh"
 
 if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
   typeset -gxU fpath FPATH
@@ -122,4 +122,4 @@ reload_z() {
 
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
 
-builtin source "${HOME}/.dotfiles/sync/zsh/themes/p10k-robbyrussell.zsh"
+builtin source "${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh"

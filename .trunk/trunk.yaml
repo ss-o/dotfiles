@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.6.0
+  version: 1.6.1
 repo:
   repo:
     host: github.com
@@ -9,10 +9,12 @@ repo:
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.12
+      ref: v0.0.13
       uri: https://github.com/trunk-io/plugins
 lint:
   enabled:
+    - ruff@0.0.256
+    - yamllint@1.29.0
     - taplo@0.7.0
     - black@23.1.0
     - isort@5.12.0
@@ -23,10 +25,10 @@ lint:
     - markdownlint@0.33.0
     - git-diff-check
     - shellcheck@0.9.0
-    - gitleaks@8.16.0
+    - gitleaks@8.16.1
     - git-diff-check
     - markdownlint@0.33.0
-    - gitleaks@8.16.0
+    - gitleaks@8.16.1
     - prettier@2.8.4
     - shellcheck@0.9.0
     - shfmt@3.5.0

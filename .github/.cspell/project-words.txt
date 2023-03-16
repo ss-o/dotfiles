@@ -3,6 +3,7 @@ LBUFFER
 logfile
 MANPATH
 msys
+qcgs
 setenv
 shfunc
 sunos

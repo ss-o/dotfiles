@@ -4,7 +4,7 @@ SCRIPTNAME=${0##*/}
 
 ## The nginx binary. Check if we're root or not. If we are get the
 ## path to nginx.  If not hardcode the path.
-if [ "$(id -u)" -eq 0 ]; then
+if [[ "$(id -u || true)" -eq 0 ]]; then
   IS_ROOT=1
   NGINX=$(command -v nginx) || exit 1
 else
@@ -16,7 +16,7 @@ fi
 NGINX_CONF_DIR=/etc/nginx
 
 function print_usage() {
-  echo "$SCRIPTNAME [-c <nginx configuration base directory> default: /etc/nginx] [ -s <startup program name> default: service nginx reload] <site name>"
+  echo "${SCRIPTNAME} [-c <nginx configuration base directory> default: /etc/nginx] [ -s <startup program name> default: service nginx reload] <site name>"
 }
 
 ## Extract the startup program name from a given argument. If it's a
@@ -28,12 +28,12 @@ function get_startup_program_name() {
   local value="$1"
   if [[ $1 =~ [[:alnum:]/-]]+nginx$ ]]; then
     value="$1 -s reload"
-  elif [ -z "$1" ]; then
+  elif [[ -z $1 ]]; then
     value="service nginx reload"
   else
     value=$1
   fi
-  echo "$value"
+  echo "${value}"
 }
 
 ## The default start up program is service.
@@ -44,36 +44,36 @@ STARTUP_PROGRAM_NAME=$(get_startup_program_name)
 ## $2: available sites directory name (usually sites-available)
 ## Returns the relative path from the sites-enabled directory.
 function make_relative_path() {
-  printf '../%.0s%s/%s' $(eval echo {0..$(expr length "${1//[^\/]/}")}) "$2" "$1"
+  printf '../%.0s%s/%s' "$(eval echo "{0..${1//[^\/]/}}" || true)" "$2" "$1"
 }
 
 ## Checking the type of action we will perform. Enabling or disabling.
-ACTION=$(echo "$SCRIPTNAME" | awk '$0 ~ /dissite/ {print "DISABLE"} $0 ~ /ensite/ {print "ENABLE"} $0 !~ /(dis|en)site/ {print "UNKNOWN"}')
+ACTION=$(echo "${SCRIPTNAME}" | awk '$0 ~ /dissite/ {print "DISABLE"} $0 ~ /ensite/ {print "ENABLE"} $0 !~ /(dis|en)site/ {print "UNKNOWN"}')
 
-if [ "$ACTION" == "UNKNOWN" ]; then
-  echo "$SCRIPTNAME: Unknown action!" >&2
+if [[ ${ACTION} == "UNKNOWN" ]]; then
+  echo "${SCRIPTNAME}: Unknown action!" >&2
   print_usage
   exit 2
 fi
 
 ## Check the number of arguments.
-if [ $# -lt 1 ] || [ $# -gt 5 ]; then
+if [[ $# -lt 1 ]] || [[ $# -gt 5 ]]; then
   print_usage >&2
   exit 3
 fi
 
 ## Parse the getops arguments.
 while getopts c:s: OPT; do
-  case $OPT in
-  c | +c)
-    NGINX_CONF_DIR=$(realpath "$OPTARG")
-    if [[ ! -d $NGINX_CONF_DIR ]]; then
-      echo "$NGINX_CONF_DIR directory not found." >&2
+  case ${OPT} in
+  c)
+    NGINX_CONF_DIR=$(realpath "${OPTARG}")
+    if [[ ! -d ${NGINX_CONF_DIR} ]]; then
+      echo "${NGINX_CONF_DIR} directory not found." >&2
       exit 3
     fi
     ;;
-  s | +s)
-    STARTUP_PROGRAM_NAME=$(get_startup_program_name "$OPTARG")
+  s)
+    STARTUP_PROGRAM_NAME=$(get_startup_program_name "${OPTARG}")
     ;;
   *)
     print_usage >&2
@@ -86,11 +86,11 @@ OPTIND=1
 
 ## The paths for both nginx configuration files and the sites
 ## configuration files and symbolic link destinations.
-AVAILABLE_SITES_PATH="$NGINX_CONF_DIR/sites-available"
-ENABLED_SITES_PATH="$NGINX_CONF_DIR/sites-enabled"
+AVAILABLE_SITES_PATH="${NGINX_CONF_DIR}/sites-available"
+ENABLED_SITES_PATH="${NGINX_CONF_DIR}/sites-enabled"
 
 ## Check the number of arguments.
-if [ $# -ne 1 ]; then
+if [[ $# -ne 1 ]]; then
   print_usage >&2
   exit 3
 else
@@ -98,54 +98,54 @@ else
 
   ## If enabling the 'default' site then make sure that it's the
   ## first to be loaded.
-  if [ "$1" == "default" ]; then
-    SITE_ENABLED="$ENABLED_SITES_PATH/default"
+  if [[ $1 == "default" ]]; then
+    SITE_ENABLED="${ENABLED_SITES_PATH}/default"
   else
-    SITE_ENABLED="$ENABLED_SITES_PATH/$1"
+    SITE_ENABLED="${ENABLED_SITES_PATH}/$1"
   fi
   ## Check if the directory where we will place the symlink
   ## exists. If not create it.
-  [ -d "${SITE_ENABLED%/*}" ] || mkdir -p "${SITE_ENABLED%/*}"
+  [[ -d ${SITE_ENABLED%/*} ]] || mkdir -p "${SITE_ENABLED%/*}"
 fi
 
 ## Check that the file corresponding to site exists if enabling or
 ## that the symbolic link exists if disabling. Perform the desired
 ## action if possible. If not signal an error and exit.
-case $ACTION in
+case ${ACTION} in
 ENABLE)
   # Change to the directory where we will place the symlink so that we
   # see the relative path correctly.
   cd "${SITE_ENABLED%/*}" || exit
-  if [ -r "$SITE_AVAILABLE" ]; then
+  if [[ -r ${SITE_AVAILABLE} ]]; then
     ## Test for a well formed configuration only when we are
     ## root.
-    if [ -n "$IS_ROOT" ]; then
+    if [[ -n ${IS_ROOT} ]]; then
       echo "Pre-flight check..."
-      $NGINX -t
+      ${NGINX} -t
       STATUS=$?
     fi
-    if [ "$STATUS" -ne 0 ]; then
+    if [[ ${STATUS} -ne 0 ]]; then
       exit 5
     fi
     ## Check the config testing status and if the link exists already.
-    if [ -h "$SITE_ENABLED" ]; then
+    if [[ -L ${SITE_ENABLED} ]]; then
       ## If already enabled say it and exit.
       echo "$1 is already enabled."
       exit 0
     fi
-    ln -s "$SITE_AVAILABLE" "$SITE_ENABLED"
-    if [ -n "$IS_ROOT" ]; then
+    ln -s "${SITE_AVAILABLE}" "${SITE_ENABLED}"
+    if [[ -n ${IS_ROOT} ]]; then
       echo "New config check..."
-      $NGINX -t
+      ${NGINX} -t
       STATUS=$?
     fi
-    if [ "$STATUS" -eq 0 ]; then
+    if [[ ${STATUS} -eq 0 ]]; then
       echo "Site $1 has been enabled."
       # printf '\nRun "%s" to apply the changes.\n' $STARTUP_PROGRAM_NAME
-      echo "Run '$STARTUP_PROGRAM_NAME' to apply the changes."
+      echo "Run '${STARTUP_PROGRAM_NAME}' to apply the changes."
       exit 0
     else
-      rm "$SITE_ENABLED"
+      rm "${SITE_ENABLED}"
       echo "$1 not enabled"
       exit 5
     fi
@@ -156,20 +156,21 @@ ENABLE)
 
   ;;
 DISABLE)
-  if [ "$1" = "default" ]; then
-    if [ -h "$ENABLED_SITES_PATH/default" ]; then
-      SITE_ENABLED="$ENABLED_SITES_PATH/default"
+  if [[ $1 == "default" ]]; then
+    if [[ -L "${ENABLED_SITES_PATH}/default" ]]; then
+      SITE_ENABLED="${ENABLED_SITES_PATH}/default"
     fi
   fi
-  if [ -h "$SITE_ENABLED" ]; then
-    rm "$SITE_ENABLED"
+  if [[ -L ${SITE_ENABLED} ]]; then
+    rm "${SITE_ENABLED}"
     echo "Site $1 has been disabled."
     # printf '\nRun "%s" to apply the changes.\n' $STARTUP_PROGRAM_NAME
-    echo "Run '$STARTUP_PROGRAM_NAME' to apply the changes."
+    echo "Run '${STARTUP_PROGRAM_NAME}' to apply the changes."
     exit 0
   else
     echo "Site $1 doesn't exist." >&2
     exit 7
   fi
   ;;
+*) exit 0 ;;
 esac
