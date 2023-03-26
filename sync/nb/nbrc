@@ -11,3 +11,5 @@ export NB_FOOTER="${NB_FOOTER:-1}"
 export NB_HEADER="${NB_HEADER:-1}"
 export NB_SYNTAX_THEME="${NB_SYNTAX_THEME:-ansi-dark}"
 export NB_DIR="${NB_DIR:-${HOME}/.nb}"
+
+export NB_LIMIT="${NB_LIMIT:-auto}" # Set by `nb` • Sun Mar 26 04:53:11 PM BST 2023
