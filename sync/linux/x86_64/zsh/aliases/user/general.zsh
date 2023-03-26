@@ -6,6 +6,7 @@ alias add-cloudflare-ca-pem="wget -O - https://developers.cloudflare.com/cloudfl
 alias add-cloudflare-ca-crt="wget -O - https://developers.cloudflare.com/cloudflare-one/static/documentation/connections/Cloudflare_CA.crt > Cloudflare_CA.crt"
 alias add-lychee-config='wget -O - https://github.com/lycheeverse/lychee/raw/master/lychee.example.toml'
 alias add-trunk='curl https://get.trunk.io -fsSL | bash'
+alias add-fly-cli='curl -L https://fly.io/install.sh | sh'
 
 alias get-origin='command git config -l| grep remote.origin.url | awk -F'=' '{print $2}''
 
@@ -34,6 +35,9 @@ alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 # Files & Directories
 alias dirs-size='du -h --max-depth=1 | sort -hr'
 
+# Trunk
+alias check='trunk check --jobs $(nproc)'
+
 # Lychee
 alias docker-lychee='docker run --init -it -v $(pwd):/input lycheeverse/lychee'
 alias docker-lychee-gh='docker run --init -it -v $(pwd):/input lycheeverse/lychee --github-token'
@@ -50,9 +54,11 @@ alias get-local-tasks-established='lsof -i -P | grep -i established'
 alias get-local-tcp-listen='netstat -an | grep LISTEN | grep tcp'
 alias get-local-unix-listen='netstat -an | grep LISTEN | grep unix'
 alias run-python-server='python -m http.server 8888'
+
 # --- SSH
 # ------ [ <tunnel port>:<destination address>:<destination port> ]
 alias ssh-forward-3000='ssh -L 3000:localhost:3000'
+
 # --- INTELLIGENCE
 # ------ [ Crowdsec ]
 alias check-ip='f() {command curl -sL -H "x-api-key: $CTI_API_KEY" https://cti.api.crowdsec.net/v2/smoke/$1 | jq . ; unset -f f; }; f'
@@ -82,4 +88,7 @@ alias compute-list-us-central='gcloud compute instances list --filter="zone:us-c
 
 # API
 # --- Check Licenses
-alias gh-api-available-licenses='gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28" /licenses'
+alias gh-api='gh api -H "Accept: application/vnd.github+json" -H "X-GitHub-Api-Version: 2022-11-28"'
+alias gh-get-licenses='gh-api /licenses'
+alias gh-get-emojis='gh-api /emojis'
+alias gh-get-gitignore-templates='gh-api /gitignore/templates'

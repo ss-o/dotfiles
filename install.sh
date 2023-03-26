@@ -70,8 +70,7 @@ say() {
       ;;
     esac
     shift
-    printf "%s${col}"
-    printf '%s' "$1"
+    printf "${col}%s" "$1"
     printf "\033[00m"
     shift
   done
@@ -186,7 +185,7 @@ _get_arch() {
     _current_arch='aarch64'
     ;;
   *)
-    _current_arch='Unknown'
+    _current_arch='unknown'
     ;;
   esac
   say "${_supported_cpu}" | grep -q "${_current_arch}"

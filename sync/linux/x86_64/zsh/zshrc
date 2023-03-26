@@ -2,10 +2,27 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-[[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
-  source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
-} || { 
-  source <(curl -sL init.zshell.dev); zzinit;
+#(){
+#  typeset cs_ok='23a563e80249a866c7cba3ac44eaedb1ca38f20c35690fb764a7cb75e95d38be'
+#  typeset cs_get=$(sha256sum <(curl -sL init.zshell.dev) | awk '{print $1}')
+#  [[ $cs_ok == $cs_get ]] && {    
+#    #curl -sL init.zshell.dev -o ~/temp
+#    source ~/temp; zzinit
+#  } || {
+#    print -P "%F{160}▓▒░ Houston, we have a problem, the %F{226}$cs_get%F{160} do not match\!%f%b"; exit 1
+#  }
+#}
+
+typeset -A ZI
+ZI[REPOSITORY]="https://github.com/ss-o/zi.git"
+ZI[STREAM]="perf/env"
+
+(){
+  [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
+    source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
+  } || { 
+    source <(curl -sL init.zshell.dev); zzinit;
+  }
 }
 
 # ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
@@ -32,10 +49,13 @@ fi
 () {
   local fnc sni
   for fnc in ${DOTFILES[ZSH]}/functions/*; do
-    builtin autoload -Uz ${fnc:t}
+    autoload -Uz ${fnc:t}
   done
   for sni in ${DOTFILES[ZSH]}/snippets/*; do
-    builtin source $sni
+    source $sni
+  done
+  for sni_lib in ${DOTFILES[ZSH]}/snippets/lib/*; do
+    source $sni_lib
   done
 }
 
@@ -66,15 +86,16 @@ zi-turbo '0a' light-mode for \
     if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
     if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
 # PLUGINS ============================================================================================================ #
-zi-turbo '0b' for \
+zi-turbo '0a' for \
   binary sbin'bin/*' \
     z-shell/nb \
   binary from"gh-r" sbin \
     ajeetdsouza/zoxide \
   has'lsd' atinit'AUTOCD=1' \
     z-shell/zsh-lsd \
-  has'zoxide' \
+  has'zoxide' ver'v1.1.0' \
     z-shell/zsh-zoxide \
+  atinit'YSU_MESSAGE_POSITION=after' \
     MichaelAquilina/zsh-you-should-use
 
 #zi load ss-o/zsh-functions
