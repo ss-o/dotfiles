@@ -40,14 +40,14 @@ info_block() {
 
 note_block() {
   # Don't print anything if we're in quiet mode
-  if [ "${_is_quiet}" = "true" ]; then
-    return 0
-  fi
+  [ "${_is_quiet}" = "true" ] && return 0
   printf '\033[1;42m%-*s\033[0m\n' "${COLUMNS:-$(tput cols || true)}" "▓▒░ ★ » $1" | tr ' ' ' '
 }
 
 say() {
+  rst="\033[00m"
   while [ -n "$1" ]; do
+    one_line=0
     case "$1" in
     -normal) col="\033[00m" ;;
     -black) col="\033[30;01m" ;;
@@ -59,22 +59,20 @@ say() {
     -cyan) col="\033[36;01m" ;;
     -white) col="\033[37;01m" ;;
     -n)
-      one_line=1
-      shift
+      one_line=1 shift
       continue
       ;;
     *)
-      printf '%s' "$1"
+      printf '%s' "${1}${rst}"
       shift
       continue
       ;;
     esac
     shift
-    printf "${col}%s" "$1"
-    printf "\033[00m"
+    printf "${col}%s${rst}" "$1"
     shift
   done
-  [ -z "${one_line}" ] && printf "\n"
+  [ "${one_line}" = 1 ] || printf "\n"
 }
 
 err() {
