@@ -5,7 +5,7 @@ fi
 #(){
 #  typeset cs_ok='23a563e80249a866c7cba3ac44eaedb1ca38f20c35690fb764a7cb75e95d38be'
 #  typeset cs_get=$(sha256sum <(curl -sL init.zshell.dev) | awk '{print $1}')
-#  [[ $cs_ok == $cs_get ]] && {    
+#  [[ $cs_ok == $cs_get ]] && {
 #    #curl -sL init.zshell.dev -o ~/temp
 #    source ~/temp; zzinit
 #  } || {
@@ -13,6 +13,7 @@ fi
 #  }
 #}
 
+# ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
 typeset -A ZI
 ZI[REPOSITORY]="https://github.com/ss-o/zi.git"
 ZI[STREAM]="perf/env"
@@ -20,21 +21,23 @@ ZI[STREAM]="perf/env"
 (){
   [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
     source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
-  } || { 
-    source <(curl -sL init.zshell.dev); zzinit;
+  } || {
+    source <(curl -sL init.zshell.dev); zzinit
   }
 }
-
-# ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
-
-typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
 
 # ‑‑‑‑‑‑ ⸨ Zsh Environment ⸩ ‑‑‑‑‑‑
 
 COMPLETION_WAITING_DOTS=true
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
+: ${ZI[HISTORY_FILE]:=${ZI[CACHE_DIR]}/.history}
+if [[ -w $ZI[HISTORY_FILE] ]]; then
+  typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE=$ZI[HISTORY_FILE]
+fi
+
 [[ $COLORTERM = *(24bit|truecolor)* ]] || { zmodload zsh/nearcolor 2> /dev/null; }
+
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
@@ -47,16 +50,10 @@ if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
 fi
 
 () {
-  local fnc sni
-  for fnc in ${DOTFILES[ZSH]}/functions/*; do
-    autoload -Uz ${fnc:t}
-  done
-  for sni in ${DOTFILES[ZSH]}/snippets/*; do
-    source $sni
-  done
-  for sni_lib in ${DOTFILES[ZSH]}/snippets/lib/*; do
-    source $sni_lib
-  done
+  local sni lib fnc
+  for sni in ${DOTFILES[ZSH]}/snippets/*; do source ${~sni}; done
+  for lib in ${DOTFILES[ZSH]}/snippets/lib/*; do source ${~lib}; done
+  for fnc in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${fnc:t}; done
 }
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
@@ -93,7 +90,7 @@ zi-turbo '0a' for \
     ajeetdsouza/zoxide \
   has'lsd' atinit'AUTOCD=1' \
     z-shell/zsh-lsd \
-  has'zoxide' ver'v1.1.0' \
+  has'zoxide' \
     z-shell/zsh-zoxide \
   atinit'YSU_MESSAGE_POSITION=after' \
     MichaelAquilina/zsh-you-should-use
@@ -108,5 +105,7 @@ reload_z() {
 }
 
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
+clean-history() { truncate -s 0 $HISTFILE; }
 
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 builtin source "${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh"
