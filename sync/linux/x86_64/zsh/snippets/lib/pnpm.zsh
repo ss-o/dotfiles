@@ -1,6 +1,6 @@
-###-begin-pnpm-completion-###
-if type compdef &>/dev/null; then
-  _pnpm_completion () {
+#compdef _pnpm_completion pnpm
+
+_pnpm_completion () {
     local reply
     local si=$IFS
 
@@ -12,6 +12,4 @@ if type compdef &>/dev/null; then
     else
       _describe 'values' reply
     fi
-  }
-  compdef _pnpm_completion pnpm
-fi
+}

@@ -31,13 +31,9 @@ ZI[STREAM]="perf/env"
 COMPLETION_WAITING_DOTS=true
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
-: ${ZI[HISTORY_FILE]:=${ZI[CACHE_DIR]}/.history}
-if [[ -w $ZI[HISTORY_FILE] ]]; then
-  typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE=$ZI[HISTORY_FILE]
-fi
-
-[[ $COLORTERM = *(24bit|truecolor)* ]] || { zmodload zsh/nearcolor 2> /dev/null; }
-
+: ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
+[[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000
+history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
@@ -48,12 +44,12 @@ if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
   typeset -gxU fpath FPATH
   fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
 fi
-
-() {
-  local sni lib fnc
-  for sni in ${DOTFILES[ZSH]}/snippets/*; do source ${~sni}; done
-  for lib in ${DOTFILES[ZSH]}/snippets/lib/*; do source ${~lib}; done
-  for fnc in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${fnc:t}; done
+(){
+  setopt local_options typeset_silent
+  typeset _sni_ _lib_ _fnc_
+  for _sni_ in ${DOTFILES[ZSH]}/snippets/*.zsh; do source $_sni_; done
+  for _lib_ in ${DOTFILES[ZSH]}/snippets/lib/*.zsh; do source $_lib_; done
+  for _fnc_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_fnc_:t}; done
 }
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
@@ -105,7 +101,6 @@ reload_z() {
 }
 
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
-clean-history() { truncate -s 0 $HISTFILE; }
 
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 builtin source "${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh"
