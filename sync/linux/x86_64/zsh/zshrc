@@ -1,0 +1,106 @@
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+#(){
+#  typeset cs_ok='23a563e80249a866c7cba3ac44eaedb1ca38f20c35690fb764a7cb75e95d38be'
+#  typeset cs_get=$(sha256sum <(curl -sL init.zshell.dev) | awk '{print $1}')
+#  [[ $cs_ok == $cs_get ]] && {
+#    #curl -sL init.zshell.dev -o ~/temp
+#    source ~/temp; zzinit
+#  } || {
+#    print -P "%F{160}▓▒░ Houston, we have a problem, the %F{226}$cs_get%F{160} do not match\!%f%b"; exit 1
+#  }
+#}
+
+# ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
+typeset -A ZI
+ZI[REPOSITORY]="https://github.com/ss-o/zi.git"
+ZI[STREAM]="perf/env"
+
+(){
+  [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
+    source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
+  } || {
+    source <(curl -sL init.zshell.dev); zzinit
+  }
+}
+
+# ‑‑‑‑‑‑ ⸨ Zsh Environment ⸩ ‑‑‑‑‑‑
+
+COMPLETION_WAITING_DOTS=true
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
+
+: ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
+[[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000
+history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
+(( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
+
+# ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
+typeset -gA DOTFILES
+DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/x86_64/zsh"
+
+if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
+  typeset -gxU fpath FPATH
+  fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
+fi
+(){
+  setopt local_options typeset_silent
+  typeset _sni_ _lib_ _fnc_
+  for _sni_ in ${DOTFILES[ZSH]}/snippets/*.zsh; do source $_sni_; done
+  for _lib_ in ${DOTFILES[ZSH]}/snippets/lib/*.zsh; do source $_lib_; done
+  for _fnc_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_fnc_:t}; done
+}
+
+typeset -gx EDITOR=$(set-cmd vim micro nano)
+# DEVOPS ============================================================================================================ #
+zi is-snippet for id-as'gcloud-completion' \
+  if'[[ -d /opt/google-cloud-sdk/bin \
+    && -f /opt/google-cloud-sdk/completion.zsh.inc ]]' \
+  atinit'[[ -n ${path[(re)/opt/google-cloud-sdk/bin]} ]] \
+    || builtin source /opt/google-cloud-sdk/path.zsh.inc' \
+  /opt/google-cloud-sdk/completion.zsh.inc
+
+zi has'svn' blockf for svn \
+  id-as'user:aliases' multisrc'{general,systemd/systemd}.zsh' pick'/dev/null' \
+    https://github.com/ss-o/dotfiles/trunk/sync/linux/x86_64/zsh/aliases/user
+# ANNEX ============================================================================================================== #
+zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
+# META-PLUGINS ======================================================================================================= #
+zi lucid for light-mode \
+  skip'ripgrep peco tig bat exa hyperfine fd' @console-tools \
+  skip'dircolors-materia' @console-style \
+  skip'F-Sy-H' @z-shell @romkatv \
+  skip'fzf fzy peco skim' @fuzzy \
+  @zsh-users+fast
+# OH-MY-ZSH PLUGINS ================================================================================================== #
+zi-turbo '0a' light-mode for \
+  atload"unalias grv g" OMZP::git \
+    if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
+    if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
+# PLUGINS ============================================================================================================ #
+zi-turbo '0a' for \
+  binary sbin'bin/*' \
+    z-shell/nb \
+  binary from"gh-r" sbin \
+    ajeetdsouza/zoxide \
+  has'lsd' atinit'AUTOCD=1' \
+    z-shell/zsh-lsd \
+  has'zoxide' \
+    z-shell/zsh-zoxide \
+  atinit'YSU_MESSAGE_POSITION=after' \
+    MichaelAquilina/zsh-you-should-use
+
+#zi load ss-o/zsh-functions
+
+reload_z() {
+  autoload -U zrecompile
+	for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do
+		zrecompile -p $f && command rm -f $f.zwc.old
+	done
+}
+
+reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
+
+[[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
+builtin source "${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh"

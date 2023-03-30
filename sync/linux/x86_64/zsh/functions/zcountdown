@@ -1,0 +1,31 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Description: Wait "$1" seconds for Ctrl-C (animated progress bar).
+
+builtin setopt local_traps
+
+trap "return 1" INT TERM QUIT
+
+[[ "$1" = "test" ]] && return $(( 1 - ${+commands[vramsteg]} ))
+
+(( ${+commands[vramsteg]} )) || {
+    builtin print -r -- "Please install \`vramsteg':"
+    builtin print -r -- "  zi ice has'cmake;make' as'command' pick'src/vramsteg' \\"
+    builtin print -r -- "    atclone'cmake . ; cp -vf doc/man/vramsteg.1 \${ZI[MAN_DIR]}/man1' atpull'%atclone' make"
+    builtin print -r -- "  zi light z-shell/vramsteg-zsh"
+    return 2
+}
+
+local START=$(vramsteg --now) pause_len="$1"
+integer cnt
+
+for (( cnt = 0; cnt <= pause_len * 7 - 1; ++ cnt )); do
+  command vramsteg --label "Abort?" --min 0 --max $(( pause_len * 7 - 1 )) \
+    --current "$cnt" --start "$START" --elapsed --percentage
+  LANG=C sleep 0.142
+done
+
+command vramsteg --remove
+
+return 0

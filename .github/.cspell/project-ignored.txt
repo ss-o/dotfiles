@@ -1,0 +1,12 @@
+armv
+configfile
+dstconfig
+endconfig
+HISTCMD
+optchar
+optspec
+pfxs
+qcsg
+qcuaspl
+qdcsg
+srcconfig

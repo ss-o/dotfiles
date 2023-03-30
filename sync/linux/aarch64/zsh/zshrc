@@ -1,0 +1,39 @@
+[[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
+  source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
+} || {
+  source <(curl -sL init.zshell.dev); zzinit;
+}
+
+# ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
+
+typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
+
+@dynamic_grc() {
+  [[ "$TERM" = dumb ]] || (( ! $+commands[grc] )) && return 0
+
+  # Set alias for available commands.
+  for cmd in $( ls /usr/share/grc/ ); do
+    cmd="${cmd##*conf.}"
+    if (( $+commands[$cmd] )); then
+      $cmd() { $(which grc) --colour=auto ${commands[$0]} "$@"; }
+    fi
+  done
+}
+@dynamic_grc
+
+@dietpi_aliases() {
+  [[ -t 0 ]] && G_INTERACTIVE=1 || return 0
+
+  if [[ -d /boot/dietpi ]]; then
+    G_SUDO(){ local input=$*; emulate sh -c "source /boot/dietpi/func/dietpi-globals && sudo $input"; }
+    () {
+      local -a dp_file
+      dp_file=( /boot/dietpi/dietpi-* )
+      dp_file=( ${dp_file:t} )
+      local dp_alias; for dp_alias in $dp_file; do
+        alias $dp_alias="G_SUDO /boot/dietpi/${dp_alias}"
+      done
+    }
+  fi
+}
+@dietpi_aliases

@@ -1,0 +1,49 @@
+version: 0.1
+cli:
+  version: 1.7.0
+repo:
+  repo:
+    host: github.com
+    owner: ss-o
+    name: dotfiles
+plugins:
+  sources:
+    - id: trunk
+      ref: v0.0.13
+      uri: https://github.com/trunk-io/plugins
+lint:
+  disabled:
+    - yamllint
+  enabled:
+    - dotenv-linter@3.3.0
+    - ruff@0.0.259
+    - taplo@0.7.0
+    - black@23.3.0
+    - isort@5.12.0
+    - flake8@6.0.0
+    - actionlint@1.6.23
+    - shfmt@3.5.0
+    - prettier@2.8.7
+    - markdownlint@0.33.0
+    - git-diff-check
+    - shellcheck@0.9.0
+    - gitleaks@8.16.1
+    - git-diff-check
+    - markdownlint@0.33.0
+    - gitleaks@8.16.1
+    - prettier@2.8.7
+    - shellcheck@0.9.0
+    - shfmt@3.5.0
+runtimes:
+  enabled:
+    - python@3.10.8
+    - go@1.19.5
+    - node@18.12.1
+actions:
+  disabled:
+    - trunk-check-pre-push
+    - trunk-fmt-pre-commit
+  enabled:
+    - trunk-announce
+    - trunk-upgrade-available
+    - trunk-cache-prune

@@ -1,0 +1,8 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Description: This file is sourced only for login shells. It should contain
+# commands that should be executed only in login shells. It should be used to
+# set the terminal type and run a series of external commands.
+#
+# Loading order: zshenv, zprofile, zshrc, zlogin.

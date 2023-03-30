@@ -1,0 +1,15 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+builtin emulate -L zsh
+builtin setopt extended_glob local_options
+autoload colors ; colors
+
+local colors n
+
+for n in {000..255}
+do
+  colors+=("%F{$n}$n%f")
+done
+
+print -cP $colors

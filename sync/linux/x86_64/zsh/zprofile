@@ -1,0 +1,7 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+#
+# Description: This file is sourced only for login shells (invoked  with "-" as
+# the first character of argv[0], and shells invoked with the -l flag).
+#
+# Loading order: zshenv, zprofile, zshrc, zlogin.

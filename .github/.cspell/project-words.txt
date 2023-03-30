@@ -1,0 +1,13 @@
+cygwin
+LBUFFER
+logfile
+MANPATH
+msys
+qcgs
+setenv
+shfunc
+sunos
+unfunction
+vramsteg
+zcompdump
+zrecompile

@@ -1,0 +1,8 @@
+# -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
+# vim: ft=zsh sw=2 ts=2 et
+
+local shell_time shell=${1-$SHELL}
+
+for shell_time in $(seq 1 4); do
+  time ${shell} -i -c exit
+done
