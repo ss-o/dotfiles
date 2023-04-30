@@ -408,29 +408,33 @@ main() {
   # If no arguments are given, run sync by default
   [ $# -eq 0 ] && _cmd_=sync && _do_options run && exit 0
 
-  set -- "${@:-}"
+  if ! temp="$(getopt -o qdgcs: --long quiet,debug,git,clean,quiet -n "$0" -- "$@")"; then
+    # getopt found an unrecognized option
+    exit 1
+  fi
 
-  optspec=":qdgcs-:"
-  while getopts "${optspec}" optchar; do
-    case "${optchar}" in
+  eval set -- "${temp}"
+  while :; do
+    case "${1}" in
     q) _is_quiet=true ;;
     d) _is_debug=true ;;
     g) _cmd_=git ;;
     c) _cmd_=clean ;;
     s) _cmd_=sync ;;
-    -)
-      case "${OPTARG}" in
-      quiet) _is_quiet=true ;;
-      debug) _is_debug=true ;;
-      git) _cmd_=git ;;
-      clean) _cmd_=clean ;;
-      sync) _cmd_=sync ;;
-      \?) say_warn "Unknown option: --${OPTARG}" ;;
-      *) say_warn "Unknown error while processing options" ;;
-      esac
+    --)
+      shift
+      break
+      #      case "${OPTARG}" in
+      #      quiet) _is_quiet=true ;;
+      #      debug) _is_debug=true ;;
+      #      git) _cmd_=git ;;
+      #      clean) _cmd_=clean ;;
+      #      sync) _cmd_=sync   ;;
+      #      \?) say_warn "Unknown option: --${OPTARG}" ;;
+      #      *) say_warn "Unknown error while processing options" ;;
+      #      esac
       ;;
-    \?) say_warn "Unknown option: -${OPTARG}" ;;
-    *) say_warn "Unknown error while processing options" ;;
+    *) say_err "Unknown error while processing options" ;;
     esac
     shift $((OPTIND - 1))
     _do_options "$@"

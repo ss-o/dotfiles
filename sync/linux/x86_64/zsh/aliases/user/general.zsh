@@ -1,3 +1,5 @@
+EDIT_ALIAS=${(%):-%N}
+
 # GIT
 alias add-editorconfig="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/editorconfig > .editorconfig"
 alias add-gitattributes="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/gitattributes >> .gitattributes"
@@ -8,13 +10,19 @@ alias add-lychee-config='wget -O - https://github.com/lycheeverse/lychee/raw/mas
 alias add-trunk='curl https://get.trunk.io -fsSL | bash'
 alias add-fly-cli='curl -L https://fly.io/install.sh | sh'
 
-alias get-origin='command git config -l| grep remote.origin.url | awk -F'=' '{print $2}''
+alias get-origin='command git config -l | grep remote.origin.url | awk -F'=' '{print $2}''
 
 # Utilities
 alias palette='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done'
 
 # Arch Linux
 #alias paru="paru --bottomup"
+
+# Node/Js
+alias pn=pnpm
+
+# GPG
+alias gpg-gen-pass='command gpg --gen-random --armor 0 24'
 
 # Zsh
 alias options-status='setopt ksh_option_print && setopt'
@@ -53,6 +61,7 @@ alias get-local-tasks-listen='lsof -i -P | grep -i listen'
 alias get-local-tasks-established='lsof -i -P | grep -i established'
 alias get-local-tcp-listen='netstat -an | grep LISTEN | grep tcp'
 alias get-local-unix-listen='netstat -an | grep LISTEN | grep unix'
+alias add-http-user='sudo htpasswd -c /etc/apache2/.htpasswd'
 alias run-python-server='python -m http.server 8888'
 
 # --- SSH

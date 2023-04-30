@@ -14,17 +14,11 @@ fi
 #}
 
 # ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
-typeset -A ZI
-ZI[REPOSITORY]="https://github.com/ss-o/zi.git"
-ZI[STREAM]="perf/env"
+#typeset -A ZI
+#ZI[REPOSITORY]="https://github.com/ss-o/zi.git"
+#ZI[STREAM]="perf/env"
 
-(){
-  [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
-    source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
-  } || {
-    source <(curl -sL init.zshell.dev); zzinit
-  }
-}
+(){ source "${HOME}/.config/zi/init.zsh" || exit 1; } && zzinit
 
 # ‑‑‑‑‑‑ ⸨ Zsh Environment ⸩ ‑‑‑‑‑‑
 
@@ -34,6 +28,7 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 : ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
 [[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000
 history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
+
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
 # ‑‑‑‑‑‑ ⸨ Private functions ⸩ ‑‑‑‑‑‑
@@ -44,6 +39,7 @@ if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
   typeset -gxU fpath FPATH
   fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
 fi
+
 (){
   setopt local_options typeset_silent
   typeset _sni_ _lib_ _fnc_
@@ -101,6 +97,16 @@ reload_z() {
 }
 
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
+
+encode64() { (( $# == 0 )) && { command cat | base64; } || { builtin print -n $1 | base64; }; }
+encodefile64() { (( $# == 0 )) && { print "Missing file"; } || { base64 -i $1 -o $1.txt; print "${1} encoded as ${1}.txt"; }; }
+decode64() {
+    if [[ $# -eq 0 ]]; then
+        cat | base64 --decode
+    else
+        printf '%s' $1 | base64 --decode
+    fi
+}
 
 [[ "$TERM_PROGRAM" == "vscode" ]] && . "$(code --locate-shell-integration-path zsh)"
 builtin source "${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh"
