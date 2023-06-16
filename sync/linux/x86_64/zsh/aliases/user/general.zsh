@@ -1,4 +1,7 @@
-EDIT_ALIAS=${(%):-%N}
+if [[ -n "${EDITOR}" ]]; then
+  typeset EDIT_ALIAS=${(%):-%N}
+  alias edit-aliases="${EDITOR} ${EDIT_ALIAS}"
+fi
 
 # GIT
 alias add-editorconfig="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/editorconfig > .editorconfig"
@@ -15,11 +18,8 @@ alias get-origin='command git config -l | grep remote.origin.url | awk -F'=' '{p
 # Utilities
 alias palette='for i in {0..255}; do print -Pn "%K{$i}  %k%F{$i}${(l:3::0:)i}%f " ${${(M)$((i%6)):#3}:+$'\n'}; done'
 
-# Arch Linux
-#alias paru="paru --bottomup"
-
 # Node/Js
-alias pn=pnpm
+alias pm=pnpm
 
 # GPG
 alias gpg-gen-pass='command gpg --gen-random --armor 0 24'
@@ -42,6 +42,10 @@ alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 
 # Files & Directories
 alias dirs-size='du -h --max-depth=1 | sort -hr'
+
+# Convert
+alias ffmpeg-convert='f() {command ffmpeg -i $1 -c:v libx264 -crf 18 -preset slow -c:a aac -b:a 192k -ac 2 $2; unset -f f; }; f'
+alias pandoc-html-to-pdf='f() {command pandoc ${1}.html -t latex -o ${2}.pdf; unset -f f; }; f'
 
 # Trunk
 alias check='trunk check --jobs $(nproc)'
@@ -67,10 +71,6 @@ alias run-python-server='python -m http.server 8888'
 # --- SSH
 # ------ [ <tunnel port>:<destination address>:<destination port> ]
 alias ssh-forward-3000='ssh -L 3000:localhost:3000'
-
-# --- INTELLIGENCE
-# ------ [ Crowdsec ]
-alias check-ip='f() {command curl -sL -H "x-api-key: $CTI_API_KEY" https://cti.api.crowdsec.net/v2/smoke/$1 | jq . ; unset -f f; }; f'
 
 # --- WireGuard
 alias wg0-up="wg-quick up wg0"

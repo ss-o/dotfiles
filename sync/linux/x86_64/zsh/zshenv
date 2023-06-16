@@ -10,3 +10,25 @@
 # output or assume the shell is attached to a tty.
 #
 # Loading order: zshenv, zprofile, zshrc, zlogin.
+
+typeset -ghA DOTFILES
+
+DOTFILES[CONFIG]=${HOME}/.dotfiles/.config
+
+source ${DOTFILES[CONFIG]}/go.env
+
+add_to_path() {
+  typeset -gxU path PATH
+  PATH="${(j/:/)path}"
+  path=( "${(@s/:/)PATH}" )
+  for add in "$@"; do
+    if [[ -d $add ]]; then
+      path=( "${path[@]}" "${add}" )
+    fi
+  done
+  path=( "${(@u)path}" ) # remove duplicates
+  unset -v add
+}
+
+add_to_path "${HOME}/.local/bin"
+add_to_path "${HOME}/.local/share/pnpm/bin"

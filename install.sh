@@ -288,25 +288,25 @@ _sync_config() {
 _read() {
   input="$1"
   shift
-  srcfile="$(printf '%s' "${input}" | awk -F: '{print $1}')"
-  dstfile="$(printf '%s' "${input}" | awk -F: '{print $2}')"
+  src_file="$(printf '%s' "${input}" | awk -F: '{print $1}')"
+  dst_file="$(printf '%s' "${input}" | awk -F: '{print $2}')"
 
-  if [ -z "${srcfile}" ]; then
-    say_err "Invalid source file: ${srcfile}"
+  if [ -z "${src_file}" ]; then
+    say_err "Invalid source file: ${src_file}"
   fi
 
-  if [ -z "${dstfile}" ]; then
-    dstfile=".$(basename "${srcfile}")"
+  if [ -z "${dst_file}" ]; then
+    dst_file=".$(basename "${src_file}")"
   fi
 
-  _sync_target="${_user_home}/${dstfile}"
+  _sync_target="${_user_home}/${dst_file}"
 
   _check_system
   if [ -n "${_sync_platform}" ]; then
-    if [ -s "${dosync_dir}/sync/${_sync_platform}/${srcfile}" ]; then
-      _sync_src="${dosync_dir}/sync/${_sync_platform}/${srcfile}"
+    if [ -s "${dosync_dir}/sync/${_sync_platform}/${src_file}" ]; then
+      _sync_src="${dosync_dir}/sync/${_sync_platform}/${src_file}"
     else
-      _sync_src="${dosync_dir}/sync/${srcfile}"
+      _sync_src="${dosync_dir}/sync/${src_file}"
     fi
   fi
 
@@ -334,12 +334,12 @@ dosync() {
       command cp -r "${_sync_target}" "${_make_backup}"
       command rm -rf "${_sync_target}"
       command ln -s "${_sync_src}" "${_sync_target}"
-      say_ok "SymLink: ${srcfile} ➤ ${_sync_target}"
+      say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
     elif [ ! -L "${_sync_target}" ]; then
       command ln -s "${_sync_src}" "${_sync_target}"
-      say_ok "SymLink: ${srcfile} ➤ ${_sync_target}"
+      say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
     else
-      say_ok "SymLink: ${srcfile} ➤ ${_sync_target}"
+      say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
     fi
     ${reset:-}
   done
@@ -409,7 +409,6 @@ main() {
   [ $# -eq 0 ] && _cmd_=sync && _do_options run && exit 0
 
   if ! temp="$(getopt -o qdgcs: --long quiet,debug,git,clean,quiet -n "$0" -- "$@")"; then
-    # getopt found an unrecognized option
     exit 1
   fi
 
@@ -424,19 +423,11 @@ main() {
     --)
       shift
       break
-      #      case "${OPTARG}" in
-      #      quiet) _is_quiet=true ;;
-      #      debug) _is_debug=true ;;
-      #      git) _cmd_=git ;;
-      #      clean) _cmd_=clean ;;
-      #      sync) _cmd_=sync   ;;
-      #      \?) say_warn "Unknown option: --${OPTARG}" ;;
-      #      *) say_warn "Unknown error while processing options" ;;
-      #      esac
       ;;
-    *) say_err "Unknown error while processing options" ;;
+    *) exit 1 ;;
     esac
     shift $((OPTIND - 1))
+    echo "${_cmd_}"
     _do_options "$@"
   done
   return $?

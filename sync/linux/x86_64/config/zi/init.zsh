@@ -3,13 +3,8 @@
 # vim: ft=zsh sw=2 ts=2 et
 #
 # === Zi Loader === #
-trap "unset -f get_source_from check_src zzsetup 2> /dev/null" EXIT
-trap "unset -f get_source_from check_src zzsetup 2> /dev/null; return 1" INT
 
-# === Environment === #
-# Set base environment for Zi
-# Variables set by the user take higher priority
-typeset -gA ZI
+typeset -ghA ZI
 
 # Source repository URL.
 [[ -z $ZI[REPOSITORY] ]] && ZI[REPOSITORY]="https://github.com/z-shell/zi.git"
@@ -38,9 +33,9 @@ typeset -gA ZI
 
 # === Initiate Zi === #
 
-typeset -i exit_code=0
-
+# Get source from URL
 get_source_from() {
+  typeset -i exit_code=0
   if (( $+commands[curl] )); then
     command curl -fsSL "$1"; exit_code=$?
   elif (( $+commands[wget] )); then
@@ -52,7 +47,9 @@ get_source_from() {
   return $exit_code
 }
 
+# Check if URL is valid
 check_src() {
+  typeset -i exit_code=0
   typeset url="$1"
   if (( $+commands[curl] )); then
     command curl --output /dev/null --silent --show-error --location --head --fail "$url"; exit_code=$?
@@ -67,14 +64,10 @@ check_src() {
 
 # Clone Zi repository if it doesn't exist
 zzsetup() {
-  (( $+functions[zi] )) && return 0
-
-  builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
-  builtin setopt extended_glob warn_create_global local_options \
-    typeset_silent no_short_loops rc_quotes no_auto_pushd
   builtin autoload colors; colors
 
   typeset -a git_refs
+  typeset -i exit_code=0
   typeset tmp_dir show_process process_url
 
   if [[ ! -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
@@ -96,11 +89,9 @@ zzsetup() {
 
     (( $+commands[clear] )) && command clear
     builtin print -P "%F{33}▓▒░ %F{160}Installing interactive & feature-rich plugin manager (%F{33}z-shell/zi%F{160})%f%b…\n"
-
     command mkdir -p "$ZI[BIN_DIR]" && \
     command chmod -R go-w "$ZI[HOME_DIR]" && command git clone --verbose --progress --branch \
       "$ZI[STREAM]" -- "$ZI[REPOSITORY]" "$ZI[BIN_DIR]" |& { command $show_process || command cat; }
-
     if [[ -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
       git_refs=("${(f@)$(builtin cd -q $ZI[BIN_DIR] && command git log --color --graph --abbrev-commit \
         --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' | head -5)}")
@@ -118,19 +109,22 @@ zzsetup() {
   return $exit_code
 }
 
-# If the setup is successful or Zi is already installed, then load Zi. Otherwise, do not continue and exit.
 zzsource() {
-  (( ZI[SOURCED] )) && unset -f zzsource 2> /dev/null && return 0
-  zzsetup && {
+  typeset -i exit_code=0
+
+  if [[ -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
     builtin source "${ZI[BIN_DIR]}/zi.zsh"
-  } || {
-    return 1
-  }
+    exit_code=$?
+  else
+    zzsetup && zzsource
+    exit_code=$?
+  fi
+
+  return $exit_code
 }
 
 # Load zi module if built
 zzpmod() {
-  (( $+commands[zpmod] )) && unset -f zzpmod 2> /dev/null && return 0
   if [[ -f "${ZI[ZMODULES_DIR]}/zpmod/Src/zi/zpmod.so" ]]; then
     module_path+=( ${ZI[ZMODULES_DIR]}/zpmod/Src );
     zmodload zi/zpmod 2> /dev/null && return 0
@@ -139,14 +133,27 @@ zzpmod() {
 
 # Enable completion (completions should be loaded after zzsource)
 zzcomps() {
-  (( $+_comps[zi] )) && unset -f zzcomps 2> /dev/null && return 0
-  builtin autoload -Uz _zi && {
-    (( ${+_comps} )) && _comps[zi]=_zi
-    return 0
-  } || {
-    return 1
-  }
+  typeset -i exit_code=0
+
+  if (( ${+_comps} )); then
+    if [[ -f "${ZI[BIN_DIR]}/lib/_zi" ]]; then
+      (( ${+_comps[zi]} )) || _comps[zi]="${ZI[BIN_DIR]}/lib/_zi"
+      exit_code=$?
+    fi
+  else
+    exit_code=1
+  fi
+
+  return $exit_code
 }
 
-# If Zi is installed, then load source, enable completion and if available load zpmod.
-zzinit() { zzsource && zzcomps; zzpmod; unset -f zzinit 2> /dev/null && return 0; }
+zzinit() {
+  builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
+  builtin setopt extended_glob \
+#    warn_create_global local_options \
+#    typeset_silent no_short_loops rc_quotes no_auto_pushd
+
+  zzsource && zzcomps
+
+  unset -f check_src get_source_from zzinit zzcomps zzpmod zzsetup zzsource main 2> /dev/null
+}
