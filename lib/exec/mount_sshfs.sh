@@ -13,36 +13,25 @@ remote_sshfs_mount() {
     activated=$?
     if [[ ${activated} -ne 0 ]]; then
       systemctl --user start "${unit}".service
-      echo "Mounted: ${unit}"
+      [[ -n ${RUN_QUIET} ]] || echo "Mounted: ${unit}"
       systemctl --user daemon-reload
       command sync
-    else
-      echo "Unit ${unit} already mounted"
-    fi
-  done
-}
-
-remote_sshfs_unmount() {
-  for unit in "${units[@]}"; do
-    systemctl --user is-active --quiet "${unit}".service
-    activated=$?
-    if [[ ${activated} -ne 0 ]]; then
-      echo "Unit ${unit} not mounted"
     else
       systemctl --user stop "${unit}".service
-      echo "Unmounted: ${unit}"
+      [[ -n ${RUN_QUIET} ]] || echo "Unmounted: ${unit}"
       systemctl --user daemon-reload
       command sync
     fi
   done
 }
 
-opt=$1
-case ${opt} in
-mount) remote_sshfs_mount ;;
-unmount) remote_sshfs_unmount ;;
-*)
-  echo "Option required: mount/unmount"
-  exit 1
-  ;;
-esac
+main() {
+  opt=$1
+  case ${opt} in
+  -q | --quiet) RUN_QUIET=true ;;
+  *) true ;;
+  esac
+  remote_sshfs_mount "$@"
+}
+
+main "$@"
