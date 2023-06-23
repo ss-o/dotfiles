@@ -13,6 +13,7 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 [[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
 
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
+[[ -r ${HOME}/.zshrc_local ]] && source ${HOME}/.zshrc_local
 
 # ‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑ ⸨ Private functions ⸩
 typeset -gA DOTFILES
@@ -81,7 +82,9 @@ reload_z() {
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
 
 encode64() { (( $# == 0 )) && { command cat | base64; } || { builtin print -n $1 | base64; }; }
+
 encodefile64() { (( $# == 0 )) && { print "Missing file"; } || { base64 -i $1 -o $1.txt; print "${1} encoded as ${1}.txt"; }; }
+
 decode64() {
   if [[ $# -eq 0 ]]; then
     cat | base64 --decode
@@ -89,6 +92,7 @@ decode64() {
     printf '%s' $1 | base64 --decode
   fi
 }
+
 history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
 
 builtin source "${DOTFILES[ZSH]}/themes/p10k-classic.zsh"

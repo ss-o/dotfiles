@@ -341,7 +341,7 @@ dosync() {
     else
       say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
     fi
-    ${reset:-}
+    ${reset-}
   done
 }
 

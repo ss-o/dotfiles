@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.10.0
+  version: 1.11.1
 repo:
   repo:
     host: github.com
@@ -9,7 +9,7 @@ repo:
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.17
+      ref: v0.0.20
       uri: https://github.com/trunk-io/plugins
     - id: configs
       local: .config/trunk
@@ -44,21 +44,21 @@ lint:
     - yamllint
   enabled:
     - dotenv-linter@3.3.0
-    - ruff@0.0.265
+    - ruff@0.0.275
     - taplo@0.7.0
     - actionlint@1.6.25
-    - shfmt@3.5.0
+    - shfmt@3.6.0
     - prettier@2.8.8
-    - markdownlint@0.34.0
+    - markdownlint@0.35.0
     - git-diff-check
     - shellcheck@0.9.0
     - gitleaks@8.17.0
     - git-diff-check
-    - markdownlint@0.34.0
+    - markdownlint@0.35.0
     - gitleaks@8.17.0
     - prettier@2.8.8
     - shellcheck@0.9.0
-    - shfmt@3.5.0
+    - shfmt@3.6.0
 runtimes:
   enabled:
     - python@3.10.8
