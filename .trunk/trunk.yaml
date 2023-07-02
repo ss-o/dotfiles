@@ -9,7 +9,7 @@ repo:
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.20
+      ref: v0.0.21
       uri: https://github.com/trunk-io/plugins
     - id: configs
       local: .config/trunk
@@ -43,6 +43,9 @@ lint:
   disabled:
     - yamllint
   enabled:
+    - checkov@2.3.309
+    - trivy@0.42.1
+    - trufflehog@3.42.0
     - dotenv-linter@3.3.0
     - ruff@0.0.275
     - taplo@0.7.0

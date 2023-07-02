@@ -63,10 +63,10 @@ zi-turbo '0a' for \
     z-shell/nb \
   binary from"gh-r" sbin \
     ajeetdsouza/zoxide \
-  has'lsd' atinit'AUTOCD=1' \
-    z-shell/zsh-lsd \
   has'zoxide' \
     z-shell/zsh-zoxide \
+  has'lsd' atinit'AUTOCD=1' \
+    z-shell/zsh-lsd \
   atinit'YSU_MESSAGE_POSITION=after' \
     MichaelAquilina/zsh-you-should-use
 

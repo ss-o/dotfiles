@@ -17,18 +17,19 @@ DOTFILES[CONFIG]=${HOME}/.dotfiles/.config
 
 source ${DOTFILES[CONFIG]}/go.env
 
-add_to_path() {
+prepend_path() {
   typeset -gxU path PATH
   PATH="${(j/:/)path}"
   path=( "${(@s/:/)PATH}" )
   for add in "$@"; do
     if [[ -d $add ]]; then
-      path=( "${path[@]}" "${add}" )
+      path=( "${add}" "${path[@]}" )
     fi
   done
   path=( "${(@u)path}" ) # remove duplicates
   unset -v add
 }
 
-add_to_path "${HOME}/.local/bin"
-add_to_path "${HOME}/.local/share/pnpm/bin"
+prepend_path "${HOME}/.local/bin"
+prepend_path "${HOME}/.yarn/bin"
+prepend_path "${HOME}/.local/share/pnpm/bin"

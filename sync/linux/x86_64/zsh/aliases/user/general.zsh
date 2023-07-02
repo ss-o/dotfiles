@@ -29,6 +29,11 @@ alias options-status='setopt ksh_option_print && setopt'
 alias zstyle-status='zstyle -L'
 
 # System
+# --- Maintenance
+alias check-logs='command journalctl -p 3 -b -e'
+alias check-symlinks='command find . -xtype l -print 2> /dev/null'
+
+# --- Wrappers
 alias exec-cmds='function() {for i in `seq 50` ; $1; [[ ! $? = 0 ]] && break ; done;}'
 alias freemem='echo 3 | sudo tee /proc/sys/vm/drop_caches'
 alias reload!='exec "$SHELL" -l'
