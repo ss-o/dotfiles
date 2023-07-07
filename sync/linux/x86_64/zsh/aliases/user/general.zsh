@@ -28,22 +28,22 @@ alias gpg-gen-pass='command gpg --gen-random --armor 0 24'
 alias options-status='setopt ksh_option_print && setopt'
 alias zstyle-status='zstyle -L'
 
-# System
-# --- Maintenance
+# --- System
+# ------ Wrappers
 alias check-logs='command journalctl -p 3 -b -e'
 alias check-symlinks='command find . -xtype l -print 2> /dev/null'
-
-# --- Wrappers
-alias exec-cmds='function() {for i in `seq 50` ; $1; [[ ! $? = 0 ]] && break ; done;}'
+alias update-grub='f() {sudo exec grub-mkconfig -o /boot/grub/grub.cfg "$@"; unset -f f; }; f'
+alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
+alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 alias freemem='echo 3 | sudo tee /proc/sys/vm/drop_caches'
 alias reload!='exec "$SHELL" -l'
-alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
 alias machine-id='cat /var/lib/dbus/machine-id | md5sum'
 alias check-macpath='[[ -n "${(j::)${(M)path[@]:#/opt/local/bin}}" ]]'
-alias mm='micro'
 alias kate='command kate >/dev/null 2>&1 "${@}" &!'
 alias history-cmd-top="fc -ln 0 | awk '{print $1}' | sort | uniq -c | sort -nr | head"
-alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
+alias mm='micro'
+# ------ Triage
+#alias exec-cmds='function() {for i in `seq 50` ; $1; [[ ! $? = 0 ]] && break ; done;}'
 
 # Files & Directories
 alias dirs-size='du -h --max-depth=1 | sort -hr'
