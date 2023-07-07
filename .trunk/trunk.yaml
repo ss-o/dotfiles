@@ -43,15 +43,15 @@ lint:
   disabled:
     - yamllint
   enabled:
-    - checkov@2.3.309
-    - trivy@0.42.1
-    - trufflehog@3.42.0
+    - checkov@2.3.314
+    - trivy@0.43.0
+    - trufflehog@3.43.0
     - dotenv-linter@3.3.0
-    - ruff@0.0.275
+    - ruff@0.0.277
     - taplo@0.7.0
     - actionlint@1.6.25
     - shfmt@3.6.0
-    - prettier@2.8.8
+    - prettier@3.0.0
     - markdownlint@0.35.0
     - git-diff-check
     - shellcheck@0.9.0
@@ -59,7 +59,7 @@ lint:
     - git-diff-check
     - markdownlint@0.35.0
     - gitleaks@8.17.0
-    - prettier@2.8.8
+    - prettier@3.0.0
     - shellcheck@0.9.0
     - shfmt@3.6.0
 runtimes:
