@@ -43,8 +43,8 @@ lint:
   disabled:
     - yamllint
   enabled:
-    - checkov@2.3.314
-    - trivy@0.43.0
+    - checkov@2.3.318
+    - trivy@0.43.1
     - trufflehog@3.43.0
     - dotenv-linter@3.3.0
     - ruff@0.0.277
