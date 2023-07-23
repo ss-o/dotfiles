@@ -1,0 +1,11 @@
+{
+    "autoclose": false,
+    "autosu": true,
+    "ignorecase": false,
+    "initlua": true,
+    "savecursor": true,
+    "saveundo": true,
+    "scrollmargin": 4,
+    "sename": true,
+    "softwrap": true
+}
