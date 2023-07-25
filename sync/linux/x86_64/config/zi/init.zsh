@@ -91,7 +91,7 @@ zzsetup() {
     builtin print -P "%F{33}▓▒░ %F{160}Installing interactive & feature-rich plugin manager (%F{33}z-shell/zi%F{160})%f%b…\n"
     command mkdir -p "$ZI[BIN_DIR]" && \
     command chmod -R go-w "$ZI[HOME_DIR]" && command git clone --verbose --progress --branch \
-      "$ZI[STREAM]" -- "$ZI[REPOSITORY]" "$ZI[BIN_DIR]" |& { command $show_process || command cat; }
+      "$ZI[STREAM]" "$ZI[REPOSITORY]" "$ZI[BIN_DIR]" |& { command $show_process || command cat; }
     if [[ -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
       git_refs=("${(f@)$(builtin cd -q $ZI[BIN_DIR] && command git log --color --graph --abbrev-commit \
         --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' | head -5)}")

@@ -16,6 +16,7 @@ typeset -ghA DOTFILES
 DOTFILES[CONFIG]=${HOME}/.dotfiles/.config
 
 source ${DOTFILES[CONFIG]}/go.env
+source ${DOTFILES[CONFIG]}/pnpm.env
 
 prepend_path() {
   typeset -gxU path PATH
@@ -26,10 +27,9 @@ prepend_path() {
       path=( "${add}" "${path[@]}" )
     fi
   done
-  path=( "${(@u)path}" ) # remove duplicates
+  path=( "${(@u)path}" ) # <- make unique
   unset -v add
 }
 
 prepend_path "${HOME}/.local/bin"
 prepend_path "${HOME}/.yarn/bin"
-prepend_path "${HOME}/.local/share/pnpm/bin"

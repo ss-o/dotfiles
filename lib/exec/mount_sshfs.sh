@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 
 # Hosts required
-declare -a hosts=(
-  core.internal
-)
+declare -a hosts=(core.internal)
 
 # Units to mount
-declare -a units=(
-  sshfs_pictures
-  sshfs_storage
-  sshfs_videos
-  sshfs_music
-)
+declare -a units=(sshfs_storage)
 
 check_hosts() {
   [[ -n ${RUN_QUIET} ]] || echo -ne "Hosts: "

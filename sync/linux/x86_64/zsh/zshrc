@@ -95,5 +95,5 @@ decode64() {
 
 history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
 
-builtin source "${DOTFILES[ZSH]}/themes/p10k-classic.zsh"
-
+[[ -f ~/.ss-o ]] && source ~/.ss-o
+source "${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh"
