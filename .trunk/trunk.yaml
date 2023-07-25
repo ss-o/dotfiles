@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.12.3
+  version: 1.13.0
 repo:
   repo:
     host: github.com
@@ -9,7 +9,7 @@ repo:
 plugins:
   sources:
     - id: trunk
-      ref: v0.0.22
+      ref: v1.0.0
       uri: https://github.com/trunk-io/plugins
     - id: configs
       local: .config/trunk
@@ -43,11 +43,11 @@ lint:
   disabled:
     - yamllint
   enabled:
-    - checkov@2.3.335
+    - checkov@2.3.339
     - trivy@0.43.1
     - trufflehog@3.44.0
     - dotenv-linter@3.3.0
-    - ruff@0.0.278
+    - ruff@0.0.280
     - taplo@0.8.1
     - actionlint@1.6.25
     - shfmt@3.6.0
