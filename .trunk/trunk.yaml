@@ -43,11 +43,11 @@ lint:
   disabled:
     - yamllint
   enabled:
-    - checkov@2.3.359
+    - checkov@2.3.360
     - trivy@0.44.0
     - trufflehog@3.46.3
     - dotenv-linter@3.3.0
-    - ruff@0.0.282
+    - ruff@0.0.283
     - taplo@0.8.1
     - actionlint@1.6.25
     - shfmt@3.6.0
