@@ -188,17 +188,20 @@ _check_system() {
 }
 
 _remove_broken_links() {
+  say_info "Checking for hidden dangling symlinks with depth 1 in ${_user_home}"
   command find "${_user_home}" -maxdepth 1 -name "*" -o -name ".*" -type l | while read -r f1; do
     if [ -L "${f1}" ] && [ ! -e "${f1}" ]; then
       command rm -f "${f1}" && say_info "Removed dangling symlink: ${f1}"
     fi
-    command find "${_user_home_config}" -maxdepth 2 -name "*" -o -name ".*" -type l | while read -r f2; do
-      if [ -L "${f2}" ] && [ ! -e "${f2}" ]; then
-        command rm -f "${f2}" && say_info "Removed dangling symlink: ${f2}"
-      fi
-    done
   done
-  say_ok "No broken symlinks"
+
+  say_info "Checking for all dangling symlinks with depth 2 in ${_user_home_config}"
+  command find "${_user_home_config}" -maxdepth 2 -name "*" -o -name ".*" -type l | while read -r f2; do
+    if [ -L "${f2}" ] && [ ! -e "${f2}" ]; then
+      command rm -f "${f2}" && say_info "Removed dangling symlink: ${f2}"
+    fi
+  done
+  return $?
 }
 
 _git_pull() {
@@ -346,88 +349,31 @@ dosync() {
 }
 
 _do_options() {
-  [ -n "$1" ] && _arg_="$1" && shift
-
-  [ "${_is_debug}" = true ] && set -x
-
   if [ "${_cmd_}" = sync ]; then
-    [ -z "${_arg_}" ] && _arg_="run"
-    case "${_arg_}" in
-    create) _create_sync_location ;;
-    run) dosync ;;
-    *?) say_warn "Sync argument unknown: ${_arg_}" ;;
-    *) ;;
-    esac
-  elif [ "${_cmd_}" = git ]; then
-    [ -z "${_arg_}" ] && _arg_="sync"
-    case "${_arg_}" in
-    pull) _git_pull ;;
-    add) _git_add ;;
-    commit) _git_commit ;;
-    push) _git_push ;;
-    sync) _git_sync ;;
-    cmd) command git "${_arg_}" ;;
-    *?) say_warn "Git argument unknown: ${_arg_}" ;;
-    *) ;;
-    esac
+    dosync
   elif [ "${_cmd_}" = clean ]; then
-    [ -z "${_arg_}" ] && _arg_="symlink"
-    case "${_arg_}" in
-    symlink) _remove_broken_links ;;
-    *?) say_warn "Clean argument unknown: ${_arg_}" ;;
-    *) ;;
-    esac
+    _remove_broken_links
   fi
 }
 
-# Main function
-#
-# Usage: $0 [options] [arguments]
-#
-# Options:
-#   -q, --quiet     [quiet mode]
-#   -s, --sync      [sync arguments]
-#   -g, --git       [git arguments]
-#   -c, --clean     [clean arguments]
-#
-# [sync arguments]:
-#   create          Create sync location for files
-#
-# [git arguments]:
-#   pull            Pull changes from remote
-#   add             Add changes to git
-#   commit          Commit changes
-#   push            Push changes to remote
-#   sync           Check if there are any changes
-#
-# [clean arguments]:
-#   symlink         Remove broken symlinks
+usage() {
+  echo "Usage: $0 [option] <command>" 1>&2
+  exit 1
+}
 
 main() {
-  unset _cmd_ _arg_ _is_quiet _is_debug
+  unset _cmd_ _opt_ _arg_ _is_quiet
+
   # If no arguments are given, run sync by default
   [ $# -eq 0 ] && _cmd_=sync && _do_options run && exit 0
 
-  if ! temp="$(getopt -o qdgcs: --long quiet,debug,git,clean,quiet -n "$0" -- "$@")"; then
-    exit 1
-  fi
-
-  eval set -- "${temp}"
-  while :; do
-    case "${1}" in
+  while getopts ":q:c:" _opt_; do
+    case "${_opt_}" in
     q) _is_quiet=true ;;
-    d) _is_debug=true ;;
-    g) _cmd_=git ;;
-    c) _cmd_=clean ;;
-    s) _cmd_=sync ;;
-    --)
-      shift
-      break
-      ;;
-    *) exit 1 ;;
+    c) _cmd_="${OPTARG}" ;;
+    *) usage ;;
     esac
     shift $((OPTIND - 1))
-    echo "${_cmd_}"
     _do_options "$@"
   done
   return $?

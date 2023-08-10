@@ -1,4 +1,4 @@
-# This file defines Go enviroment and meant to be included in user or system files respectively, e.g.:
+# This file defines Go environment and meant to be included in user or system files respectively, e.g.:
 # user: ~/.profile, Zsh: ~/.zshenv, Bash: ~/.bash_profile, system-wide: /etc/profile, etc.
 
 export GOPATH="${HOME}/.local/share/go"
