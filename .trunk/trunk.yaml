@@ -44,10 +44,10 @@ lint:
     - yamllint
   enabled:
     - checkov@2.3.360
-    - trivy@0.44.0
-    - trufflehog@3.46.3
+    - trivy@0.44.1
+    - trufflehog@3.47.0
     - dotenv-linter@3.3.0
-    - ruff@0.0.283
+    - ruff@0.0.284
     - taplo@0.8.1
     - actionlint@1.6.25
     - shfmt@3.6.0
