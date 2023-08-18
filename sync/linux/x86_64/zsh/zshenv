@@ -15,8 +15,8 @@ typeset -ghA DOTFILES
 
 DOTFILES[CONFIG]=${HOME}/.dotfiles/.config
 
-source ${DOTFILES[CONFIG]}/go.env
-source ${DOTFILES[CONFIG]}/pnpm.env
+source ${DOTFILES[CONFIG]}/go.sh
+source ${DOTFILES[CONFIG]}/pnpm.sh
 
 prepend_path() {
   typeset -gxU path PATH
