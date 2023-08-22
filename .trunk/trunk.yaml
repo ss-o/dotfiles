@@ -1,6 +1,6 @@
 version: 0.1
 cli:
-  version: 1.13.0
+  version: 1.14.1
 repo:
   repo:
     host: github.com
@@ -43,11 +43,11 @@ lint:
   disabled:
     - yamllint
   enabled:
-    - checkov@2.4.1
+    - checkov@2.4.4
     - trivy@0.44.1
     - trufflehog@3.48.0
     - dotenv-linter@3.3.0
-    - ruff@0.0.284
+    - ruff@0.0.285
     - taplo@0.8.1
     - actionlint@1.6.25
     - shfmt@3.6.0
