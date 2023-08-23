@@ -32,7 +32,7 @@ alias zstyle-status='zstyle -L'
 # ------ Wrappers
 alias check-logs='command journalctl -p 3 -b -e'
 alias check-symlinks='command find . -xtype l -print 2> /dev/null'
-alias update-grub='f() {sudo exec grub-mkconfig -o /boot/grub/grub.cfg "$@"; unset -f f; }; f'
+alias update-grub='f() {sudo grub-mkconfig -o /boot/grub/grub.cfg "$@"; unset -f f; }; f'
 alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
 alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 alias freemem='echo 3 | sudo tee /proc/sys/vm/drop_caches'

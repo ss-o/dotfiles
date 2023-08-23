@@ -9,32 +9,33 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
  \| PlugInstall --sync | source $MYVIMRC
  \| endif
 
-call plug#begin()
+
+call plug#begin('~/.vim/plugged')
 "Plug 'tpope/vim-sensible'
-Plug 'chrisbra/colorizer'
 "Plug 'kovetskiy/sxhkd-vim'
+"Plug 'Valloric/YouCompleteMe'
+"Plug 'Yggdroot/LeaderF'
+Plug 'chrisbra/colorizer'
 Plug 'chxuan/vim-edit'
 Plug 'chxuan/change-colorscheme'
 Plug 'chxuan/prepare-code'
 Plug 'chxuan/vim-buffer'
 Plug 'chxuan/vimplus-startify'
 Plug 'preservim/tagbar'
-"Plug 'Valloric/YouCompleteMe'
-"Plug 'Yggdroot/LeaderF'
-"Plug 'vimwiki/vimwiki'
 Plug 'mileszs/ack.vim'
 Plug 'junegunn/vim-slash'
 Plug 'junegunn/gv.vim'
-"Plug 'junegunn/vim-github-dashboard'
-Plug 'easymotion/vim-easymotion'
 Plug 'haya14busa/incsearch.vim'
 Plug 'z-shell/zi-vim-syntax'
+Plug 'easymotion/vim-easymotion'
+Plug 'junegunn/vim-easy-align'
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'editorconfig/editorconfig-vim'
 Plug 'ryanoasis/vim-devicons'
+Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --xdg --no-fish --all' }
 Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 call plug#end()
@@ -65,8 +66,3 @@ set smartcase              " Disable 'ignorecase' if the term contains upper-cas
 set nrformats-=octal       " Remove octal support from 'nrformats'.
 set encoding=UTF-8
 set laststatus=2
-
-" Vim Colours
-"if (has("termguicolors"))
-"  set termguicolors
-"endif

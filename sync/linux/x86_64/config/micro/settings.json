@@ -1,11 +1,12 @@
 {
     "autoclose": false,
     "autosu": true,
+    "fmt-onsave": true,
+    "ftoptions": false,
     "ignorecase": false,
     "initlua": true,
     "savecursor": true,
     "saveundo": true,
-    "scrollmargin": 4,
     "sename": true,
     "softwrap": true
 }
