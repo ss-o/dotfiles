@@ -18,18 +18,55 @@ DOTFILES[CONFIG]=${HOME}/.dotfiles/.config
 source ${DOTFILES[CONFIG]}/go.sh
 source ${DOTFILES[CONFIG]}/pnpm.sh
 
+typeset -gx GPG_TTY=$(tty)
+gpg-connect-agent updatestartuptty /bye >/dev/null
+
+if (( $+commands[yarn] )); then
+  YARN_PATH="$(yarn global bin)"
+else
+  YARN_PATH="${HOME}/.local/share/yarn/bin"
+fi
+
+typeset -a add_path create_path dir_path
+
+create_path=(
+  "${HOME}/.local/bin"
+)
+
+add_path=(
+  "$YARN_PATH"
+)
+
+for dir_path in "${create_path[@]}"; do
+  if [[ ! -d $dir_path ]]; then
+    mkdir -p $dir_path 2> /dev/null
+  fi
+done; unset dir_path
+
 prepend_path() {
   typeset -gxU path PATH
-  PATH="${(j/:/)path}"
-  path=( "${(@s/:/)PATH}" )
+  #PATH="${(j/:/)path}"
+  #path=( ${(@s/:/)PATH} )
   for add in "$@"; do
     if [[ -d $add ]]; then
-      path=( "${add}" "${path[@]}" )
+      path=( "${add}" "${(@)path}" )
+    else
+      path=( "${(@)path:#$add}" )
     fi
-  done
-  path=( "${(@u)path}" ) # <- make unique
-  unset -v add
+  done; unset -v add
+  path=( "${(@u)path}" )
 }
 
-prepend_path "${HOME}/.local/bin"
-prepend_path "${HOME}/.yarn/bin"
+#typeset -a aa
+#aa=(test1 test2 test3)
+#aa=("${(@)aa:#test2}")
+
+#if (( ${#aa} > 0 )); then
+#	echo $aa
+#fi
+
+
+prepend_path "${create_path[@]}"
+prepend_path "${add_path[@]}"
+
+unset -f prepend_path
