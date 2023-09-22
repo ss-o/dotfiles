@@ -98,5 +98,3 @@ history-clean() { (( $+commands[truncate] )) && \
 
 [[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
   { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
-
-[ -f "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh ] && source "${XDG_CONFIG_HOME:-$HOME/.config}"/fzf/fzf.zsh
