@@ -21,6 +21,9 @@ source ${DOTFILES[CONFIG]}/pnpm.sh
 typeset -gx GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
 
+typeset -gx FLYCTL_INSTALL="${HOME}/.local/share/fly"
+typeset -gx PATH="$FLYCTL_INSTALL/bin:$PATH"
+
 if (( $+commands[yarn] )); then
   YARN_PATH="$(yarn global bin)"
 else

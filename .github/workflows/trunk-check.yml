@@ -14,13 +14,6 @@ permissions: read-all
 jobs:
   check:
     runs-on: ubuntu-latest
-    permissions:
-      checks: write
-      actions: write
-      statuses: write
-      contents: write
-      deployments: write
-      pull-requests: write
     steps:
       - name: ✅ Checkout
         uses: actions/checkout@v4

@@ -9,15 +9,17 @@ concurrency:
   group: ${{ github.head_ref || github.run_id }}
   cancel-in-progress: true
 
-permissions: write-all
+permissions: read-all
 
 jobs:
   cache:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     steps:
       - name: ✅ Checkout
         uses: actions/checkout@v4
       - name: ✨ Trunk Check
-        uses: trunk-io/trunk-action@v1
+        uses: trunk-io/trunk-action@42569983d45f9899b2343da8bcf135f6d45a3bb5
         with:
           check-mode: populate_cache_only
