@@ -63,8 +63,8 @@ alias docker-lychee-gh='docker run --init -it -v $(pwd):/input lycheeverse/lyche
 alias rclone-dedupe='rclone dedupe --by-hash --dedupe-mode newest'
 
 # Network
-alias get-ipv4='curl -sf https://ipv4.icanhazip.com || curl -sf https://ifconfig.me || curl -sF zx2c4.com/ip'
-alias get-ipv6='curl -sf https://ipv6.icanhazip.com'
+alias get-public-ipv4='curl -sf "https://ipv4.icanhazip.com" || curl -sf "https://ifconfig.me" || curl -sf "zx2c4.com/ip"'
+alias get-public-ipv6='curl -sf "https://ipv6.icanhazip.com"'
 alias get-cidr="ip addr | grep inet | awk '{print $2}' | sort"
 alias get-local-tasks-listen='lsof -i -P | grep -i listen'
 alias get-local-tasks-established='lsof -i -P | grep -i established'
@@ -87,8 +87,8 @@ alias warp-on="sudo systemctl start warp-svc.service"
 alias warp-off="sudo systemctl stop warp-svc.service"
 alias warp="warp-cli"
 # ------ [ info ]
-alias get-cloudflare-ipv6='curl -sL https://www.cloudflare.com/ips-v6'
-alias get-cloudflare-ipv4='curl -sL https://www.cloudflare.com/ips-v4'
+alias get-cloudflare-ipv6='curl -sL "https://www.cloudflare.com/ips-v6"'
+alias get-cloudflare-ipv4='curl -sL "https://www.cloudflare.com/ips-v4"'
 
 # --- Google Cloud
 alias gcloud-interactive='gcloud beta interactive'
