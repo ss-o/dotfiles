@@ -3,7 +3,7 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-(){ source "${HOME}/.config/zi/init.zsh" || exit 1; } && zzinit
+(){ source "${HOME}/.config/zi/init.zsh"; zzinit; }
 
 COMPLETION_WAITING_DOTS=true
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1

@@ -41,7 +41,7 @@ get_source_from() {
   elif (( $+commands[wget] )); then
     command wget -qO- "$1"; exit_code=$?
   else
-    exit_code=500
+    exit_code=255
   fi
 
   return $exit_code
@@ -56,7 +56,7 @@ check_src() {
   elif (( $+commands[wget] )); then
     command wget --spider --quiet "$url"; exit_code=$?
   else
-    exit_code=404
+    exit_code=204
   fi
 
   return $exit_code
@@ -65,7 +65,6 @@ check_src() {
 # Clone Zi repository if it doesn't exist
 zzsetup() {
   builtin autoload colors; colors
-
   typeset -a git_refs
   typeset -i exit_code=0
   typeset tmp_dir show_process process_url
@@ -111,49 +110,42 @@ zzsetup() {
 
 zzsource() {
   typeset -i exit_code=0
-
   if [[ -f "${ZI[BIN_DIR]}/zi.zsh" ]]; then
-    builtin source "${ZI[BIN_DIR]}/zi.zsh"
+    source "${ZI[BIN_DIR]}/zi.zsh"
     exit_code=$?
   else
     zzsetup && zzsource
     exit_code=$?
   fi
-
   return $exit_code
 }
 
 # Load zi module if built
 zzpmod() {
+  typeset -i exit_code=0
   if [[ -f "${ZI[ZMODULES_DIR]}/zpmod/Src/zi/zpmod.so" ]]; then
     module_path+=( ${ZI[ZMODULES_DIR]}/zpmod/Src );
-    zmodload zi/zpmod 2> /dev/null && return 0
+    zmodload zi/zpmod 2> /dev/null
+    exit_code=$?
   fi
+  return $exit_code
 }
 
 # Enable completion (completions should be loaded after zzsource)
 zzcomps() {
   typeset -i exit_code=0
-
   if (( ${+_comps} )); then
     if [[ -f "${ZI[BIN_DIR]}/lib/_zi" ]]; then
       (( ${+_comps[zi]} )) || _comps[zi]="${ZI[BIN_DIR]}/lib/_zi"
-      exit_code=$?
     fi
-  else
-    exit_code=1
+    exit_code=$?
   fi
-
   return $exit_code
 }
 
 zzinit() {
-  builtin emulate -L zsh ${=${options[xtrace]:#off}:+-o xtrace}
-  builtin setopt extended_glob \
-#    warn_create_global local_options \
-#    typeset_silent no_short_loops rc_quotes no_auto_pushd
-
-  zzsource && zzcomps
-
-  unset -f check_src get_source_from zzinit zzcomps zzpmod zzsetup zzsource main 2> /dev/null
+  zzsource && zzcomps && zzpmod
+  unset -f check_src get_source_from 2> /dev/null
+  unset -f zzsetup zzsource zzcomps zzpmod zzinit 2> /dev/null
+  unset exit_code 2> /dev/null
 }
