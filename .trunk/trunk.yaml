@@ -46,7 +46,7 @@ lint:
   enabled:
     - checkov@2.5.9
     - trivy@0.46.0
-    - trufflehog@3.59.0
+    - trufflehog@3.60.0
     - dotenv-linter@3.3.0
     - ruff@0.0.292
     - taplo@0.8.1
