@@ -48,7 +48,7 @@ lint:
     - trivy@0.46.0
     - trufflehog@3.60.0
     - dotenv-linter@3.3.0
-    - ruff@0.0.292
+    - ruff@0.1.0
     - taplo@0.8.1
     - actionlint@1.6.26
     - shfmt@3.6.0
