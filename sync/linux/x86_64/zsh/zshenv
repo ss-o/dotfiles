@@ -15,14 +15,12 @@ typeset -ghA DOTFILES
 
 DOTFILES[CONFIG]=${HOME}/.dotfiles/.config
 
-source ${DOTFILES[CONFIG]}/go.sh
-source ${DOTFILES[CONFIG]}/pnpm.sh
+for environment in ${DOTFILES[CONFIG]}/env/*.sh; do
+  source "$environment"
+done
 
 typeset -gx GPG_TTY=$(tty)
 gpg-connect-agent updatestartuptty /bye >/dev/null
-
-typeset -gx FLYCTL_INSTALL="${HOME}/.local/share/fly"
-typeset -gx PATH="$FLYCTL_INSTALL/bin:$PATH"
 
 if (( $+commands[yarn] )); then
   YARN_PATH="$(yarn global bin)"
@@ -48,8 +46,6 @@ done; unset dir_path
 
 prepend_path() {
   typeset -gxU path PATH
-  #PATH="${(j/:/)path}"
-  #path=( ${(@s/:/)PATH} )
   for add in "$@"; do
     if [[ -d $add ]]; then
       path=( "${add}" "${(@)path}" )
@@ -59,15 +55,6 @@ prepend_path() {
   done; unset -v add
   path=( "${(@u)path}" )
 }
-
-#typeset -a aa
-#aa=(test1 test2 test3)
-#aa=("${(@)aa:#test2}")
-
-#if (( ${#aa} > 0 )); then
-#	echo $aa
-#fi
-
 
 prepend_path "${create_path[@]}"
 prepend_path "${add_path[@]}"

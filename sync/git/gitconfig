@@ -17,7 +17,8 @@
 
 [credential]
 	credentialStore = gpg
-
+[credential "https://dev.azure.com"]
+	useHttpPath = true
 [url "ssh://git@github.com/"]
   insteadOf = https://github.com/
 
@@ -122,5 +123,5 @@
 
 [include]
   path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
-[credential "https://dev.azure.com"]
-	useHttpPath = true
+[http]
+	sslcainfo = ~/.local/share/ca-certificates/Cloudflare_CA.pem
