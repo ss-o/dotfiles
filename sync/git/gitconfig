@@ -123,5 +123,3 @@
 
 [include]
   path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
-[http]
-	sslcainfo = ~/.local/share/ca-certificates/Cloudflare_CA.pem

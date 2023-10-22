@@ -26,7 +26,7 @@ function upload {
 }
 
 # Check arguments
-if [ "$1" == "-h" -o "$1" == "--help" ]; then
+if [[ $1 == "-h" || $1 == "--help" ]]; then
   usage
   exit 0
 elif [[ $# -eq 0 ]]; then
