@@ -13,7 +13,7 @@ plugins:
       uri: https://github.com/trunk-io/plugins
     - id: configs
       #local: .config/trunk
-      ref: main
+      ref: v0.0.2-draft
       uri: https://github.com/ss-o/trunk-configs
 lint:
   downloads:
@@ -46,8 +46,8 @@ lint:
   enabled:
     - checkov@2.5.9
     - trivy@0.46.0
-    - trufflehog@3.60.0
-    - ruff@0.1.1
+    - trufflehog@3.60.4
+    - ruff@0.1.2
     - taplo@0.8.1
     - actionlint@1.6.26
     - shfmt@3.6.0
