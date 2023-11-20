@@ -44,7 +44,7 @@ lint:
     - semgrep
     - yamllint
   enabled:
-    - checkov@3.0.37
+    - checkov@3.0.38
     - trivy@0.47.0
     - trufflehog@3.62.1
     - ruff@0.1.5
