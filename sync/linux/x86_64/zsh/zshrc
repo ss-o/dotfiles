@@ -96,5 +96,8 @@ decode64() {
 history-clean() { (( $+commands[truncate] )) && \
   { truncate -s 0 $HISTFILE || return 1; }; }
 
-[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
-  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
+[[ -f ${DOTFILES[ZSH]}/themes/p10k-classic.zsh ]] && \
+  { source ${DOTFILES[ZSH]}/themes/p10k-classic.zsh || return 1; }
+
+#[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
+#  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }

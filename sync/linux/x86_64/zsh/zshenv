@@ -19,23 +19,10 @@ for environment in ${DOTFILES[CONFIG]}/env/*.sh; do
   source "$environment"
 done
 
-typeset -gx GPG_TTY=$(tty)
-gpg-connect-agent updatestartuptty /bye >/dev/null
-
-if (( $+commands[yarn] )); then
-  YARN_PATH="$(yarn global bin)"
-else
-  YARN_PATH="${HOME}/.local/share/yarn/bin"
-fi
-
-typeset -a add_path create_path dir_path
+typeset -a create_path dir_path
 
 create_path=(
   "${HOME}/.local/bin"
-)
-
-add_path=(
-  "$YARN_PATH"
 )
 
 for dir_path in "${create_path[@]}"; do
@@ -57,6 +44,7 @@ prepend_path() {
 }
 
 prepend_path "${create_path[@]}"
-prepend_path "${add_path[@]}"
 
 unset -f prepend_path
+
+[[ -r ${HOME}/.env_local ]] && source ${HOME}/.env_local
