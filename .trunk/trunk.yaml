@@ -9,7 +9,7 @@ repo:
 plugins:
   sources:
     - id: trunk
-      ref: v1.2.6
+      ref: v1.3.0
       uri: https://github.com/trunk-io/plugins
     - id: configs
       #local: .config/trunk
@@ -44,10 +44,10 @@ lint:
     - semgrep
     - yamllint
   enabled:
-    - checkov@3.0.38
+    - checkov@3.1.4
     - trivy@0.47.0
-    - trufflehog@3.62.1
-    - ruff@0.1.5
+    - trufflehog@3.63.1
+    - ruff@0.1.6
     - taplo@0.8.1
     - actionlint@1.6.26
     - shfmt@3.6.0
@@ -55,10 +55,10 @@ lint:
     - markdownlint@0.37.0
     - git-diff-check
     - shellcheck@0.9.0
-    - gitleaks@8.18.0
+    - gitleaks@8.18.1
     - git-diff-check
     - markdownlint@0.37.0
-    - gitleaks@8.18.0
+    - gitleaks@8.18.1
     - prettier@3.1.0
     - shellcheck@0.9.0
     - shfmt@3.6.0
