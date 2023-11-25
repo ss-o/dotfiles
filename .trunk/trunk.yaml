@@ -1,78 +1,17 @@
 version: 0.1
+
 cli:
   version: 1.17.2
-repo:
-  repo:
-    host: github.com
-    owner: ss-o
-    name: dotfiles
+
 plugins:
   sources:
     - id: trunk
       ref: v1.3.0
       uri: https://github.com/trunk-io/plugins
+
     - id: configs
-      #local: .config/trunk
-      ref: v0.0.2-draft
-      uri: https://github.com/ss-o/trunk-configs
+      local: .trunk/configs
+
 lint:
-  downloads:
-    - name: trunk-toolbox
-      downloads:
-        - os:
-            linux: unknown-linux-gnu
-            macos: apple-darwin
-          cpu:
-            x86_64: x86_64
-            arm_64: aarch64
-          url: https://github.com/trunk-io/toolbox/releases/download/${version}/trunk-toolbox-${version}-${cpu}-${os}.tar.gz
-  definitions:
-    - name: trunk-toolbox
-      download: trunk-toolbox
-      files: [ALL]
-      commands:
-        - output: sarif
-          run: trunk-toolbox --upstream ${upstream-ref}
-          success_codes: [0]
-          read_output_from: stdout
-          disable_upstream: true
-          target: .
-      environment:
-        - name: PATH
-          list: ["${linter}"]
-  disabled:
-    - semgrep
-    - yamllint
-  enabled:
-    - checkov@3.1.9
-    - trivy@0.47.0
-    - trufflehog@3.63.2-rc0
-    - ruff@0.1.6
-    - taplo@0.8.1
-    - actionlint@1.6.26
-    - shfmt@3.6.0
-    - prettier@3.1.0
-    - markdownlint@0.37.0
-    - git-diff-check
-    - shellcheck@0.9.0
-    - gitleaks@8.18.1
-    - git-diff-check
-    - markdownlint@0.37.0
-    - gitleaks@8.18.1
-    - prettier@3.1.0
-    - shellcheck@0.9.0
-    - shfmt@3.6.0
-runtimes:
-  enabled:
-    - python@3.10.8
-    - go@1.21.0
-    - node@18.12.1
-actions:
-  disabled:
-    - trunk-check-pre-push
-    - trunk-fmt-pre-commit
-  enabled:
-    - git-blame-ignore-revs
-    - trunk-announce
-    - trunk-upgrade-available
-    - trunk-cache-prune
+  disabled: []
+  enabled: []
