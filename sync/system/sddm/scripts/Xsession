@@ -62,10 +62,11 @@ USERXSESSIONRC=${HOME}/.xsessionrc
 ALTUSERXSESSION=${HOME}/.Xsession
 
 if [[ -d ${xsessionddir} ]]; then
-  for i in $(ls "${xsessionddir}"); do
+  for i in $("${xsessionddir}"); do
+    [[ -d ${xsessionddir} ]] || break
     script="${xsessionddir}/${i}"
     echo "Loading X session script ${script}"
-    if [ -r "${script}" -a -f "${script}" ] && expr "${i}" : '^[[:alnum:]_-]\{1,\}$' >/dev/null; then
+    if [[ -r ${script} ]] && [[ -f ${script} ]] && expr "${i}" : '^[[:alnum:]_-]\{1,\}$' >/dev/null; then
       . "${script}"
     fi
   done
@@ -80,15 +81,21 @@ elif [[ -f /etc/X11/Xresources ]]; then
 fi
 [[ -f "${HOME}"/.Xresources ]] && xrdb -merge "${HOME}"/.Xresources
 
+if [[ -f ${OPTIONFILE} ]]; then
+  . "${OPTIONFILE}"
+fi
 if [[ -f ${USERXSESSIONRC} ]]; then
   . "${USERXSESSIONRC}"
 fi
 if [[ -f ${USERXSESSION} ]]; then
   . "${USERXSESSION}"
 fi
+if [[ -f ${ALTUSERXSESSION} ]]; then
+  . "${ALTUSERXSESSION}"
+fi
 
 if [[ -z $* ]]; then
   exec xmessage -center -buttons OK:0 -default OK "Sorry, ${DESKTOP_SESSION} is no valid session."
 else
-  exec $@
+  exec "$@"
 fi
