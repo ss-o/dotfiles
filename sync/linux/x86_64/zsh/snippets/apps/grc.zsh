@@ -3,9 +3,8 @@
 
 if [ ! -n "$TERM" ] || [ "$TERM" = dumb ] || (( ! $+commands[grc] )); then
   return 1
-fi
-
-if (( ${#_grc_cmds[@]} == 0 )); then
+else
+  if (( ${#_grc_cmds[@]} == 0 )); then
   _grc_cmds=(
     'as'
     'ant'
@@ -81,7 +80,7 @@ if (( ${#_grc_cmds[@]} == 0 )); then
     'wdiff'
     'whois'
   )
-fi
+  fi
 
   # Wrap commands in grc
   for _grc_cmd in "${_grc_cmds[@]}"; do
@@ -94,4 +93,5 @@ fi
     fi
   done
 
-unset _grc_cmd{s,}
+  unset _grc_cmd{s,}
+fi

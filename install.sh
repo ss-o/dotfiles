@@ -3,6 +3,7 @@
 # vim: ft=sh sw=2 ts=2 et
 # ============================================================================= #
 trap '' INT QUIT TERM
+
 # ============================================================================= #
 # shellcheck source=/dev/null
 dosync_dir="$(command cd -P -- "$(dirname -- "$(command -v -- "$0" || true)")" && pwd -P)"
@@ -23,12 +24,13 @@ _git_sub_opt="-q"
 _required_cmds="zsh git i_am_required me_too"
 _supported_os="linux darwin"
 _supported_cpu="x86_64 aarch64"
-# ============================================================================== #
 
+# ============================================================================== #
 # Check environment ™
 _is_quiet="${_is_quiet:-false}"
 _is_tty="${_is_tty:-false}"
 _is_piped="${_is_piped:-false}"
+
 # ============================================================================== #
 info_block() {
   # Don't print anything if we're in quiet mode
@@ -122,8 +124,8 @@ say_log() {
 }
 # ============================================================================== #
 _get_os() {
-  _current_os="$(command -v uname)"
-  case $("${_current_os}" | tr '[:upper:]' '[:lower:]') in
+  _current_os=$(uname | tr '[:upper:]' '[:lower:]')
+  case "${_current_os}" in
   android*) _current_os='android' ;;
   darwin*) _current_os='darwin' ;;
   linux*) _current_os='linux' ;;
@@ -139,8 +141,8 @@ _get_os() {
 }
 
 _get_arch() {
-  _current_arch="$(command -v uname)"
-  case $("${_current_arch}" -m | tr '[:upper:]' '[:lower:]') in
+  _current_arch=$(uname -m | tr '[:upper:]' '[:lower:]')
+  case "${_current_arch}" in
   x86_64 | amd64) _current_arch='x86_64' ;;
   i?86 | x86) _current_arch='386' ;;
   armv8* | aarch64 | arm64) _current_arch='aarch64' ;;
@@ -148,6 +150,17 @@ _get_arch() {
   esac
   say "${_supported_cpu}" | command grep -q "${_current_arch}"
   return $?
+}
+
+_get_distro() {
+  if [ -f /etc/os-release ]; then
+    # shellcheck source=/dev/null
+    . /etc/os-release
+    _current_arch=${ID}
+    return 0
+  else
+    return 1
+  fi
 }
 
 _go_to() { command cd "$1" || say_err "Failed to enter directory %s."; }
@@ -223,10 +236,10 @@ _git_pull() {
 _git_commit() {
   _go_to "${dosync_dir}" && _check_git
   say -cyan "Committing latest changes to the repository"
-  command git commit -a "${_git_opt}" -m "Sync on $(date || true)"
+  git commit -a "${_git_opt}" -m "Sync on $(date || true)"
   if [ -f .gitmodules ]; then
     say -cyan "Committing latest changes for submodules"
-    command git submodule "${_git_sub_opt}" foreach --recursive git commit -a "${_git_opt}" -m "Sync on $(date || true)"
+    git submodule "${_git_sub_opt}" foreach --recursive git commit -a "${_git_opt}" -m "Sync on $(date || true)"
   fi
   _go_back
   return $?
@@ -235,22 +248,22 @@ _git_commit() {
 _git_push() {
   _go_to "${dosync_dir}" && _check_git
   say -cyan "Pushing changes upstream to ${ORIGIN}"
-  command git push "${_git_opt}"
+  git push "${_git_opt}"
   if [ -f .gitmodules ]; then
     say -cyan "Pushing changes for submodules"
-    command git push "${_git_sub_opt}" --recurse-submodules=on-demand
-    command git submodule "${_git_sub_opt}" foreach --recursive git push
+    git push "${_git_sub_opt}" --recurse-submodules=on-demand
+    git submodule "${_git_sub_opt}" foreach --recursive git push
   fi
   _go_back
   return $?
 }
 
 _git_add() {
-  _check_git && _go_to "${dosync_dir}" && command git add -A && command git status -s
+  _check_git && _go_to "${dosync_dir}" && git add -A && git status -s
   if [ -f .gitmodules ]; then
     say -cyan "Adding changes for submodules"
-    command git submodule "${_git_sub_opt}" foreach --recursive git add -A
-    command git submodule "${_git_sub_opt}" foreach --recursive git status -s
+    git submodule "${_git_sub_opt}" foreach --recursive git add -A
+    git submodule "${_git_sub_opt}" foreach --recursive git status -s
   fi
 
   return $?
@@ -327,7 +340,6 @@ _read() {
 
 dosync() {
   _sync_config
-
   for file in ${_files_src}; do
     _read "${file}"
     if [ -e "${_sync_target}" ] && [ ! -h "${_sync_target}" ]; then
@@ -349,11 +361,11 @@ dosync() {
 }
 
 _do_options() {
-  if [ "${_cmd_}" = sync ]; then
-    dosync
-  elif [ "${_cmd_}" = clean ]; then
-    _remove_broken_links
-  fi
+  case "${_cmd_}" in
+  sync) dosync ;;
+  clean) _remove_broken_links ;;
+  *) return 1 ;;
+  esac
 }
 
 usage() {
@@ -365,7 +377,7 @@ main() {
   unset _cmd_ _opt_ _arg_ _is_quiet
 
   # If no arguments are given, run sync by default
-  [ $# -eq 0 ] && _cmd_=sync && _do_options run && exit 0
+  [ $# -eq 0 ] && _cmd_=sync _do_options && exit 0
 
   while getopts ":q:c:" _opt_; do
     case "${_opt_}" in

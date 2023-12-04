@@ -1,3 +1,5 @@
+# vim: ft=zsh sw=2 ts=2 et
+
 # ‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑ ⸨ Zsh ⸩
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
@@ -5,7 +7,7 @@ fi
 
 (){ source "${HOME}/.config/zi/init.zsh"; zzinit; }
 
-COMPLETION_WAITING_DOTS=true
+COMPLETION_WAITING_DOTS=1
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
 : ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
@@ -27,13 +29,17 @@ fi
 (){
   setopt local_options typeset_silent
   typeset _sni_ _fnc_
-  for _sni_ in ${DOTFILES[ZSH]}/snippets/*.zsh; do source $_sni_; done
+  zstyle ':zi:plugins:ssh-agent' agent-forwarding yes
+  zstyle ':zi:plugins:ssh-agent' quiet yes
+  zstyle ':zi:plugins:ssh-agent' lazy yes
+  for _sni_ in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_sni_; done
   for _fnc_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_fnc_:t}; done
 }
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
 # DEVOPS ============================================================================================================ #
-zi is-snippet for id-as'gcloud-completion' \
+zi is-snippet for \
+  id-as'gcloud-completion' \
   if'[[ -d ~/.local/share/google-cloud-sdk/bin \
     && -f ~/.local/share/google-cloud-sdk/completion.zsh.inc ]]' \
   atinit'[[ -n ${path[(re)${HOME}/.local/share/google-cloud-sdk/bin]} ]] \
@@ -55,8 +61,7 @@ zi lucid for light-mode \
 # OH-MY-ZSH PLUGINS ================================================================================================== #
 zi-turbo '0a' light-mode for \
   atload"unalias grv g" OMZP::git \
-    if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
-    if'[[ -d ~/.ssh ]]' silent OMZP::ssh-agent
+#    if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
 # PLUGINS ============================================================================================================ #
 zi-turbo '0a' for \
   binary sbin'bin/*' \
@@ -72,19 +77,10 @@ zi-turbo '0a' for \
 
 #zi load ss-o/zsh-functions
 
-reload_z() {
-  autoload -U zrecompile
-	for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do
-		zrecompile -p $f && command rm -f $f.zwc.old
-	done
-}
+reload_z() { autoload -U zrecompile; for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do zrecompile -p $f && command rm -f $f.zwc.old; done; }
 
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
-
 encode64() { (( $# == 0 )) && { command cat | base64; } || { builtin print -n $1 | base64; }; }
-
-encodefile64() { (( $# == 0 )) && { print "Missing file"; } || { base64 -i $1 -o $1.txt; print "${1} encoded as ${1}.txt"; }; }
-
 decode64() {
   if [[ $# -eq 0 ]]; then
     cat | base64 --decode
@@ -93,11 +89,11 @@ decode64() {
   fi
 }
 
-history-clean() { (( $+commands[truncate] )) && \
-  { truncate -s 0 $HISTFILE || return 1; }; }
+history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
 
 [[ -f ${DOTFILES[ZSH]}/themes/p10k-classic.zsh ]] && \
   { source ${DOTFILES[ZSH]}/themes/p10k-classic.zsh || return 1; }
 
 #[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
 #  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
+
