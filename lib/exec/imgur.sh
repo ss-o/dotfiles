@@ -55,7 +55,7 @@ while [[ $# -gt 0 ]]; do
   else
     # File -> imgur
     # Check file exists
-    if [ "${file}" != "-" -a ! -f "${file}" ]; then
+    if [[ ${file} != "-" ]] && [[ ! -f ${file} ]]; then
       echo "File '${file}' doesn't exist; skipping" >&2
       errors=true
       continue
@@ -63,7 +63,7 @@ while [[ $# -gt 0 ]]; do
     response=$(upload "@${file}") 2>/dev/null
   fi
 
-  if [[ $? -ne 0 ]]; then
+  if [[ $# -eq 0 ]]; then
     echo "Upload failed" >&2
     errors=true
     continue
