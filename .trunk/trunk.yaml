@@ -6,10 +6,17 @@ cli:
 plugins:
   sources:
     - id: configs
+<<<<<<< HEAD
       ref: v1.0.1
       uri: https://github.com/trunk-io/configs
     - id: trunk
       ref: v1.4.1
+=======
+      ref: v1.0.0
+      uri: https://github.com/trunk-io/configs
+    - id: trunk
+      ref: v1.4.0
+>>>>>>> daf7175 (	modified:   .trunk/trunk.yaml)
       uri: https://github.com/trunk-io/plugins
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
