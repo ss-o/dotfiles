@@ -29,9 +29,7 @@ fi
 (){
   setopt local_options typeset_silent
   typeset _init_
-  zstyle ':zi:plugins:ssh-agent' agent-forwarding yes
   zstyle ':zi:plugins:ssh-agent' quiet yes
-  zstyle ':zi:plugins:ssh-agent' lazy yes
   for _init_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_init_:t}; done
   for _init_ in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_init_; done
   for _init_ in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source $_init_; done
@@ -76,20 +74,10 @@ zi-turbo '0a' for \
   atinit'YSU_MESSAGE_POSITION=after' \
     MichaelAquilina/zsh-you-should-use
 
-#zi load ss-o/zsh-functions
-
-reload_z() { autoload -U zrecompile; for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do zrecompile -p $f && command rm -f $f.zwc.old; done; }
-
+reload_z() { autoload -Uz zrecompile; for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do zrecompile -p $f && command rm -f $f.zwc.old; done; }
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
-encode64() { (( $# == 0 )) && { command cat | base64; } || { builtin print -n $1 | base64; }; }
-decode64() {
-  if [[ $# -eq 0 ]]; then
-    cat | base64 --decode
-  else
-    printf '%s' $1 | base64 --decode
-  fi
-}
-
+encode64() { (( $# == 0 )) && { cat | base64; } || { builtin print -n $1 | base64; }; }
+decode64() { if [[ $# -eq 0 ]] { cat | base64 --decode; } else { printf '%s' $1 | base64 --decode; }; }
 history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
 
 [[ -r ${HOME}/.zshrc_local ]] && source ${HOME}/.zshrc_local

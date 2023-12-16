@@ -1,12 +1,14 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
 
-man -k . | fzf -n1,2 --preview "echo {} \
+builtin setopt extended_glob
+
+man -k . | fzf -n1,2 --preview "print {} \
     | cut -d' ' -f1 \
     | sed 's# (#.#' \
     | sed 's#)##' \
     | xargs -I% man %" --bind "enter:execute: \
-      (echo {} \
+      (print {} \
         | cut -d' ' -f1 \
         | sed 's# (#.#' \
         | sed 's#)##' \

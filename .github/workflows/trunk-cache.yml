@@ -1,9 +1,10 @@
 ---
-name: "⭕ Trunk [cache]"
+name: ⭕ Trunk Cache
+
 on:
   push:
+    branches: [main]
     paths: [.trunk/trunk.yaml]
-  workflow_dispatch: {}
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}

@@ -1,12 +1,7 @@
 {
     "autoclose": false,
     "autosu": true,
-    "fmt-onsave": true,
-    "ftoptions": false,
-    "ignorecase": false,
-    "initlua": true,
-    "savecursor": true,
-    "saveundo": true,
-    "sename": true,
-    "softwrap": true
+    "parsecursor": true,
+    "reload": "auto",
+    "saveundo": true
 }
