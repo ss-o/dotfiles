@@ -1,7 +1,13 @@
 {
     "autoclose": false,
     "autosu": true,
+    "fastdirty": true,
+    "keymenu": true,
+    "linter": false,
+    "mkparents": true,
     "parsecursor": true,
+    "paste": true,
     "reload": "auto",
+    "rmtrailingws": true,
     "saveundo": true
 }
