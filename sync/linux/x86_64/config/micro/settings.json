@@ -1,12 +1,13 @@
 {
     "autoclose": false,
     "autosu": true,
-    "fmt-onsave": true,
-    "ftoptions": false,
-    "ignorecase": false,
-    "initlua": true,
-    "savecursor": true,
-    "saveundo": true,
-    "sename": true,
-    "softwrap": true
+    "fastdirty": true,
+    "keymenu": true,
+    "linter": false,
+    "mkparents": true,
+    "parsecursor": true,
+    "paste": true,
+    "reload": "auto",
+    "rmtrailingws": true,
+    "saveundo": true
 }

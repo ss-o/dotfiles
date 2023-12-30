@@ -6,9 +6,9 @@
 builtin setopt local_options extended_glob
 
 local -a pfxs lines desc files
-pfxs=( zsh user system )                                                # grouped commands
-pfxs+=( "*~$HOME/.dotfiles/sync/linux/x86_64/zsh/functions/(${(j:|:)pfxs}|lps)" )    # ungrouped commands
-pfxs+=( local )                                                         # local, uncommitted commands
+pfxs=( zsh user system )                                                              # grouped commands
+pfxs+=( "*~$HOME/.dotfiles/sync/linux/x86_64/zsh/functions/(${(j:|:)pfxs}|lps)" )     # ungrouped commands
+pfxs+=( local )                                                                       # local, uncommitted commands
 
 integer pass longest=0 longest2=0
 local p file header="# Description: "

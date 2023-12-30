@@ -20,9 +20,17 @@ if ! isdirectory(expand(&g:undodir))
   silent! call mkdir(expand(&g:undodir), 'p', 0700)
 endif
 
+" Ignore compiled files
+set wildignore=*.o,*~,*.pyc
+if has("win16") || has("win32")
+    set wildignore+=.git\*,.hg\*,.svn\*
+else
+    set wildignore+=*/.git/*,*/.hg/*,*/.svn/*,*/.DS_Store
+endif
+
 " Install vim-plug if not found"
-if empty(glob('~/.vim/autoload/plug.vim'))
-   silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+if empty(glob('$HOME/.vim/autoload/plug.vim'))
+   silent !curl -fLo $HOME/.vim/autoload/plug.vim --create-dirs
      \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
    endif
 
@@ -31,64 +39,64 @@ autocmd VimEnter * if len(filter(values(g:plugs), '!isdirectory(v:val.dir)'))
  \| PlugInstall --sync | source $MYVIMRC
  \| endif
 
-call plug#begin('~/.vim/plugged')
-"Plug 'tpope/vim-sensible'
-"Plug 'kovetskiy/sxhkd-vim'
-"Plug 'Valloric/YouCompleteMe'
-"Plug 'Yggdroot/LeaderF'
-Plug 'chrisbra/colorizer'
+call plug#begin()
+"Plug 'mileszs/ack.vim'
 "Plug 'chxuan/vim-edit'
-"Plug 'chxuan/change-colorscheme'
+"Plug 'Yggdroot/LeaderF'
+"Plug 'tpope/vim-sensible'
 "Plug 'chxuan/prepare-code'
+"Plug 'kovetskiy/sxhkd-vim'
+"Plug 'z-shell/zi-vim-syntax'
+"Plug 'haya14busa/incsearch.vim'
+"Plug 'chxuan/change-colorscheme'
+"Plug 'easymotion/vim-easymotion'
+"Plug 'Shougo/vimproc.vim', {'do' : 'make'}
+"Plug 'ycm-core/YouCompleteMe', { 'do': './install.py' }
+Plug 'chrisbra/colorizer'
 Plug 'chxuan/vim-buffer'
 Plug 'chxuan/vimplus-startify'
-"Plug 'preservim/tagbar'
-"Plug 'mileszs/ack.vim'
+Plug 'preservim/tagbar'
 Plug 'junegunn/vim-slash'
 Plug 'junegunn/gv.vim'
-"Plug 'haya14busa/incsearch.vim'
-"Plug 'z-shell/zi-vim-syntax'
-"Plug 'easymotion/vim-easymotion'
 Plug 'junegunn/vim-easy-align'
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
-"Plug 'Xuyuanp/nerdtree-git-plugin'
+Plug 'ryanoasis/vim-devicons'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 Plug 'editorconfig/editorconfig-vim'
-Plug 'ryanoasis/vim-devicons'
-"Plug 'junegunn/fzf', { 'dir': '~/.local/share/fzf', 'do': './install --xdg --no-fish --all' }
-"Plug 'Shougo/vimproc.vim', {'do' : 'make'}
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'preservim/nerdtree', { 'on': 'NERDTreeToggle' }
+
+" - Automatically executes `filetype plugin indent on` and `syntax enable`.
 call plug#end()
 
 " Start NERDTree and leave the cursor in it.
 " autocmd VimEnter * NERDTree
+noremap <leader>n :NERDTreeFocus<CR>
 nnoremap <C-n> :NERDTree<CR>
 nnoremap <C-t> :NERDTreeToggle<CR>
 nnoremap <C-f> :NERDTreeFind<CR>
 
 " Use Vim defaults instead of 100% vi compatibility
 " Avoid side-effects when nocompatible has already been set.
-if &compatible
-  set nocompatible
-endif
-
-syntax on
-filetype plugin indent on
+"if &compatible
+"  set nocompatible
+"endif
 
 set backspace=indent,eol,start
-set autoindent             " Use current indent for new lines.
-set display=lastline       " Show as much of the line as will fit.
-set wildmenu               " Better tab completion in the commandline.
-set wildmode=list:longest  " List all matches and complete to the longest match.
+set backspace=eol,start,indent
+
+set wrap                   " Wrap long lines.
+set ruler                  " Show the ruler in the statusline.
+set number                 " Show line numbers.
 set showcmd                " Show (partial) command in bottom-right.
 set smarttab               " Backspace removes 'shiftwidth' worth of spaces.
-set number                 " Show line numbers.
-set wrap                   " Wrap long lines.
-set laststatus=2           " Always show the statusline.
-set ruler                  " Show the ruler in the statusline.
-set ignorecase             " Searching with / is case-insensitive.
+set wildmenu               " Better tab completion in the commandline.
 set smartcase              " Disable 'ignorecase' if the term contains upper-case.
+set autoindent             " Use current indent for new lines.
+set ignorecase             " Searching with / is case-insensitive.
+set display=lastline       " Show as much of the line as will fit.
+set encoding=utf8          " Set utf8 as standard encoding.
+set wildmode=list:longest  " List all matches and complete to the longest match.
+set laststatus=2           " Always show the statusline.
 set nrformats-=octal       " Remove octal support from 'nrformats'.
-set encoding=UTF-8
-set laststatus=2

@@ -21,6 +21,7 @@ Rclone
 setenv
 setopt
 shfunc
+strikethrough
 sunos
 TMPDIR
 unfunction

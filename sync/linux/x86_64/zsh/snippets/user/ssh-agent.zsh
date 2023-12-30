@@ -6,6 +6,11 @@ USERNAME=${USERNAME:-$USER:-user}
 ssh_env_cache="$HOME/.ssh/env-$HOST"
 
 _start_agent() {
+  if (( ! $+commands[ssh] || ! $+commands[ssh-agent] )); then
+    zstyle -t :zi:plugins:ssh-agent quiet || echo >&2 "Commands ssh and ssh-agent not found ..."
+    return 1
+  fi
+
   # Check if ssh-agent is already running
   if [[ -f "$ssh_env_cache" ]]; then
     . "$ssh_env_cache" > /dev/null

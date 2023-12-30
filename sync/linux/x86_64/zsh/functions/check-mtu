@@ -3,24 +3,18 @@
 #
 # Description: Ping Test to determine Optimal MTU Size
 
-builtin emulate -L zsh
-builtin setopt extended_glob warn_create_global
+if [[ $# -gt 0 ]]; then
+  local -a deps
+  local dep target=$1; shift
+  local lower=0 upper=1500
 
-local -a deps
-local dep target=$1; shift
-local lower=0 upper=1500
+  deps=( 'ping' )
 
-deps=( 'ping' )
-
-for dep in "${deps[@]}"; do
-  if (( ! $+commands[$dep] )); then
-    print -Pr "Missing dependency: $dep"; return 100
-  fi
-done
-
-if [[ -z $target ]]; then
-  print "Missing target to check"; return 1
-else
+  for dep in "${deps[@]}"; do
+    if (( ! $+commands[$dep] )); then
+      print -Pr "Missing dependency: $dep"; return 100
+    fi
+  done
   until [[ $((lower + 1)) -eq $upper ]]; do
     current=$(((lower + upper) / 2))
     print -n "lower: $lower, upper: $upper, testing: $current -- "
@@ -31,5 +25,6 @@ else
     fi
   done
   print "max packet size: $lower, mtu: $((lower + 28))"; return 0
+else
+  print "Specify IP/Host to check"; return 1
 fi
-

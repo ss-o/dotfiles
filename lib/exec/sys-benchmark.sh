@@ -1,9 +1,6 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
-#
-# Description:
-
-builtin setopt local_options extended_glob
+# shellcheck shell=bash
 
 command_exists() { command -v "$@" >/dev/null 2>&1; }
 
@@ -19,12 +16,13 @@ redact_ip() {
   *:*)
     printf '%s:xxxx\n' "$(printf '%s\n' "$1" | cut -d : -f 1-3)"
     ;;
+  *) ;;
   esac
 }
 
 finish() {
   printf '\n'
-  rm -f test_$$ $temp_bin
+  rm -rf test_$$ "${temp_bin}"
   exit 0
 }
 
@@ -33,15 +31,15 @@ finish() {
 trap finish EXIT INT TERM
 
 command_benchmark() {
-  if [ "$1" = "-q" ]; then
+  if [[ $1 == "-q" ]]; then
     QUIET=1
     shift
   fi
   if command_exists "$1"; then
-    (time "$gnu_dd" if=/dev/zero bs=1M count=500 2>/dev/null |
+    (time "${gnu_dd}" if=/dev/zero bs=1M count=500 2>/dev/null |
       "$@" >/dev/null) 2>&1
   else
-    if [ "$QUIET" -ne 1 ]; then
+    if [[ ${QUIET} -ne 1 ]]; then
       unset QUIET
       # shellcheck disable=SC2016
       printf '[command `%s` not found]\n' "$1"
@@ -58,7 +56,7 @@ dd_benchmark() {
   # The awk script assumes bytes/second if the suffix is !~ [TGMK]B. Call me
   # if your storage system does more than terabytes per second; I'll want to
   # see that.
-  LC_ALL=C "$gnu_dd" if=/dev/zero of=test_$$ bs=64k count=16k conv=fdatasync 2>&1 |
+  LC_ALL=C "${gnu_dd}" if=/dev/zero of=test_$$ bs=64k count=16k conv=fdatasync 2>&1 |
     awk -F, '
             {
                 io=$NF
@@ -89,7 +87,7 @@ else
   exit 1
 fi
 
-if ! "$gnu_dd" --version >/dev/null 2>&1; then
+if ! "${gnu_dd}" --version >/dev/null 2>&1; then
   printf '%s\n' 'It seems your system only has a non-GNU version of dd.'
   printf '%s\n' 'dd write tests disabled.'
   gnu_dd=''
@@ -105,15 +103,15 @@ printf '\n'
 
 if ! command_exists ioping; then
   temp_bin=$(mktemp -d -t tmp.XXXXXXXXXX)
-  ioping_cmd="$temp_bin/ioping.static"
-  curl -s --max-time 10 -o "$ioping_cmd" http://wget.racing/ioping.static
-  chmod +x "$ioping_cmd"
+  ioping_cmd="${temp_bin}/ioping.static"
+  curl -s --max-time 10 -o "${ioping_cmd}" http://wget.racing/ioping.static
+  chmod +x "${ioping_cmd}"
 else
   ioping_cmd="ioping"
 fi
 
 # Basic info
-if [ "$(uname)" = "Linux" ]; then
+if [[ "$(uname)" == "Linux" ]]; then
   printf 'Processor:    '
   awk -F: '/model name/ {name=$2} END {print name}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//'
   printf 'CPU cores:    '
@@ -122,7 +120,7 @@ if [ "$(uname)" = "Linux" ]; then
   awk -F: ' /cpu MHz/ {freq=$2} END {print freq " MHz"}' /proc/cpuinfo | sed 's/^[ \t]*//;s/[ \t]*$//'
   printf 'RAM:          '
   free -h | awk 'NR==2 {print $2}'
-  if [ "$(swapon -s | wc -l)" -lt 2 ]; then
+  if [[ "$(swapon -s | wc -l)" -lt 2 ]]; then
     printf 'Swap:         -\n'
   else
     printf 'Swap:         '
@@ -140,7 +138,7 @@ else
   printf 'RAM:          '
   sysctl -n hw.physmem | B_to_MiB
 
-  if [ "$(swapinfo | wc -l)" -lt 2 ]; then
+  if [[ "$(swapinfo | wc -l)" -lt 2 ]]; then
     printf 'Swap:         -\n'
   else
     printf 'Swap:         '
@@ -153,9 +151,9 @@ uname -s -r -m
 printf '\n'
 
 printf 'Disks:\n'
-if command_exists lsblk && [ -n "$(lsblk)" ]; then
+if command_exists lsblk && [[ -n "$(lsblk)" ]]; then
   lsblk --nodeps --noheadings --output NAME,SIZE,ROTA --exclude 1,2,11 | sort | awk '{if ($3 == 0) {$3="SSD"} else {$3="HDD"}; printf("%-3s%8s%5s\n", $1, $2, $3)}'
-elif [ -r "/var/run/dmesg.boot" ]; then
+elif [[ -r "/var/run/dmesg.boot" ]]; then
   awk '/(ad|ada|da|vtblk)[0-9]+: [0-9]+.B/ { print $1, $2/1024, "GiB" }' /var/run/dmesg.boot | sort -u
 elif command_exists df; then
   df -h --output=source,fstype,size,itotal | awk 'NR == 1 || /^\/dev/'
@@ -181,30 +179,30 @@ printf '\n'
 
 # ioping
 printf 'ioping: seek rate\n    '
-"$ioping_cmd" -DR -w 5 . | tail -n 1
+"${ioping_cmd}" -DR -w 5 . | tail -n 1
 printf 'ioping: sequential read speed\n    '
-"$ioping_cmd" -DRL -w 5 . | tail -n 2 | head -n 1
+"${ioping_cmd}" -DRL -w 5 . | tail -n 2 | head -n 1
 
 printf '\n'
 
 # dd disk test
 printf 'dd: sequential write speed\n'
 
-if [ -z "$gnu_dd" ]; then
+if [[ -z ${gnu_dd} ]]; then
   printf '    %s\n' '[disabled due to missing GNU dd]'
 else
   io1=$(dd_benchmark)
-  printf '    1st run:    %s\n' "$(printf '%d\n' "$io1" | Bps_to_MiBps)"
+  printf '    1st run:    %s\n' "$(printf '%d\n' "${io1}" | Bps_to_MiBps)"
 
   io2=$(dd_benchmark)
-  printf '    2nd run:    %s\n' "$(printf '%d\n' "$io2" | Bps_to_MiBps)"
+  printf '    2nd run:    %s\n' "$(printf '%d\n' "${io2}" | Bps_to_MiBps)"
 
   io3=$(dd_benchmark)
-  printf '    3rd run:    %s\n' "$(printf '%d\n' "$io3" | Bps_to_MiBps)"
+  printf '    3rd run:    %s\n' "$(printf '%d\n' "${io3}" | Bps_to_MiBps)"
 
   # Calculating avg I/O (better approach with awk for non int values)
-  ioavg=$(awk 'BEGIN{printf("%.0f", ('"$io1"' + '"$io2"' + '"$io3"')/3)}')
-  printf '    average:    %s\n' "$(printf '%d\n' "$ioavg" | Bps_to_MiBps)"
+  ioavg=$(awk 'BEGIN{printf("%.0f", ('"${io1}"' + '"${io2}"' + '"${io3}"')/3)}')
+  printf '    average:    %s\n' "$(printf '%d\n' "${ioavg}" | Bps_to_MiBps)"
 fi
 
 printf '\n'
@@ -212,9 +210,9 @@ printf '\n'
 # Network speedtests
 
 ipv4=$(curl -4 -s --max-time 5 http://icanhazip.com/)
-if [ -n "$ipv4" ]; then
+if [[ -n ${ipv4} ]]; then
   printf 'IPv4 speedtests\n'
-  printf '    your IPv4:    %s\n' "$(redact_ip "$ipv4")"
+  printf '    your IPv4:    %s\n' "$(redact_ip "${ipv4}")"
   printf '\n'
 
   printf '    Cachefly CDN:         '
@@ -244,9 +242,9 @@ fi
 printf '\n'
 
 ipv6=$(curl -6 -s --max-time 5 http://icanhazip.com/)
-if [ -n "$ipv6" ]; then
+if [[ -n ${ipv6} ]]; then
   printf 'IPv6 speedtests\n'
-  printf '    your IPv6:    %s\n' "$(redact_ip "$ipv6")"
+  printf '    your IPv6:    %s\n' "$(redact_ip "${ipv6}")"
   printf '\n'
 
   printf '    Leaseweb (NL):        '
@@ -273,4 +271,4 @@ printf '%s\n' '-------------------------------------------------'
 
 # delete downloaded ioping binary if script has been run straight from a pipe
 # (rather than a downloaded file)
-[ -t 0 ] || rm -f $ioping_cmd
+[[ -t 0 ]] || rm -rf "${ioping_cmd}"

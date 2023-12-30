@@ -1,9 +1,7 @@
 ---
-name: "⭕ Trunk [check]"
-on:
-  pull_request:
-    types: [opened, synchronize]
-  workflow_dispatch: {}
+name: ⭕ Trunk Check
+
+on: [pull_request]
 
 concurrency:
   group: ${{ github.head_ref || github.run_id }}
@@ -15,7 +13,8 @@ jobs:
   check:
     runs-on: ubuntu-latest
     permissions:
-      checks: write
+      checks: write # For trunk to post annotations
+      contents: read # For repo checkout
     steps:
       - name: ✅ Checkout
         uses: actions/checkout@v4

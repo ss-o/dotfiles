@@ -16,7 +16,6 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 [[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
 
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
-[[ -r ${HOME}/.zshrc_local ]] && source ${HOME}/.zshrc_local
 
 # ‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑ ⸨ Private functions ⸩
 typeset -gA DOTFILES
@@ -29,12 +28,11 @@ fi
 
 (){
   setopt local_options typeset_silent
-  typeset _sni_ _fnc_
-  zstyle ':zi:plugins:ssh-agent' agent-forwarding yes
+  typeset _init_
   zstyle ':zi:plugins:ssh-agent' quiet yes
-  zstyle ':zi:plugins:ssh-agent' lazy yes
-  for _sni_ in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_sni_; done
-  for _fnc_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_fnc_:t}; done
+  for _init_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_init_:t}; done
+  for _init_ in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_init_; done
+  for _init_ in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source $_init_; done
 }
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
@@ -47,9 +45,9 @@ zi is-snippet for \
     || builtin source ~/.local/share/google-cloud-sdk/path.zsh.inc' \
   ~/.local/share/google-cloud-sdk/completion.zsh.inc
 
-zi has'svn' blockf for svn \
-  id-as'user:aliases' multisrc'{general,systemd/systemd}.zsh' pick'/dev/null' \
-    https://github.com/ss-o/dotfiles/trunk/sync/linux/x86_64/zsh/aliases/user
+#zi has'svn' blockf for svn \
+#  id-as'user:aliases' multisrc'{general,systemd/systemd}.zsh' pick'/dev/null' \
+#    https://github.com/ss-o/dotfiles/trunk/sync/linux/x86_64/zsh/aliases/user
 # ANNEX ============================================================================================================== #
 zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
 # META-PLUGINS ======================================================================================================= #
@@ -62,7 +60,7 @@ zi lucid for light-mode \
 # OH-MY-ZSH PLUGINS ================================================================================================== #
 zi-turbo '0a' light-mode for \
   atload"unalias grv g" OMZP::git \
-#    if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent \
+    if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent
 # PLUGINS ============================================================================================================ #
 zi-turbo '0a' for \
   binary sbin'bin/*' \
@@ -76,25 +74,15 @@ zi-turbo '0a' for \
   atinit'YSU_MESSAGE_POSITION=after' \
     MichaelAquilina/zsh-you-should-use
 
-#zi load ss-o/zsh-functions
-
-reload_z() { autoload -U zrecompile; for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do zrecompile -p $f && command rm -f $f.zwc.old; done; }
-
+reload_z() { autoload -Uz zrecompile; for f in ~/.zshrc $ZI[ZCOMPDUMP_PATH]; do zrecompile -p $f && command rm -f $f.zwc.old; done; }
 reverse-text() { builtin print "${(j::)${(@Oa)${(s::):-$1}}}"; }
-encode64() { (( $# == 0 )) && { command cat | base64; } || { builtin print -n $1 | base64; }; }
-decode64() {
-  if [[ $# -eq 0 ]]; then
-    cat | base64 --decode
-  else
-    printf '%s' $1 | base64 --decode
-  fi
-}
-
+encode64() { (( $# == 0 )) && { cat | base64; } || { builtin print -n $1 | base64; }; }
+decode64() { if [[ $# -eq 0 ]] { cat | base64 --decode; } else { printf '%s' $1 | base64 --decode; }; }
 history-clean() { (( $+commands[truncate] )) && { truncate -s 0 $HISTFILE || return 1; }; }
 
+[[ -r ${HOME}/.zshrc_local ]] && source ${HOME}/.zshrc_local
 [[ -f ${DOTFILES[ZSH]}/themes/p10k-classic.zsh ]] && \
   { source ${DOTFILES[ZSH]}/themes/p10k-classic.zsh || return 1; }
 
 #[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
 #  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
-
