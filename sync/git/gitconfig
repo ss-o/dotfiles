@@ -1,10 +1,10 @@
 # https://git-scm.com/docs/git-config#_configuration_file
 
 [user]
-  useConfigOnly = true
+	useConfigOnly = true
 
 [include]
-  path = ~/.dotfiles/sync/git/gitconfig.d/ss-o.gitconfig
+	path = ~/.dotfiles/sync/git/gitconfig.d/ss-o.gitconfig
 
 #[includeIf "gitdir:~/Codespace/GitHub/digital-teams/"]
 #  path = ~/.gitconfig.d/digital-teams.gitconfig
@@ -17,15 +17,17 @@
 
 [credential]
 	credentialStore = gpg
+
 [credential "https://dev.azure.com"]
 	useHttpPath = true
+
 [url "ssh://git@github.com/"]
-  insteadOf = https://github.com/
+	insteadOf = https://github.com/
 
 [core]
-  editor = micro
-  filemode = true
-	pager = diff-so-fancy | less --tabs=4 -RFXS
+	editor = micro
+ 	filemode = true
+	pager = diff-so-fancy | less --tabs=4 -RFX
 	commitGraph = true
 
 [diff-so-fancy]
@@ -40,7 +42,7 @@
 	interactive = auto
 	log = auto
 	status = auto
-	ui = auto
+	ui = true
 
 [rerere]
 	enabled = true
@@ -79,13 +81,12 @@
 	prune = true
 
 [pull]
-  rebase = merges
-  rebase = true
+	ff = only
 
 [push]
 	default = current
-  rebase = true
-  followTags = true
+	rebase = true
+	followTags = true
 	default = current
 	autoSetupRemote = true
 
@@ -96,30 +97,31 @@
 	missingCommitsCheck = warn
 
 [status]
-  submoduleSummary = true
-  showUntrackedFiles = all
+	submoduleSummary = true
+	showUntrackedFiles = all
 
 [log]
-  follow = true
-  decorate = true
+	follow = true
+	decorate = true
 
 [init]
-  defaultBranch = main
+	defaultBranch = main
 
 [help]
-  autocorrect = 20
+	autocorrect = 20
 
 [advice]
-  skippedCherryPicks = false
+	skippedCherryPicks = false
 
 [filter "lfs"]
-  clean = git-lfs clean -- %f
-  smudge = git-lfs smudge -- %f
-  process = git-lfs filter-process
-  required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
 
 [hub]
-  protocol = git
+ 	protocol = git
 
 [include]
-  path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
+	path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
+	path = ~/.dotfiles/sync/git/gitconfig.d/color.gitconfig
