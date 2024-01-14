@@ -2,7 +2,7 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.18.1
+  version: 1.19.0
 plugins:
   sources:
     - id: configs
@@ -10,7 +10,7 @@ plugins:
       uri: https://github.com/trunk-io/configs
       import_to_global: true
     - id: trunk
-      ref: v1.4.1
+      ref: v1.4.2
       uri: https://github.com/trunk-io/plugins
       import_to_global: true
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
