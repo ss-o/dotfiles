@@ -5,10 +5,9 @@ cli:
   version: 1.20.1
 plugins:
   sources:
-    - id: configs
-      ref: v1.0.2
-      uri: https://github.com/trunk-io/configs
-      import_to_global: true
+    #    - id: configs
+    #      ref: v1.0.2
+    #      uri: https://github.com/trunk-io/configs
     - id: trunk
       ref: v1.4.3
       uri: https://github.com/trunk-io/plugins
