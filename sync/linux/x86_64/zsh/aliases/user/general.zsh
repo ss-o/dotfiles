@@ -1,7 +1,4 @@
-if [[ -n "${EDITOR}" ]]; then
-  typeset EDIT_ALIAS=${(%):-%N}
-  alias edit-aliases="${EDITOR} ${EDIT_ALIAS}"
-fi
+alias edit-aliases="${EDITOR:-vim} ${(%):-%N}"
 
 # GIT
 alias add-editorconfig="wget -O - https://raw.githubusercontent.com/ss-o/ss-o/gh-pages/config/editorconfig > .editorconfig"
@@ -30,18 +27,22 @@ alias zstyle-status='zstyle -L'
 
 # --- System
 # ------ Wrappers
+alias reload!='exec "$SHELL" -l'
+
 alias check-logs='command journalctl -p 3 -b -e'
 alias check-symlinks='command find . -xtype l -print 2> /dev/null'
 alias update-grub='f() {sudo grub-mkconfig -o /boot/grub/grub.cfg "$@"; unset -f f; }; f'
 alias sys-info='echo OSTYPE=${OSTYPE} MACHTYPE=${MACHTYPE} CPUTYPE=${CPUTYPE}'
 alias sys-useradd='sudo useradd -s /usr/sbin/nologin -r -M'
 alias freemem='echo 3 | sudo tee /proc/sys/vm/drop_caches'
-alias reload!='exec "$SHELL" -l'
 alias machine-id='cat /var/lib/dbus/machine-id | md5sum'
 alias check-macpath='[[ -n "${(j::)${(M)path[@]:#/opt/local/bin}}" ]]'
 alias kate='command kate >/dev/null 2>&1 "${@}" &!'
 alias history-cmd-top="fc -ln 0 | awk '{print $1}' | sort | uniq -c | sort -nr | head"
 alias mm='micro'
+
+alias generate-boot-log="sudo journalctl -b | curl -F 'file=@-' 0x0.st"
+
 # ------ Triage
 #alias exec-cmds='function() {for i in `seq 50` ; $1; [[ ! $? = 0 ]] && break ; done;}'
 

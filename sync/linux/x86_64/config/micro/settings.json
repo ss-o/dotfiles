@@ -2,7 +2,6 @@
     "autoclose": false,
     "autosu": true,
     "fastdirty": true,
-    "keymenu": true,
     "linter": false,
     "mkparents": true,
     "parsecursor": true,
