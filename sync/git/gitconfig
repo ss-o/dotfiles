@@ -21,6 +21,14 @@
 [credential "https://dev.azure.com"]
 	useHttpPath = true
 
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+
+
 [url "ssh://git@github.com/"]
 	insteadOf = https://github.com/
 
@@ -56,20 +64,20 @@
 
 [diff]
 	color = true
-  renames = true
-  submodule = log
+ 	renames = true
+ 	submodule = log
 	algorithm = patience
-  mnemonicPrefix = true
+ 	mnemonicPrefix = true
 	compactionHeuristic = true
 
 [diff "bin"]
-  textconv = hexdump -v -C
+ 	textconv = hexdump -v -C
 
 [grep]
-  break = true
-  heading = true
-  lineNumber = true
-  extendedRegexp = true
+	break = true
+	heading = true
+	lineNumber = true
+	extendedRegexp = true
 
 [mergetool]
   keepBackup = false
@@ -125,9 +133,3 @@
 [include]
 	path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
 	path = ~/.dotfiles/sync/git/gitconfig.d/color.gitconfig
-[credential "https://github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
-[credential "https://gist.github.com"]
-	helper = 
-	helper = !/usr/bin/gh auth git-credential
