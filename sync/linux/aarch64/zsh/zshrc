@@ -1,16 +1,54 @@
-[[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]] && {
+if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
+  source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
+fi
+
+if [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]]; then
   source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
-} || {
+else
   source <(curl -sL init.zshell.dev); zzinit;
-}
+fi
 
 # ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
+typeset -gA DOTFILES
+DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
 
-typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
+COMPLETION_WAITING_DOTS=1
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
+
+: ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
+[[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
+[[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
+
+(( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
+
+# ANNEX ============================================================================================================== #
+zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
+# META-PLUGINS ======================================================================================================= #
+zi lucid for light-mode \
+  skip'ripgrep peco tig bat exa hyperfine fd' @console-tools \
+  skip'dircolors-materia' @console-style \
+  skip'F-Sy-H' @z-shell @romkatv \
+  @zsh-users+fast
+
+# OH-MY-ZSH PLUGINS ================================================================================================== #
+zi-turbo '0a' light-mode for \
+  atload"unalias grv g" OMZP::git 
+
+# PLUGINS ============================================================================================================ #
+zi-turbo '0a' for \
+  binary sbin'bin/*' \
+    z-shell/nb \
+  binary from"gh-r" sbin \
+    ajeetdsouza/zoxide \
+  has'zoxide' \
+    z-shell/zsh-zoxide \
+  has'lsd' atinit'AUTOCD=1' \
+    z-shell/zsh-lsd \
+  atinit'YSU_MESSAGE_POSITION=after' \
+    MichaelAquilina/zsh-you-should-use
 
 @dynamic_grc() {
   [[ "$TERM" = dumb ]] || (( ! $+commands[grc] )) && return 0
-
   # Set alias for available commands.
   for cmd in $( ls /usr/share/grc/ ); do
     cmd="${cmd##*conf.}"
@@ -37,3 +75,6 @@ typeset -gx SAVEHIST=500000 HISTSIZE=501000 HISTFILE="${ZI[CACHE_DIR]}/.history"
   fi
 }
 @dietpi_aliases
+
+[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
+  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
