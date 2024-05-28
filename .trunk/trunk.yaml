@@ -27,7 +27,7 @@ lint:
   enabled:
     - actionlint@1.7.0
     - git-diff-check
-    - markdownlint@0.40.0
+    - markdownlint@0.41.0
     - prettier@3.2.5
     - shellcheck@0.10.0
     - shfmt@3.6.0
