@@ -28,7 +28,7 @@ lint:
     - actionlint@1.7.1
     - git-diff-check
     - markdownlint@0.41.0
-    - prettier@3.2.5
+    - prettier@3.3.1
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.8.1
