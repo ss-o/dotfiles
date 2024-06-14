@@ -2,14 +2,14 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.1
+  version: 1.22.2
 plugins:
   sources:
     #    - id: configs
     #      ref: v1.0.2
     #      uri: https://github.com/trunk-io/configs
     - id: trunk
-      ref: v1.5.0
+      ref: v1.6.0
       uri: https://github.com/trunk-io/plugins
       import_to_global: true
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
@@ -28,7 +28,7 @@ lint:
     - actionlint@1.7.1
     - git-diff-check
     - markdownlint@0.41.0
-    - prettier@3.3.1
+    - prettier@3.3.2
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.8.1
