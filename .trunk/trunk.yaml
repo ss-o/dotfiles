@@ -25,6 +25,8 @@ lint:
     - trivy
     - trufflehog
   enabled:
+    - pre-commit-hooks@4.6.0
+    - trunk-toolbox@0.3.1
     - actionlint@1.7.1
     - git-diff-check
     - markdownlint@0.41.0

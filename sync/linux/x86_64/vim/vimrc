@@ -19,8 +19,8 @@ Plug 'tpope/vim-sensible'
 "Plug 'kovetskiy/sxhkd-vim'
 "Plug 'z-shell/zi-vim-syntax'
 "Plug 'haya14busa/incsearch.vim'
-"Plug 'chxuan/change-colorscheme'
-"Plug 'easymotion/vim-easymotion'
+Plug 'chxuan/change-colorscheme'
+Plug 'easymotion/vim-easymotion'
 "Plug 'Shougo/vimproc.vim', {'do' : 'make'}
 "Plug 'ycm-core/YouCompleteMe', { 'do': './install.py' }
 Plug 'chrisbra/colorizer'
