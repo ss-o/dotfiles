@@ -17,6 +17,7 @@
 
 [credential]
 	credentialStore = gpg
+	helper = /usr/lib/git-core/git-credential-libsecret
 
 [credential "https://dev.azure.com"]
 	useHttpPath = true
@@ -27,10 +28,6 @@
 [credential "https://gist.github.com"]
 	helper =
 	helper = !/usr/bin/gh auth git-credential
-
-
-[url "ssh://git@github.com/"]
-	insteadOf = https://github.com/
 
 [core]
 	editor = micro
@@ -129,6 +126,14 @@
 
 [hub]
  	protocol = git
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+
+#[url "ssh://aur@aur.archlinux.org/"]
+#	insteadOf = https://aur.archlinux.org/
+#	insteadOf = http://aur.archlinux.org/
+#	insteadOf = git://aur.archlinux.org/
 
 [include]
 	path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
