@@ -12,7 +12,7 @@
 declare host='core.internal'
 declare host_path='/mnt/dietpi_userdata'
 declare target_path='/srv/sshfs'
-declare mount_options="_netdev,rw,nosuid,allow_other,uid=$UID,gid=850,default_permissions,follow_symlinks,idmap=user"
+declare mount_options="_netdev,rw,nosuid,allow_other,uid=${UID},gid=850,default_permissions,follow_symlinks,idmap=user"
 
 return_ok() {
   if [[ -z ${RUN_QUIET} ]]; then
@@ -52,7 +52,7 @@ sshfs_mount() {
       return_err
     fi
   else
-    [[ -n ${RUN_QUIET} ]] || echo -e "Error: failed to ping $host"
+    [[ -n ${RUN_QUIET} ]] || echo -e "Error: failed to ping ${host}"
   fi
   #  done
 }

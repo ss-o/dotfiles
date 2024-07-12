@@ -5,9 +5,9 @@ cli:
   version: 1.22.2
 plugins:
   sources:
-    #    - id: configs
-    #      ref: v1.0.2
-    #      uri: https://github.com/trunk-io/configs
+    - id: configs
+      ref: v1.0.5
+      uri: https://github.com/trunk-io/configs
     - id: trunk
       ref: v1.6.0
       uri: https://github.com/trunk-io/plugins
@@ -26,7 +26,7 @@ lint:
     - trufflehog
   enabled:
     - pre-commit-hooks@4.6.0
-    - trunk-toolbox@0.3.1
+    - trunk-toolbox@0.3.2
     - actionlint@1.7.1
     - git-diff-check
     - markdownlint@0.41.0
@@ -41,3 +41,7 @@ actions:
     - trunk-check-pre-push
     - trunk-fmt-pre-commit
     - trunk-upgrade-available
+tools:
+  enabled:
+    - action-validator@0.6.0
+    - gh@2.52.0
