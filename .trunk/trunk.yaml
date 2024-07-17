@@ -9,7 +9,7 @@ plugins:
       ref: v1.0.5
       uri: https://github.com/trunk-io/configs
     - id: trunk
-      ref: v1.6.0
+      ref: v1.6.1
       uri: https://github.com/trunk-io/plugins
       import_to_global: true
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
@@ -30,10 +30,10 @@ lint:
     - actionlint@1.7.1
     - git-diff-check
     - markdownlint@0.41.0
-    - prettier@3.3.2
+    - prettier@3.3.3
     - shellcheck@0.10.0
     - shfmt@3.6.0
-    - taplo@0.8.1
+    - taplo@0.9.2
     - yamllint@1.35.1
 actions:
   enabled:

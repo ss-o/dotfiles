@@ -6,7 +6,7 @@
 #
 
 B="B"
-cache=$(du -sk /var/cache/pacman/pkg/ | awk '{ print $1 }')
+cache="$(du -sk /var/cache/pacman/pkg/ | awk '{ print $1 }')"
 lib=$(du -sk /var/lib/pacman/ | awk '{ print $1 }')
 home_cache=$(du -sk "${HOME}"/.cache/ | awk '{ print $1 }')
 trash=$(du -sk "${HOME}"/.local/share/Trash/files/ | awk '{ print $1 }')
