@@ -6,7 +6,7 @@ cli:
 plugins:
   sources:
     - id: configs
-      ref: v1.0.5
+      ref: v1.0.6
       uri: https://github.com/trunk-io/configs
     - id: trunk
       ref: v1.6.1
@@ -33,7 +33,7 @@ lint:
     - prettier@3.3.3
     - shellcheck@0.10.0
     - shfmt@3.6.0
-    - taplo@0.9.2
+    - taplo@0.9.3
     - yamllint@1.35.1
 actions:
   enabled:
@@ -44,4 +44,4 @@ actions:
 tools:
   enabled:
     - action-validator@0.6.0
-    - gh@2.52.0
+    - gh@2.54.0
