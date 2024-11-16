@@ -30,6 +30,10 @@ typeset -ghA ZI
 : ${ZI[ZCOMPDUMP_PATH]:=${ZI[CACHE_DIR]}/.zcompdump}
 # If set to 1, then mutes some of the Zi warnings, specifically the plugin already registered warning.
 : ${ZI[MUTE_WARNINGS]:=0}
+# Declare default history file and parameters
+: ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
+[[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
+[[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
 
 # === Initiate Zi === #
 
