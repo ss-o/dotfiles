@@ -4,8 +4,6 @@ fi
 
 if [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]]; then
   source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
-else
-  source <(curl -sL init.zshell.dev); zzinit;
 fi
 
 # ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
