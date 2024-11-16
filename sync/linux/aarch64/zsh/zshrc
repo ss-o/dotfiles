@@ -13,10 +13,6 @@ DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
 COMPLETION_WAITING_DOTS=1
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
-: ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
-[[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
-[[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
-
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
 # ANNEX ============================================================================================================== #

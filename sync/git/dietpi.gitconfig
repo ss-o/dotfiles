@@ -1,0 +1,130 @@
+# https://git-scm.com/docs/git-config#_configuration_file
+
+[user]
+        email = ss-o@users.noreply.github.com
+        signingKey = C228AC5C91BD90E3
+        name = Salvydas Lukosius
+
+[credential]
+	credentialStore = gpg
+	helper = /usr/lib/git-core/git-credential-libsecret
+
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+
+[core]
+	editor = micro
+ 	filemode = true
+	pager = diff-so-fancy | less --tabs=4 -RFX
+	commitGraph = true
+
+[diff-so-fancy]
+	first-run = false
+
+[interactive]
+	diffFilter = diff-so-fancy --patch
+
+[color]
+	branch = auto
+	diff = auto
+	interactive = auto
+	log = auto
+	status = auto
+	ui = true
+
+[rerere]
+	enabled = true
+	autoupdate = 1
+
+[format]
+  signoff = true
+
+[blame]
+	date = relative
+
+[diff]
+	color = true
+ 	renames = true
+ 	submodule = log
+	algorithm = patience
+ 	mnemonicPrefix = true
+	compactionHeuristic = true
+
+[diff "bin"]
+ 	textconv = hexdump -v -C
+
+[grep]
+	break = true
+	heading = true
+	lineNumber = true
+	extendedRegexp = true
+
+[mergetool]
+  keepBackup = false
+  keepTemporaries = false
+  writeToTemp = true
+  prompt = false
+
+[fetch]
+	prune = true
+
+[pull]
+	rebase = true
+
+[push]
+	default = current
+	rebase = true
+	followTags = true
+	default = current
+	autoSetupRemote = true
+
+[rebase]
+	autosquash = true
+	instructionFormat = <%aN> %s [%ar]
+	abbreviateCommands = true
+	missingCommitsCheck = warn
+
+[status]
+	submoduleSummary = true
+	showUntrackedFiles = all
+
+[log]
+	follow = true
+	decorate = true
+
+[init]
+	defaultBranch = main
+
+[help]
+	autocorrect = 20
+
+[advice]
+	skippedCherryPicks = false
+
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+
+[hub]
+ 	protocol = git
+
+[url "ssh://git@github.com/"]
+	insteadOf = https://github.com/
+
+#[url "ssh://aur@aur.archlinux.org/"]
+#	insteadOf = https://aur.archlinux.org/
+#	insteadOf = http://aur.archlinux.org/
+#	insteadOf = git://aur.archlinux.org/
+
+#[include]
+#	path = ~/.dotfiles/sync/git/gitconfig.d/aliases.gitconfig
+#	path = ~/.dotfiles/sync/git/gitconfig.d/color.gitconfig
