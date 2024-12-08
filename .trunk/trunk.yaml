@@ -2,14 +2,14 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.2
+  version: 1.22.8
 plugins:
   sources:
     - id: configs
-      ref: v1.0.6
+      ref: v1.0.9
       uri: https://github.com/trunk-io/configs
     - id: trunk
-      ref: v1.6.1
+      ref: v1.6.5
       uri: https://github.com/trunk-io/plugins
       import_to_global: true
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
@@ -26,11 +26,11 @@ lint:
     - trufflehog
   enabled:
     - pre-commit-hooks@4.6.0
-    - trunk-toolbox@0.3.2
-    - actionlint@1.7.1
+    - trunk-toolbox@0.5.4
+    - actionlint@1.7.4
     - git-diff-check
-    - markdownlint@0.41.0
-    - prettier@3.3.3
+    - markdownlint@0.43.0
+    - prettier@3.4.2
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.9.3
@@ -44,4 +44,4 @@ actions:
 tools:
   enabled:
     - action-validator@0.6.0
-    - gh@2.54.0
+    - gh@2.63.2
