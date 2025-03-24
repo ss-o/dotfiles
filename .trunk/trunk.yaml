@@ -12,6 +12,7 @@ plugins:
       ref: v1.6.7
       uri: https://github.com/trunk-io/plugins
       import_to_global: true
+
 # Many linters and tools depend on runtimes - configure them here. (https://docs.trunk.io/runtimes)
 runtimes:
   enabled:
@@ -25,7 +26,6 @@ lint:
     - trivy
     - trufflehog
   enabled:
-    - pre-commit-hooks@4.6.0
     - actionlint@1.7.7
     - git-diff-check
     - markdownlint@0.44.0
