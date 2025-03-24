@@ -80,3 +80,5 @@ zi-turbo '0a' for \
 
 #[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
 #  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
+
+test -f /home/ss-o/.cache/trunk/shell-hooks/zsh.rc && source /home/ss-o/.cache/trunk/shell-hooks/zsh.rc;
