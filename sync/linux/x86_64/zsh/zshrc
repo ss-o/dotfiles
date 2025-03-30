@@ -1,7 +1,7 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
 #
-# ‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑ ⸨ Zsh ⸩
+# ⸨ Zsh ⸩
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
@@ -17,7 +17,7 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
-# ‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑‑ ⸨ Private functions ⸩
+# ⸨ Private functions ⸩
 typeset -gA DOTFILES
 DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/x86_64/zsh"
 
@@ -26,14 +26,13 @@ if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
   fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
 fi
 
-(){
-  setopt local_options typeset_silent
-  typeset _init_
+_init(){
+  setopt typeset_silent; typeset _init_1 _init_2 _init_3
   zstyle ':zi:plugins:ssh-agent' quiet yes
-  for _init_ in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_init_:t}; done
-  for _init_ in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_init_; done
-  for _init_ in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source $_init_; done
-}
+  for _init_1 in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_init_1:t}; done
+  for _init_2 in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_init_2; done
+  for _init_3 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source $_init_3; done
+}; _init; unset -f _init
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
 # DEVOPS ============================================================================================================ #
@@ -59,7 +58,7 @@ zi lucid for light-mode \
   @zsh-users+fast
 # OH-MY-ZSH PLUGINS ================================================================================================== #
 zi-turbo '0a' light-mode for \
-  atload"unalias grv g" OMZP::git \
+    atload"unalias grv g" OMZP::git \
     if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent
 # PLUGINS ============================================================================================================ #
 zi-turbo '0a' for \
@@ -80,5 +79,3 @@ zi-turbo '0a' for \
 
 #[[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
 #  { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
-
-test -f /home/ss-o/.cache/trunk/shell-hooks/zsh.rc && source /home/ss-o/.cache/trunk/shell-hooks/zsh.rc;
