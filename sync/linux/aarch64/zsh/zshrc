@@ -2,19 +2,43 @@ if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
+# ⸨ Initiate Zi ⸩
 if [[ -r "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" ]]; then
   source "${XDG_CONFIG_HOME:-$HOME/.config}/zi/init.zsh" && zzinit
 fi
 
-# ‑‑‑‑‑‑ ⸨ Global Environment ⸩ ‑‑‑‑‑‑
-typeset -gA DOTFILES
-DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
-
+# ⸨ History ⸩
 COMPLETION_WAITING_DOTS=1
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
+: ${HISTFILE:=${ZI[CACHE_DIR]}/.history}
+[[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
+[[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
+
+# ⸨ LS COLORS ⸩
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
+# ⸨ Dotfiles ⸩
+typeset -gA DOTFILES
+DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
+DOTFILES[ZSH_SNIPPETS]="${DOTFILES[ZSH]}/snippets"
+
+# ⸨ Functions ⸩
+if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
+  typeset -gxU fpath FPATH
+  fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
+fi
+
+# ⸨ Initiate ⸩
+@init(){
+  setopt typeset_silent; typeset _init_1 _init_2 _init_3
+#  zstyle ':zi:plugins:ssh-agent' quiet yes
+  for _init_1 in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz "${_init_1:t}"; done
+  for _init_2 in ${DOTFILES[ZSH_SNIPPETS]}/loaded/*.zsh; do source "$_init_2"; done
+#  for _init_3 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source "$_init_3"; done
+}; @init; unset -f @init
+
+# ⸨ Zi ⸩
 # ANNEX ============================================================================================================== #
 zi light-mode compile'functions/.*za-*~*.zwc' for z-shell/z-a-meta-plugins @annexes
 # META-PLUGINS ======================================================================================================= #
@@ -41,34 +65,17 @@ zi-turbo '0a' for \
   atinit'YSU_MESSAGE_POSITION=after' \
     MichaelAquilina/zsh-you-should-use
 
-@dynamic_grc() {
-  [[ "$TERM" = dumb ]] || (( ! $+commands[grc] )) && return 0
-  # Set alias for available commands.
-  for cmd in $( ls /usr/share/grc/ ); do
-    cmd="${cmd##*conf.}"
-    if (( $+commands[$cmd] )); then
-      $cmd() { $(which grc) --colour=auto ${commands[$0]} "$@"; }
-    fi
-  done
-}
-@dynamic_grc
-
-@dietpi_aliases() {
-  [[ -t 0 ]] && G_INTERACTIVE=1 || return 0
-
-  if [[ -d /boot/dietpi ]]; then
-    G_SUDO(){ local input=$*; emulate sh -c "source /boot/dietpi/func/dietpi-globals && sudo $input"; }
-    () {
-      local -a dp_file
-      dp_file=( /boot/dietpi/dietpi-* )
-      dp_file=( ${dp_file:t} )
-      local dp_alias; for dp_alias in $dp_file; do
-        alias $dp_alias="G_SUDO /boot/dietpi/${dp_alias}"
-      done
-    }
-  fi
-}
-@dietpi_aliases
+#@dynamic_grc() {
+#  [[ "$TERM" = dumb ]] || (( ! $+commands[grc] )) && return 0
+#  # Set alias for available commands.
+#  for cmd in $( ls /usr/share/grc/ ); do
+#    cmd="${cmd##*conf.}"
+#    if (( $+commands[$cmd] )); then
+#      $cmd() { $(which grc) --colour=auto ${commands[$0]} "$@"; }
+#    fi
+#  done
+#}
+#@dynamic_grc
 
 [[ -f ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh ]] && \
   { source ${DOTFILES[ZSH]}/themes/p10k-robbyrussell.zsh || return 1; }
