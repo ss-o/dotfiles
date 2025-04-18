@@ -8,6 +8,7 @@ fi
 
 (){ source "${HOME}/.config/zi/init.zsh"; zzinit; }
 
+# ⸨ History ⸩
 COMPLETION_WAITING_DOTS=1
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 
@@ -15,24 +16,28 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 [[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
 [[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
 
+# ⸨ LS COLORS ⸩
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
 
-# ⸨ Private functions ⸩
+# ⸨ Dotfiles ⸩
 typeset -gA DOTFILES
-DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/x86_64/zsh"
+DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
+DOTFILES[ZSH_SNIPPETS]="${DOTFILES[ZSH]}/snippets"
 
+# ⸨ Functions ⸩
 if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
   typeset -gxU fpath FPATH
   fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
 fi
 
-_init(){
+# ⸨ Initiate ⸩
+@init(){
   setopt typeset_silent; typeset _init_1 _init_2 _init_3
   zstyle ':zi:plugins:ssh-agent' quiet yes
-  for _init_1 in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz ${_init_1:t}; done
-  for _init_2 in ${DOTFILES[ZSH]}/snippets/user/*.zsh; do source $_init_2; done
-  for _init_3 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source $_init_3; done
-}; _init; unset -f _init
+  for _init_1 in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz "${_init_1:t}"; done
+  for _init_2 in ${DOTFILES[ZSH_SNIPPETS]}/loaded/*.zsh; do source "$_init_2"; done
+  for _init_3 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source "$_init_3"; done
+}; @init; unset -f @init
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
 # DEVOPS ============================================================================================================ #
