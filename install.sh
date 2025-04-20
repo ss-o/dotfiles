@@ -1,8 +1,15 @@
 #!/usr/bin/env sh
 # -*- mode: sh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=sh sw=2 ts=2 et
-# ============================================================================= #
-trap '' INT QUIT TERM
+# shellcheck disable=SC2317 # Unreachable code for defensive programming
+
+cleanup() {
+  # Cleanup temporary files and restore state if needed
+  say_info "Cleaning up and exiting..."
+  # Add cleanup operations here
+}
+
+trap 'cleanup; exit 1' INT QUIT TERM
 
 # ============================================================================= #
 # shellcheck source=/dev/null
@@ -10,7 +17,7 @@ dosync_dir="$(command cd -P -- "$(dirname -- "$(command -v -- "$0" || true)")" &
 [ -z "${sync_dir}" ] && sync_dir=${dosync_dir}
 [ -z "${_user_home}" ] && _user_home="${HOME}"
 
-_time_stamp=$(date +%D)
+_time_stamp=$(date +%Y-%m-%d_%H-%M-%S)
 
 _backup_dir="${_user_home}/.backup/${_time_stamp}"
 _logfile="${_user_home}/.backup/${_time_stamp}/install.log"
@@ -21,7 +28,7 @@ _sync_file="${sync_dir}/sync.config"
 _git_opt="-q"
 _git_sub="-q"
 _git_sub_opt="-q"
-_required_cmds="zsh git i_am_required me_too"
+_required_cmds="zsh git grep find ln mkdir" # Remove placeholders, add actual requirements
 _supported_os="linux darwin"
 _supported_cpu="x86_64 aarch64"
 
@@ -119,9 +126,18 @@ say_err() {
 }
 
 say_log() {
-  [ -d "${_backup_dir}" ] || command mkdir -p "${_backup_dir}"
+  ensure_dir "${_backup_dir}"
   say_info "$1 -- $(date || true)" | command tee -a "${_logfile}" >/dev/null
 }
+
+ensure_dir() {
+  if [ ! -d "$1" ]; then
+    command mkdir -p "$1" || say_err "Failed to create directory: $1"
+    say_info "Created directory: $1"
+  fi
+  return 0
+}
+
 # ============================================================================== #
 _get_os() {
   _current_os=$(uname | tr '[:upper:]' '[:lower:]')
@@ -202,14 +218,14 @@ _check_system() {
 
 _remove_broken_links() {
   say_info "Checking for hidden dangling symlinks with depth 1 in ${_user_home}"
-  command find "${_user_home}" -maxdepth 1 -name "*" -o -name ".*" -type l | while read -r f1; do
+  command find "${_user_home}" -maxdepth 1 \( -name "*" -o -name ".*" \) -type l | while read -r f1; do
     if [ -L "${f1}" ] && [ ! -e "${f1}" ]; then
       command rm -f "${f1}" && say_info "Removed dangling symlink: ${f1}"
     fi
   done
 
   say_info "Checking for all dangling symlinks with depth 2 in ${_user_home_config}"
-  command find "${_user_home_config}" -maxdepth 2 -name "*" -o -name ".*" -type l | while read -r f2; do
+  command find "${_user_home_config}" -maxdepth 2 \( -name "*" -o -name ".*" \) -type l | while read -r f2; do
     if [ -L "${f2}" ] && [ ! -e "${f2}" ]; then
       command rm -f "${f2}" && say_info "Removed dangling symlink: ${f2}"
     fi
@@ -217,17 +233,39 @@ _remove_broken_links() {
   return $?
 }
 
+# Example of well-documented function
+# ----------------------------------------------------------------------------
+# _git_pull: Update the repository and submodules from remote
+#
+# Arguments: None
+# Returns: Exit code from git operations
+# ----------------------------------------------------------------------------
 _git_pull() {
   _go_to "${dosync_dir}" && _check_git
   say -cyan "Pulling latest changes from ${ORIGIN}"
-  command git pull "${_git_opt}"
+  if ! command git pull "${_git_opt}"; then
+    say_warn "Failed to pull from remote"
+    return 1
+  fi
+
   if [ -f .gitmodules ]; then
     say -cyan "Pulling latest changes for submodules"
-    command git submodule "${_git_sub_opt}" sync --recursive
-    # Required if a submodule origin changed
-    command git submodule "${_git_sub_opt}" update --init --recursive
-    command git submodule "${_git_sub_opt}" foreach --recursive git fetch
-    command git submodule "${_git_sub_opt}" foreach --recursive git pull
+    if ! command git submodule "${_git_sub_opt}" sync --recursive; then
+      say_warn "Failed to sync submodules"
+      return 1
+    fi
+    if ! command git submodule "${_git_sub_opt}" update --init --recursive; then
+      say_warn "Failed to update submodules"
+      return 1
+    fi
+    if ! command git submodule "${_git_sub_opt}" foreach --recursive git fetch; then
+      say_warn "Failed to fetch submodules"
+      return 1
+    fi
+    if ! command git submodule "${_git_sub_opt}" foreach --recursive git pull; then
+      say_warn "Failed to pull submodules"
+      return 1
+    fi
   fi
   _go_back
   return $?
@@ -278,7 +316,7 @@ _create_sync_location() {
   if [ -n "${_current_os}" ] && [ -n "${_current_arch}" ]; then
     _sync_location="${dosync_dir}/sync/${_sync_platform}"
     if [ ! -d "${_sync_location}" ]; then
-      command mkdir -p "${_sync_location}" || say_err "Failed to create sync location"
+      ensure_dir "${_sync_location}" || say_err "Failed to create sync location"
       say_ok "Created sync location: ${_sync_location}"
       return 0
     else
@@ -290,15 +328,16 @@ _create_sync_location() {
 }
 
 _sync_config() {
-  if [ -s "${_sync_file}" ]; then
-    _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#' | grep -v '^$' | sort -u)"
-    if [ -z "${_files_src}" ]; then
-      say_err "Specify files to sync in ${_sync_file} file"
-    fi
-    return 0
-  else
-    say_err "File ${_sync_file} doesn't exist, exiting"
+  if [ ! -s "${_sync_file}" ]; then
+    say_err "File ${_sync_file} doesn't exist or is empty"
   fi
+
+  _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#' | grep -v '^$' | sort -u)"
+  if [ -z "${_files_src}" ]; then
+    say_err "No files to sync found in ${_sync_file}"
+  fi
+
+  return 0
 }
 
 _read() {
@@ -332,9 +371,7 @@ _read() {
     _sync_src_dir="${_sync_src}"
   else
     _sync_src_dir="$(dirname "${_sync_src}")"
-    if [ ! -d "${_sync_src_dir}" ]; then
-      command mkdir -p "${_sync_src_dir}" || say_err "Failed to create directory ${_sync_src_dir}"
-    fi
+    ensure_dir "${_sync_src_dir}" || say_err "Failed to create directory ${_sync_src_dir}"
   fi
 }
 
@@ -343,7 +380,7 @@ dosync() {
   for file in ${_files_src}; do
     _read "${file}"
     if [ -e "${_sync_target}" ] && [ ! -h "${_sync_target}" ]; then
-      [ ! -d "${_backup_dir}" ] && command mkdir -p "${_backup_dir}"
+      ensure_dir "${_backup_dir}"
       _make_backup="${_backup_dir}/$(basename "${file}")"
       say_info "Backup: ${_sync_target} ➤ ${_make_backup}"
       command cp -r "${_sync_target}" "${_make_backup}"
@@ -374,20 +411,24 @@ usage() {
 }
 
 main() {
-  unset _cmd_ _opt_ _arg_ _is_quiet
+  unset _cmd_ _is_quiet
 
   # If no arguments are given, run sync by default
-  [ $# -eq 0 ] && _cmd_=sync _do_options && exit 0
+  [ $# -eq 0 ] && set -- "sync"
 
-  while getopts ":q:c:" _opt_; do
-    case "${_opt_}" in
-    q) _is_quiet=true ;;
-    c) _cmd_="${OPTARG}" ;;
-    *) usage ;;
+  while getopts ":qc:" opt; do
+    case "${opt}" in
+      q) _is_quiet=true ;;
+      c) _cmd_="${OPTARG}" ;;
+      *) usage ;;
     esac
-    shift $((OPTIND - 1))
-    _do_options "$@"
   done
+  shift $((OPTIND - 1))
+
+  # If command wasn't specified with -c, use first argument
+  [ -z "${_cmd_}" ] && [ $# -gt 0 ] && _cmd_="$1"
+
+  _do_options
   return $?
 }
 
