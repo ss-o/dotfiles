@@ -6,10 +6,38 @@
 cleanup() {
   # Cleanup temporary files and restore state if needed
   say_info "Cleaning up and exiting..."
-  # Add cleanup operations here
+
+  # Remove temporary files if any were created
+  if [ -n "${_tmp_files}" ]; then
+    for tmp_file in ${_tmp_files}; do
+      [ -f "${tmp_file}" ] && command rm -f "${tmp_file}"
+    done
+  fi
 }
 
 trap 'cleanup; exit 1' INT QUIT TERM
+
+# Enhanced error handling function
+handle_error() {
+  _exit_code=$?
+  _error_msg="$1"
+  _error_cmd="$2"
+  _error_line="$3"
+
+  say_err "Error: ${_error_msg} (command: ${_error_cmd}, line: ${_error_line}, exit code: ${_exit_code})"
+  # Optionally log to file
+  say_log "ERROR: ${_error_msg} (command: ${_error_cmd}, line: ${_error_line}, exit code: ${_exit_code})" >> "${_logfile}"
+
+  # Option to continue despite errors
+  if [ "${_continue_on_error:-false}" = "true" ]; then
+    say_warn "Continuing despite error..."
+    return ${_exit_code}
+  else
+    exit ${_exit_code}
+  fi
+}
+
+# Usage: some_command || handle_error "Failed to do X" "some_command" "${LINENO}"
 
 # ============================================================================= #
 # shellcheck source=/dev/null
@@ -210,10 +238,7 @@ _check_system() {
   _get_arch || say_err "Unsupported CPU: ${_current_arch}"
 
   _sync_platform="${_current_os}/${_current_arch}"
-  if [ -n "${_sync_platform}" ]; then
-    say "${_sync_platform}" | command grep -q "${_current_os}/${_current_arch}"
-    return $?
-  fi
+  return 0
 }
 
 _remove_broken_links() {
@@ -243,11 +268,7 @@ _remove_broken_links() {
 _git_pull() {
   _go_to "${dosync_dir}" && _check_git
   say -cyan "Pulling latest changes from ${ORIGIN}"
-  if ! command git pull "${_git_opt}"; then
-    say_warn "Failed to pull from remote"
-    return 1
-  fi
-
+  command git pull "${_git_opt}" || handle_error "Failed to pull from remote" "git pull" "${LINENO}"
   if [ -f .gitmodules ]; then
     say -cyan "Pulling latest changes for submodules"
     if ! command git submodule "${_git_sub_opt}" sync --recursive; then
@@ -327,12 +348,17 @@ _create_sync_location() {
   return 1
 }
 
-_sync_config() {
-  if [ ! -s "${_sync_file}" ]; then
-    say_err "File ${_sync_file} doesn't exist or is empty"
+_parse_config() {
+  if command -v yq >/dev/null 2>&1; then
+    _files_src=$(yq e '.files[] | .src + ":" + .dest' "${sync_dir}/sync.yaml")
+  else
+    # Fallback to existing logic
+    _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#' | grep -v '^$' | sort -u)"
   fi
+}
 
-  _files_src="$(sed -n '/\[files\]/,/\[endfiles\]/p' "${_sync_file}" | grep -v '^\[.*files]' | grep -v '^#' | grep -v '^$' | sort -u)"
+_sync_config() {
+  _parse_config
   if [ -z "${_files_src}" ]; then
     say_err "No files to sync found in ${_sync_file}"
   fi
@@ -343,8 +369,9 @@ _sync_config() {
 _read() {
   input="$1"
   shift
-  src_file="$(printf '%s' "${input}" | awk -F: '{print $1}')"
-  dst_file="$(printf '%s' "${input}" | awk -F: '{print $2}')"
+  src_file="${input%%:*}"
+  dst_file="${input#*:}"
+  [ "$src_file" = "$input" ] && dst_file=""  # No colon found
 
   if [ -z "${src_file}" ]; then
     say_err "Invalid source file: ${src_file}"
@@ -375,25 +402,132 @@ _read() {
   fi
 }
 
+_show_progress() {
+  # Only show progress if not in quiet mode and connected to a terminal
+  if [ "${_is_quiet}" = "false" ] && [ -t 1 ]; then
+    _current=$1
+    _total=$2
+    _percent=$(( (_current * 100) / _total ))
+    _progress=$(( _percent / 2 ))
+
+    printf "\r[%-50s] %d%%" "$(printf '%0.s#' $(seq 1 $_progress))" "${_percent}"
+    [ "${_current}" -eq "${_total}" ] && printf "\n"
+  fi
+}
+
+_safe_operation() {
+  if [ "${_is_dry_run:-false}" = "true" ]; then
+    say_info "[DRY RUN] Would execute: $*"
+    return 0
+  else
+    "$@"
+    return $?
+  fi
+}
+
 dosync() {
   _sync_config
-  for file in ${_files_src}; do
+  _total_files=$(echo "${_files_src}" | wc -l)
+  _current_file=0
+  printf '%s\n' "${_files_src}" | while IFS= read -r file; do
+    _current_file=$(( _current_file + 1 ))
+    _show_progress "${_current_file}" "${_total_files}"
     _read "${file}"
-    if [ -e "${_sync_target}" ] && [ ! -h "${_sync_target}" ]; then
-      ensure_dir "${_backup_dir}"
-      _make_backup="${_backup_dir}/$(basename "${file}")"
-      say_info "Backup: ${_sync_target} ➤ ${_make_backup}"
-      command cp -r "${_sync_target}" "${_make_backup}"
-      command rm -rf "${_sync_target}"
-      command ln -s "${_sync_src}" "${_sync_target}"
-      say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
-    elif [ ! -L "${_sync_target}" ]; then
-      command ln -s "${_sync_src}" "${_sync_target}"
+    if [ -L "${_sync_target}" ]; then
+      # Verify if symlink points to correct destination
+      _current_link=$(readlink "${_sync_target}")
+      if [ "${_current_link}" = "${_sync_src}" ]; then
+        say_ok "SymLink: ${src_file} ➤ ${_sync_target} (already exists)"
+      else
+        say_warn "Invalid symlink at ${_sync_target}, recreating..."
+        # Only back up if symlink target exists and isn't the same as our source
+        if [ -e "${_current_link}" ] && ! cmp -s "${_current_link}" "${_sync_src}"; then
+          _make_backup="${_backup_dir}/${dst_file}"
+          ensure_dir "$(dirname "${_make_backup}")"
+          command cp -r "${_current_link}" "${_make_backup}" &&
+            say_info "Backup: ${_current_link} ➤ ${_make_backup}"
+        fi
+        _safe_operation command rm -f "${_sync_target}"
+        _safe_operation command ln -s "${_sync_src}" "${_sync_target}"
+        say_ok "SymLink: ${src_file} ➤ ${_sync_target} (fixed)"
+      fi
+    elif [ -e "${_sync_target}" ]; then
+      # Handle real file/directory (not a symlink)
+      # Only back up if target isn't identical to source
+      if [ -f "${_sync_target}" ] && [ -f "${_sync_src}" ]; then
+        # For regular files, compare contents
+        if ! cmp -s "${_sync_target}" "${_sync_src}"; then
+          _make_backup="${_backup_dir}/${dst_file}"
+          ensure_dir "$(dirname "${_make_backup}")"
+          command cp -r "${_sync_target}" "${_make_backup}" &&
+            say_info "Backup: ${_sync_target} ➤ ${_make_backup} (content differs)"
+        else
+          say_info "Content identical, no backup needed for ${_sync_target}"
+        fi
+      else
+        # For directories or different file types, always back up
+        _make_backup="${_backup_dir}/${dst_file}"
+        ensure_dir "$(dirname "${_make_backup}")"
+        command cp -r "${_sync_target}" "${_make_backup}" &&
+          say_info "Backup: ${_sync_target} ➤ ${_make_backup}"
+      fi
+
+      _safe_operation command rm -rf "${_sync_target}"
+      _safe_operation command ln -s "${_sync_src}" "${_sync_target}"
       say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
     else
-      say_ok "SymLink: ${src_file} ➤ ${_sync_target}"
+      # Create new symlink (no backup needed as target doesn't exist)
+      ensure_dir "$(dirname "${_sync_target}")"
+      _safe_operation command ln -s "${_sync_src}" "${_sync_target}"
+      say_ok "SymLink: ${src_file} ➤ ${_sync_target} (new)"
     fi
-    ${reset-}
+  done
+}
+
+dosync_tag() {
+  tag="$1"
+  _files_src="$(sed -n "/\[files:${tag}\]/,/\[/p" "${_sync_file}" | grep -v '^\[.*\]' | grep -v '^#' | grep -v '^$' | sort -u)"
+  if [ -z "${_files_src}" ]; then
+    say_warn "No files with tag '${tag}' found in ${_sync_file}"
+    return 1
+  fi
+
+  printf '%s\n' "${_files_src}" | while IFS= read -r file; do
+    _read "${file}"
+    # Rest of dosync logic
+  done
+}
+
+rollback() {
+  if [ -z "$1" ]; then
+    # Add check if backup directory exists
+    if [ ! -d "${_user_home}/.backup/" ]; then
+      say_warn "No backups found"
+      return 1
+    fi
+
+    # List available backups
+    command find "${_user_home}/.backup/" -maxdepth 1 -type d -name "20*" | sort -r | while read -r backup; do
+      echo "$(basename "${backup}") ($(command find "${backup}" -type f | wc -l) files)"
+    done
+    return 0
+  fi
+
+  _restore_dir="${_user_home}/.backup/$1"
+  if [ ! -d "${_restore_dir}" ]; then
+    say_err "Backup $1 not found"
+  fi
+
+  say_info "Restoring from backup: $1"
+  command find "${_restore_dir}" -type f | while read -r file; do
+    relative_path="${file#${_restore_dir}/}"
+    target_path="${_user_home}/${relative_path}"
+    if [ -L "${target_path}" ]; then
+      command rm -f "${target_path}"
+    fi
+    ensure_dir "$(dirname "${target_path}")"
+    command cp -r "${file}" "${target_path}" &&
+      say_ok "Restored: ${target_path}"
   done
 }
 
@@ -401,12 +535,28 @@ _do_options() {
   case "${_cmd_}" in
   sync) dosync ;;
   clean) _remove_broken_links ;;
-  *) return 1 ;;
+  rollback) rollback "$@" ;;
+  sync-tag) dosync_tag "$@" ;;
+  *) usage ;;
   esac
 }
 
 usage() {
-  echo "Usage: $0 [option] <command>" 1>&2
+  cat << EOF
+Usage: $0 [options] [command]
+
+Options:
+  -q        Quiet mode
+  -d        Dry run mode
+  -c CMD    Specify command
+
+Commands:
+  sync      Synchronize dotfiles (default)
+  clean     Remove broken symlinks
+  rollback  Restore files from backup
+  sync-tag  Sync dotfiles with specific tag
+
+EOF
   exit 1
 }
 
@@ -416,9 +566,10 @@ main() {
   # If no arguments are given, run sync by default
   [ $# -eq 0 ] && set -- "sync"
 
-  while getopts ":qc:" opt; do
+  while getopts ":qdc:" opt; do
     case "${opt}" in
       q) _is_quiet=true ;;
+      d) _is_dry_run=true ;;
       c) _cmd_="${OPTARG}" ;;
       *) usage ;;
     esac
