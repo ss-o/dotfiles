@@ -31,9 +31,9 @@ handle_error() {
   # Option to continue despite errors
   if [ "${_continue_on_error:-false}" = "true" ]; then
     say_warn "Continuing despite error..."
-    return ${_exit_code}
+    return "${_exit_code}"
   else
-    exit ${_exit_code}
+    exit "${_exit_code}"
   fi
 }
 
@@ -371,7 +371,7 @@ _read() {
   shift
   src_file="${input%%:*}"
   dst_file="${input#*:}"
-  [ "$src_file" = "$input" ] && dst_file="" # No colon found
+  [ "${src_file}" = "${input}" ] && dst_file="" # No colon found
 
   if [ -z "${src_file}" ]; then
     say_err "Invalid source file: ${src_file}"
@@ -410,7 +410,7 @@ _show_progress() {
     _percent=$(((_current * 100) / _total))
     _progress=$((_percent / 2))
 
-    printf "\r[%-50s] %d%%" "$(printf '%0.s#' $(seq 1 $_progress))" "${_percent}"
+    printf "\r[%-50s] %d%%" "$(printf '%0.s#' $(seq 1 "${_progress}"))" "${_percent}"
     [ "${_current}" -eq "${_total}" ] && printf "\n"
   fi
 }
@@ -520,7 +520,7 @@ rollback() {
 
   say_info "Restoring from backup: $1"
   command find "${_restore_dir}" -type f | while read -r file; do
-    relative_path="${file#${_restore_dir}/}"
+    relative_path="${file#"${_restore_dir}"/}"
     target_path="${_user_home}/${relative_path}"
     if [ -L "${target_path}" ]; then
       command rm -f "${target_path}"
