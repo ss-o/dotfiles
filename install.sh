@@ -26,7 +26,7 @@ handle_error() {
 
   say_err "Error: ${_error_msg} (command: ${_error_cmd}, line: ${_error_line}, exit code: ${_exit_code})"
   # Optionally log to file
-  say_log "ERROR: ${_error_msg} (command: ${_error_cmd}, line: ${_error_line}, exit code: ${_exit_code})" >> "${_logfile}"
+  say_log "ERROR: ${_error_msg} (command: ${_error_cmd}, line: ${_error_line}, exit code: ${_exit_code})" >>"${_logfile}"
 
   # Option to continue despite errors
   if [ "${_continue_on_error:-false}" = "true" ]; then
@@ -371,7 +371,7 @@ _read() {
   shift
   src_file="${input%%:*}"
   dst_file="${input#*:}"
-  [ "$src_file" = "$input" ] && dst_file=""  # No colon found
+  [ "$src_file" = "$input" ] && dst_file="" # No colon found
 
   if [ -z "${src_file}" ]; then
     say_err "Invalid source file: ${src_file}"
@@ -407,8 +407,8 @@ _show_progress() {
   if [ "${_is_quiet}" = "false" ] && [ -t 1 ]; then
     _current=$1
     _total=$2
-    _percent=$(( (_current * 100) / _total ))
-    _progress=$(( _percent / 2 ))
+    _percent=$(((_current * 100) / _total))
+    _progress=$((_percent / 2))
 
     printf "\r[%-50s] %d%%" "$(printf '%0.s#' $(seq 1 $_progress))" "${_percent}"
     [ "${_current}" -eq "${_total}" ] && printf "\n"
@@ -430,7 +430,7 @@ dosync() {
   _total_files=$(echo "${_files_src}" | wc -l)
   _current_file=0
   printf '%s\n' "${_files_src}" | while IFS= read -r file; do
-    _current_file=$(( _current_file + 1 ))
+    _current_file=$((_current_file + 1))
     _show_progress "${_current_file}" "${_total_files}"
     _read "${file}"
     if [ -L "${_sync_target}" ]; then
@@ -542,7 +542,7 @@ _do_options() {
 }
 
 usage() {
-  cat << EOF
+  cat <<EOF
 Usage: $0 [options] [command]
 
 Options:
@@ -568,10 +568,10 @@ main() {
 
   while getopts ":qdc:" opt; do
     case "${opt}" in
-      q) _is_quiet=true ;;
-      d) _is_dry_run=true ;;
-      c) _cmd_="${OPTARG}" ;;
-      *) usage ;;
+    q) _is_quiet=true ;;
+    d) _is_dry_run=true ;;
+    c) _cmd_="${OPTARG}" ;;
+    *) usage ;;
     esac
   done
   shift $((OPTIND - 1))

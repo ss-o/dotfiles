@@ -2,11 +2,11 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.12
+  version: 1.22.15
 plugins:
   sources:
     - id: configs
-      ref: v1.0.11
+      ref: v1.0.12
       uri: https://github.com/trunk-io/configs
     - id: trunk
       ref: v1.6.8
@@ -33,7 +33,7 @@ lint:
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.9.3
-    - yamllint@1.37.0
+    - yamllint@1.37.1
 actions:
   enabled:
     - trunk-announce
@@ -43,4 +43,4 @@ actions:
 tools:
   enabled:
     - action-validator@0.6.0
-    - gh@2.70.0
+    - gh@2.72.0
