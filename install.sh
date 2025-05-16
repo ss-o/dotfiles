@@ -579,7 +579,7 @@ main() {
   # If command wasn't specified with -c, use first argument
   [ -z "${_cmd_}" ] && [ $# -gt 0 ] && _cmd_="$1"
 
-  _do_options
+  _do_options "$@"
   return $?
 }
 
