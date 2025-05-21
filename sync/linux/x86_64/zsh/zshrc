@@ -40,6 +40,7 @@ fi
 }; @init; unset -f @init
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)
+
 # DEVOPS ============================================================================================================ #
 zi is-snippet for \
   id-as'gcloud-completion' \

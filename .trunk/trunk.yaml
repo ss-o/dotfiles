@@ -28,7 +28,7 @@ lint:
   enabled:
     - actionlint@1.7.7
     - git-diff-check
-    - markdownlint@0.44.0
+    - markdownlint@0.45.0
     - prettier@3.5.3
     - shellcheck@0.10.0
     - shfmt@3.6.0
@@ -43,4 +43,4 @@ actions:
 tools:
   enabled:
     - action-validator@0.6.0
-    - gh@2.72.0
+    - gh@2.73.0
