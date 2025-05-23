@@ -16,10 +16,9 @@
 	gpgsign = true
 
 [credential]
-	credentialStore = gpg
-	helper =
-# /usr/lib/git-core/git-credential-libsecret
-	helper = !/usr/bin/gh auth git-credential
+        credentialStore = gpg
+        helper = /usr/lib/git-core/git-credential-libsecret
+
 [credential "https://github.com"]
 	helper =
 	helper = !/usr/bin/gh auth git-credential
