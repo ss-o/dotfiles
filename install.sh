@@ -6,14 +6,15 @@
 # cleanup: Perform cleanup operations before script exit
 #
 # Arguments: None
-# Returns: None
+# Returns: 0
 # ----------------------------------------------------------------------------
 cleanup() {
   # Cleanup temporary files and restore state if needed
-  say_info "Cleaning up and exiting..."
+  say_info "Cleaning up..."
+  return 0
 }
 
-trap 'cleanup; exit 1' INT QUIT TERM
+trap 'cleanup' INT QUIT TERM
 
 # ----------------------------------------------------------------------------
 # handle_error: Enhanced error handling with detailed reporting and logging
@@ -39,7 +40,7 @@ handle_error() {
     say_warn "Continuing despite error..."
     return "${_exit_code}"
   else
-    exit "${_exit_code}"
+    return "${_exit_code}"
   fi
 }
 
@@ -50,7 +51,6 @@ dosync_dir="$(command cd -P -- "$(dirname -- "$(command -v -- "$0" || true)")" &
 [[ -z ${_user_home} ]] && _user_home="${HOME}"
 
 _time_stamp=$(date +%Y-%m-%d_%H-%M-%S)
-
 _backup_dir="${_user_home}/.backup/${_time_stamp}"
 _logfile="${_user_home}/.backup/${_time_stamp}/install.log"
 _user_home_config="${_user_home}/.config"
@@ -60,7 +60,7 @@ _sync_file="${sync_dir}/sync.config"
 _git_opt="-q"
 _git_sub="-q"
 _git_sub_opt="-q"
-_required_cmds="zsh git grep find ln mkdir" # Remove placeholders, add actual requirements
+_required_cmds="zsh git grep find ln mkdir"
 _supported_os="linux darwin"
 _supported_cpu="x86_64 aarch64"
 
@@ -75,12 +75,14 @@ info_block() {
   # Don't print anything if we're in quiet mode
   [[ ${_is_quiet} == "true" ]] && return 0
   printf '\033[1;46m%-*s\033[0m\n' "${COLUMNS:-$(tput cols || true)}" "▓▒░ ★ » $1" | tr ' ' ' '
+  return 0
 }
 
 note_block() {
   # Don't print anything if we're in quiet mode
   [[ ${_is_quiet} == "true" ]] && return 0
   printf '\033[1;42m%-*s\033[0m\n' "${COLUMNS:-$(tput cols || true)}" "▓▒░ ★ » $1" | tr ' ' ' '
+  return 0
 }
 
 say() {
@@ -116,7 +118,7 @@ say() {
 
 err() {
   say -red "$1" >&2
-  exit 1
+  return 1
 }
 
 say_ok() {
@@ -126,7 +128,6 @@ say_ok() {
   printf "\033[34;1m▓▒░\033[32;01m ✔ \033[00m» "
   say -green "$1"
   printf "\033[00m"
-
   return 0
 }
 
@@ -137,7 +138,6 @@ say_info() {
   printf "\033[34;1m▓▒░\033[35;01m ❢ \033[00m» "
   say -magenta "$1"
   printf "\033[00m"
-
   return 0
 }
 
@@ -148,13 +148,14 @@ say_warn() {
   printf "\033[34;1m▓▒░\033[33;01m ❢ \033[00m» "
   say -yellow "$1"
   printf "\033[00m"
+  return 0
 }
 
 say_err() {
   printf "\033[34;01m▓▒░\033[31;01m ✘ \033[00m» "
   say -red "$1" >&2
   printf "\033[00m"
-  exit 1
+  return 1
 }
 
 # ----------------------------------------------------------------------------
@@ -318,7 +319,6 @@ _check_deps() {
       say_err "Missing required dependency: ${deps}"
     }
   done
-
   return 0
 }
 
@@ -453,12 +453,7 @@ _create_sync_location() {
 # Returns: None, sets _files_src global variable
 # ----------------------------------------------------------------------------
 _parse_config() {
-  if command -v yq >/dev/null 2>&1; then
-    _files_src=$(yq e '.files[] | .src + ":" + .dest' "${sync_dir}/sync.yaml")
-  else
-    # Updated to match the approach in dosync_tag
-    _files_src="$(sed -n '/^\[files\]/,/^\[/p' "${_sync_file}" | grep -v '^\[' | grep -v '^#' | grep -v '^$' | sort -u)"
-  fi
+  _files_src="$(sed -n '/^\[files\]/,/^\[/p' "${_sync_file}" | grep -v '^\[' | grep -v '^#' | grep -v '^$' | sort -u)"
 }
 
 # ----------------------------------------------------------------------------
@@ -580,7 +575,7 @@ _perform_sync() {
   # Process each file
   printf '%s\n' "${_files_to_sync}" | while IFS= read -r file; do
     _current_file=$((_current_file + 1))
-    _show_progress "${_current_file}" "${_total_files}"
+    #_show_progress "${_current_file}" "${_total_files}"
     _read "${file}"
 
     if [[ -L ${_sync_target} ]]; then
@@ -791,7 +786,7 @@ Commands:
   sync-all-tags Sync all tagged dotfiles
 
 EOF
-  exit 1
+  return 0
 }
 
 # ----------------------------------------------------------------------------
@@ -808,7 +803,7 @@ main() {
   _is_dry_run=false
 
   # Check dependencies early
-  _check_deps || exit 1
+  _check_deps || return 1
 
   # If no arguments are given, run sync by default
   [[ $# -eq 0 ]] && set -- "sync"
