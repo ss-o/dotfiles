@@ -55,9 +55,10 @@ if [ $? -eq 0 ]; then
   # To check if actual changes occurred:
   if cmp -s "${filename}" "${filename}.bak"; then
     echo "Note: No occurrences of '${old_text}' were found, so the file content remains unchanged."
-    # Optionally remove the identical backup
-    # rm "${filename}.bak"
-    # echo "Identical backup ${filename}.bak removed."
+    if [ "${remove_identical_backups}" = "true" ]; then
+      rm "${filename}.bak"
+      echo "Identical backup ${filename}.bak removed."
+    fi
   else
     echo "File has been modified."
   fi
