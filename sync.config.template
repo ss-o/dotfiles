@@ -1,9 +1,70 @@
-[files][endfiles]
+# sync.config - Configuration file for dotfiles synchronization
+#
+# Format:
+# [files]          - Default section for basic dotfiles
+# [files:tagname]  - Tagged section for selective sync with 'sync-tag tagname'
+# source:destination - Each line specifies source file and destination
+#   source        - Path relative to sync/ directory
+#   destination   - Path relative to user's home directory (optional)
+#                   If omitted, defaults to .filename in home directory
+#
+# Notes:
+# - Platform-specific files in sync/os/arch/ are used when available
+# - Comments start with '#'
+# - Empty lines are ignored
 
-# --- ⸨ INFO ⸩
+# =============================================================================
+# Default dotfiles (sync with ./install.sh or ./install.sh sync)
+# =============================================================================
+[files]
+# Shell configuration
+zsh/zshrc:.zshrc
+zsh/zshenv:.zshenv
+bash/bashrc:.bashrc
+bash/bash_profile:.bash_profile
 
-# Source file path in dotfiles and destination in user home.
+# Editor configuration
+vim/vimrc:.vimrc
+vim/vim:.vim
+neovim/init.vim:.config/nvim/init.vim
 
-# source_file/path:destination_file/path
+# Git configuration
+git/gitconfig:.gitconfig
+git/gitignore_global:.gitignore_global
 
-# If destination_file not specified, then .source_file will be used by default.
+# Terminal configuration
+tmux/tmux.conf:.tmux.conf
+alacritty/alacritty.yml:.config/alacritty/alacritty.yml
+
+# =============================================================================
+# Development tools (sync with ./install.sh sync-tag dev)
+# =============================================================================
+[files:dev]
+vscode/settings.json:.config/Code/User/settings.json
+vscode/keybindings.json:.config/Code/User/keybindings.json
+nvim/init.lua:.config/nvim/init.lua
+nvim/lua:.config/nvim/lua
+
+# =============================================================================
+# Desktop environment (sync with ./install.sh sync-tag desktop)
+# =============================================================================
+[files:desktop]
+i3/config:.config/i3/config
+polybar/config:.config/polybar/config
+dunst/dunstrc:.config/dunst/dunstrc
+rofi/config.rasi:.config/rofi/config.rasi
+
+# =============================================================================
+# Productivity tools (sync with ./install.sh sync-tag productivity)
+# =============================================================================
+[files:productivity]
+taskwarrior/taskrc:.taskrc
+timewarrior/timewarrior.cfg:.timewarrior/timewarrior.cfg
+
+# =============================================================================
+# Server configuration (sync with ./install.sh sync-tag server)
+# =============================================================================
+[files:server]
+ssh/config:.ssh/config
+screen/screenrc:.screenrc
+mosh/mosh.config:.config/mosh/config

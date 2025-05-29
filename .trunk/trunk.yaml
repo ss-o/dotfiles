@@ -2,14 +2,14 @@
 # To learn more about the format of this file, see https://docs.trunk.io/reference/trunk-yaml
 version: 0.1
 cli:
-  version: 1.22.11
+  version: 1.24.0
 plugins:
   sources:
     - id: configs
-      ref: v1.0.10
+      ref: v1.1.0
       uri: https://github.com/trunk-io/configs
     - id: trunk
-      ref: v1.6.7
+      ref: v1.7.0
       uri: https://github.com/trunk-io/plugins
       import_to_global: true
 
@@ -17,7 +17,7 @@ plugins:
 runtimes:
   enabled:
     - go@1.21.0
-    - node@18.20.5
+    - node@22.16.0
     - python@3.10.8
 # This is the section where you manage your linters. (https://docs.trunk.io/check/configuration)
 lint:
@@ -28,12 +28,12 @@ lint:
   enabled:
     - actionlint@1.7.7
     - git-diff-check
-    - markdownlint@0.44.0
+    - markdownlint@0.45.0
     - prettier@3.5.3
     - shellcheck@0.10.0
     - shfmt@3.6.0
     - taplo@0.9.3
-    - yamllint@1.36.2
+    - yamllint@1.37.1
 actions:
   enabled:
     - trunk-announce
@@ -43,4 +43,4 @@ actions:
 tools:
   enabled:
     - action-validator@0.6.0
-    - gh@2.69.0
+    - gh@2.73.0
