@@ -23,20 +23,23 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 typeset -gA DOTFILES
 DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
 DOTFILES[ZSH_SNIPPETS]="${DOTFILES[ZSH]}/snippets"
+DOTFILES[ZSH_FUNCTIONS]="${DOTFILES[ZSH]}/functions"
+DOTFILES[ZSH_COMPLETIONS]="${DOTFILES[ZSH]}/completions"
 
 # ⸨ Functions ⸩
-if [[ -z ${fpath[(re)${DOTFILES[ZSH]/functions}]} ]]; then
+if [[ -z ${fpath[(re)${DOTFILES[ZSH_FUNCTIONS]}]} ]]; then
   typeset -gxU fpath FPATH
-  fpath=( "${DOTFILES[ZSH]}/functions" "${fpath[@]}" )
+  fpath=( "${DOTFILES[ZSH_FUNCTIONS]}" "${fpath[@]}" )
 fi
 
 # ⸨ Initiate ⸩
 @init(){
-  setopt typeset_silent; typeset _init_1 _init_2 _init_3
+  setopt typeset_silent; typeset _init_1 _init_2 _init_3 _init_4
   zstyle ':zi:plugins:ssh-agent' quiet yes
-  for _init_1 in ${DOTFILES[ZSH]}/functions/*; do autoload -Uz "${_init_1:t}"; done
-  for _init_2 in ${DOTFILES[ZSH_SNIPPETS]}/loaded/*.zsh; do source "$_init_2"; done
-  for _init_3 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source "$_init_3"; done
+  for _init_1 in ${DOTFILES[ZSH_FUNCTIONS]}/*; do autoload -Uz "${_init_1:t}"; done
+  for _init_2 in ${DOTFILES[ZSH_COMPLETIONS]}/*; do ln -sf "${_init_2}" "${HOME}/.zi/completions/"; done
+  for _init_3 in ${DOTFILES[ZSH_SNIPPETS]}/loaded/*.zsh; do source "$_init_3"; done
+  for _init_4 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source "$_init_4"; done
 }; @init; unset -f @init
 
 typeset -gx EDITOR=$(set-cmd vim micro nano)

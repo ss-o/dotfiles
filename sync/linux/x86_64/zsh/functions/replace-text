@@ -1,0 +1,70 @@
+#!/usr/bin/env zsh
+
+replace-text() {
+local old_text="$1"
+local new_text="$2"
+local filename="$3"
+
+# --- Input Validation ---
+if [ "$#" -ne 3 ]; then
+  echo "Usage: $0 <old_text> <new_text> <filename>"
+  echo "Example: $0 'some/text' 'new text' 'myfile.txt'"
+  return 1
+fi
+
+if [ ! -f "${filename}" ]; then
+  echo "Error: File '${filename}' not found."
+  return 1
+fi
+
+# --- Escape old_text for sed (to treat as literal regex) ---
+# Order matters: escape backslash first, then other special characters.
+local old_text_escaped
+old_text_escaped=$(printf '%s' "${old_text}" |
+  sed -e 's/\\/\\\\/g' \
+    -e 's/\//\\\//g' \
+    -e 's/\./\\\./g' \
+    -e 's/\*/\\\*/g' \
+    -e 's/\^/\\\^/g' \
+    -e 's/\$/\\\$/g' \
+    -e 's/\[/\\[/g' \
+    -e 's/\]/\\]/g')
+
+# --- Escape new_text for sed (for literal replacement) ---
+# Order matters: escape backslash first, then & and delimiter /.
+local new_text_escaped
+new_text_escaped=$(printf '%s' "${new_text}" |
+  sed -e 's/\\/\\\\/g' \
+    -e 's/\//\\\//g' \
+    -e 's/&/\\&/g')
+
+# --- Perform the replacement using sed ---
+# The -i.bak option creates a backup with the .bak extension.
+# If you are on macOS/BSD, sed -i requires an extension.
+# GNU sed allows -i without an extension for no backup.
+# Using -i.bak is generally safer and more portable for this behavior.
+echo "Attempting to replace '${old_text}' with '${new_text}' in '${filename}'..."
+echo "A backup of the original file will be created as '${filename}.bak'."
+
+sed -i.bak "s/${old_text_escaped}/${new_text_escaped}/g" "${filename}"
+
+if [ $? -eq 0 ]; then
+  echo "Replacement successful."
+  # You can check if changes were made by comparing the file with its backup, e.g., using `cmp` or `diff`,
+  # but sed will return 0 even if no patterns were matched and thus no changes were made.
+  # To check if actual changes occurred:
+  if cmp -s "${filename}" "${filename}.bak"; then
+    echo "Note: No occurrences of '${old_text}' were found, so the file content remains unchanged."
+    # Optionally remove the identical backup
+    # rm "${filename}.bak"
+    # echo "Identical backup ${filename}.bak removed."
+  else
+    echo "File has been modified."
+  fi
+else
+  echo "Error: sed command failed. Replacement may not have occurred."
+  return 1
+fi
+}
+
+replace-text "$@"
