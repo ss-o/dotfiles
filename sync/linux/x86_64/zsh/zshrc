@@ -1,12 +1,15 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
 #
-# ⸨ Zsh ⸩
+# ⸨ Powerlevel10k ⸩
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
 fi
 
-(){ source "${HOME}/.config/zi/init.zsh"; zzinit; }
+# ⸨ Zi ⸩
+source "${HOME}/.config/zi/init.zsh"; zzinit
+# ⸨ Dotfiles ZSH plugin ⸩
+source "${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh/dotfiles-zsh.plugin.zsh"
 
 # ⸨ History ⸩
 COMPLETION_WAITING_DOTS=1
@@ -16,32 +19,9 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 [[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
 [[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
 
-# ⸨ LS COLORS ⸩
+
+# ⸨ ENV ⸩
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
-
-# ⸨ Dotfiles ⸩
-typeset -gA DOTFILES
-DOTFILES[ZSH]="${HOME}/.dotfiles/sync/linux/${CPUTYPE}/zsh"
-DOTFILES[ZSH_SNIPPETS]="${DOTFILES[ZSH]}/snippets"
-DOTFILES[ZSH_FUNCTIONS]="${DOTFILES[ZSH]}/functions"
-DOTFILES[ZSH_COMPLETIONS]="${DOTFILES[ZSH]}/completions"
-
-# ⸨ Functions ⸩
-if [[ -z ${fpath[(re)${DOTFILES[ZSH_FUNCTIONS]}]} ]]; then
-  typeset -gxU fpath FPATH
-  fpath=( "${DOTFILES[ZSH_FUNCTIONS]}" "${fpath[@]}" )
-fi
-
-# ⸨ Initiate ⸩
-@init(){
-  setopt typeset_silent; typeset _init_1 _init_2 _init_3 _init_4
-  zstyle ':zi:plugins:ssh-agent' quiet yes
-  for _init_1 in ${DOTFILES[ZSH_FUNCTIONS]}/*; do autoload -Uz "${_init_1:t}"; done
-  for _init_2 in ${DOTFILES[ZSH_COMPLETIONS]}/*; do ln -sf "${_init_2}" "${HOME}/.zi/completions/"; done
-  for _init_3 in ${DOTFILES[ZSH_SNIPPETS]}/loaded/*.zsh; do source "$_init_3"; done
-  for _init_4 in ${DOTFILES[ZSH]}/aliases/user/*.zsh; do source "$_init_4"; done
-}; @init; unset -f @init
-
 typeset -gx EDITOR=$(set-cmd vim micro nano)
 
 # DEVOPS ============================================================================================================ #
@@ -70,11 +50,9 @@ zi-turbo '0a' light-mode for \
     atload"unalias grv g" OMZP::git \
     if'[[ -d ~/.gnupg ]]' OMZP::gpg-agent
 # PLUGINS ============================================================================================================ #
-zi-turbo '0a' for \
+zi-turbo '0b' for \
   binary sbin'bin/*' \
     z-shell/nb \
-  binary from"gh-r" sbin \
-    ajeetdsouza/zoxide \
   has'zoxide' \
     z-shell/zsh-zoxide \
   has'lsd' atinit'AUTOCD=1' \
