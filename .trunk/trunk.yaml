@@ -43,4 +43,4 @@ actions:
 tools:
   enabled:
     - action-validator@0.6.0
-    - gh@2.73.0
+    - gh@2.74.1
