@@ -16,8 +16,8 @@
 	gpgsign = true
 
 [credential]
-        credentialStore = gpg
-        helper = /usr/lib/git-core/git-credential-libsecret
+	credentialStore = gpg
+	helper = /usr/lib/git-core/git-credential-libsecret
 
 [credential "https://github.com"]
 	helper =
@@ -32,14 +32,10 @@
 [core]
 	editor = micro
  	filemode = true
-	pager = diff-so-fancy | less --tabs=4 -RFX
-	commitGraph = true
+ 	commitGraph = true
 
-[diff-so-fancy]
-	first-run = false
-
-[interactive]
-	diffFilter = diff-so-fancy --patch
+#[interactive]
+#	diffFilter = diff-so-fancy --patch
 
 [color]
 	branch = auto

@@ -1,6 +1,6 @@
 # -*- mode: zsh; sh-indentation: 2; indent-tabs-mode: nil; sh-basic-offset: 2; -*-
 # vim: ft=zsh sw=2 ts=2 et
-#
+
 # ⸨ Powerlevel10k ⸩
 if [[ -r "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh" ]]; then
   source "${XDG_CACHE_HOME:-$HOME/.cache}/p10k-instant-prompt-${(%):-%n}.zsh"
@@ -19,10 +19,9 @@ HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
 [[ -e $HISTFILE ]] || { command mkdir -p ${HISTFILE:h}; command touch $HISTFILE; }
 [[ -w $HISTFILE ]] && typeset -gx SAVEHIST=440000 HISTSIZE=441000 HISTFILE
 
-
 # ⸨ ENV ⸩
 (( $+commands[vivid] )) && { typeset -gx LS_COLORS="$(vivid generate molokai)" 2> /dev/null; }
-typeset -gx EDITOR=$(set-cmd vim micro nano)
+(( $+functions[set-cmd] )) && { typeset -gx EDITOR="$(set-cmd vim micro nano)" 2> /dev/null; }
 
 # DEVOPS ============================================================================================================ #
 zi is-snippet for \

@@ -14,17 +14,21 @@ DOTFILES[ZSH_SNIPPETS]="${0:h}/snippets"
 DOTFILES[ZSH_FUNCTIONS]="${0:h}/functions"
 DOTFILES[ZSH_COMPLETIONS]="${0:h}/completions"
 
-# https://wiki.zshell.dev/community/zsh_plugin_standard#funtions-directory
-if [[ $PMSPEC != *f* ]]; then
-  fpath+=( "${DOTFILES[ZSH_FUNCTIONS]}" )
+if [[ -z ${fpath[(re)${DOTFILES[ZSH_FUNCTIONS]}]} ]]; then
+  typeset -gxU fpath FPATH
+  fpath=( "${DOTFILES[ZSH_FUNCTIONS]}" "${fpath[@]}" )
 fi
 
 # ⸨ Initiate ⸩
 @init(){
-  setopt typeset_silent; typeset _init_1 _init_2 _init_3 _init_4
+  setopt typeset_silent
+  typeset -aU _init_1 _init_2 _init_3 _init_4
   zstyle ':zi:plugins:ssh-agent' quiet yes
+
   for _init_1 in ${DOTFILES[ZSH_FUNCTIONS]}/*; do autoload -Uz "${_init_1:t}"; done
   for _init_2 in ${DOTFILES[ZSH_COMPLETIONS]}/*; do ln -sf "${_init_2}" "${HOME}/.zi/completions/"; done
   for _init_3 in ${DOTFILES[ZSH_SNIPPETS]}/loaded/*.zsh; do source "$_init_3"; done
   for _init_4 in ${DOTFILES[ZSH_ALIASES]}/user/*.zsh; do source "$_init_4"; done
-}; @init; unset -f @init
+}
+
+@init; unset -f @init
